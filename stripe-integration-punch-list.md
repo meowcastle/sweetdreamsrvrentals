@@ -22,6 +22,25 @@ Stripe calls, and accounts for hosting on your Synology NAS.
   - Alternative: DDNS through Synology plus router port forwarding for 443, with DSM's
     reverse proxy terminating TLS. Works, but more surface area and no buffer if the
     NAS goes offline mid-charge cycle.
+- **`sweetdreamsrvrentals.com` is live right now and must stay untouched until go-live.**
+  It's registered at GoDaddy, but nameservers currently point at Wix
+  (`NS2.WIXDNS.NET` / `NS3.WIXDNS.NET`), and it's serving a live Wix site plus real
+  Google Workspace email for `info@sweetdreamsrvrentals.com` (MX to
+  `aspmx.l.google.com` and friends, plus an SPF TXT record and a
+  `google-site-verification` TXT record). Putting the app on a Cloudflare Tunnel means
+  eventually pointing this domain's nameservers at Cloudflare, which replaces the whole
+  DNS zone at once, not just one record, so it would take the Wix site down and can
+  break that email if the MX/SPF/TXT records aren't recreated first.
+  - For all development and testing (build order steps 4 through 15), use Cloudflare's
+    free Quick Tunnel instead: `cloudflared tunnel --url http://localhost:3000` hands
+    back an ephemeral `https://<random-words>.trycloudflare.com` URL. No domain, no
+    DNS change, no Cloudflare account even required, and it cannot affect the live site
+    or email in any way. Point Stripe's test-mode webhook at that URL, and re-register
+    it each time the tunnel restarts (the hostname isn't stable).
+  - The real nameserver cutover to Cloudflare, and the permanent named Tunnel + DNS
+    route that goes with it, only happens once, deliberately, right before go-live
+    (build order step 16), with the existing MX/SPF/TXT records verified to carry over
+    first.
 - Back up the Postgres volume with Hyper Backup. This is now financial data, not a demo
   seed array, so it needs a real backup plan, not just RAID.
 
@@ -49,8 +68,11 @@ the Playwright suite, but production reads should come from the database, not th
 - Create the Stripe account, grab test-mode keys.
 - Enable Apple Pay, Google Pay, and Klarna in the Dashboard (the checkout copy already
   promises these, so this just has to be flipped on, no code change needed).
-- Register a webhook endpoint in the Dashboard pointing at
-  `https://yourdomain.com/api/webhooks/stripe`, and save the signing secret.
+- Register a webhook endpoint in the Dashboard. During development this points at the
+  Quick Tunnel URL from Section 1 (`https://<random-words>.trycloudflare.com/api/webhooks/stripe`),
+  not the real domain, since the real domain's DNS doesn't move until step 16. Save the
+  signing secret, and swap the endpoint URL to the permanent domain once the nameserver
+  cutover happens.
 
 ## 4. Mapping the existing stubs to real Stripe calls
 
@@ -121,14 +143,16 @@ anything in section 4 goes live, not after.
    writing to `localStorage`, served in dev by a plain `python3 -m http.server`. This
    step has to exist before step 2 has anything to put in a container.
 2. Docker Compose on the Synology: Node app + Postgres, via Container Manager
-3. Domain, Cloudflare Tunnel (or DDNS + reverse proxy), Let's Encrypt cert
+3. Cloudflare Quick Tunnel for development (`cloudflared tunnel --url http://localhost:3000`).
+   No domain, no DNS change, no risk to the live Wix site or its Google Workspace email.
+   This is what steps 7 through 15 test against.
 4. Real admin auth: server-side password check plus session token, replacing the
    client-side `sd_admin_session` flag
 5. Migrate the three localStorage shapes to Postgres tables
 6. Back up the Postgres volume with Hyper Backup, configured before any real booking
    or payment data lands in it, not after
 7. Stripe test-mode account: grab keys, enable Apple Pay/Google Pay/Klarna in the
-   Dashboard, register the webhook endpoint
+   Dashboard, register the webhook endpoint against the Quick Tunnel URL from step 3
 8. `POST /api/create-checkout-session`, wire up `CHECKOUT_ENDPOINT`
 9. Rate-limit the public endpoints (`create-checkout-session`, the webhook route)
    now that they're reachable from the open internet via the tunnel from step 3
@@ -140,10 +164,29 @@ anything in section 4 goes live, not after.
 14. Wire up `NOTIFY_ENDPOINT`
 15. Point the existing Playwright chaos suite at the real backend instead of localStorage,
     confirm the same invariants (no double-booked trailers, no out-of-range stays) still hold
-16. Switch Stripe to live keys and go live
+16. Domain cutover, done once and deliberately, only when the build is fully tested and
+    ready to replace the Wix site:
+    - Add `sweetdreamsrvrentals.com` as a zone in Cloudflare and let it scan existing
+      DNS. Before doing anything else, verify the scan captured the MX records
+      (`aspmx.l.google.com` and its four alternates), the `v=spf1 include:_spf.google.com`
+      TXT record, and the `google-site-verification` TXT record exactly. Add any it missed
+      by hand.
+    - Create a persistent named Tunnel (replacing the dev Quick Tunnel) and a DNS route
+      for the production hostname, pointing at the app container.
+    - Only then update nameservers at GoDaddy from Wix's to Cloudflare's. Confirm
+      propagation, confirm the site resolves, and confirm `info@sweetdreamsrvrentals.com`
+      still sends and receives before anything else proceeds.
+    - Re-register the Stripe webhook endpoint against the permanent domain, replacing
+      the Quick Tunnel URL from step 7.
+17. Switch Stripe to live keys and go live
 
 ## 6. Notes for Claude Code
 
+- **Do not touch DNS, nameservers, or anything else for `sweetdreamsrvrentals.com` before
+  step 16.** It's a live production domain right now: a live Wix site, and real Google
+  Workspace email for `info@sweetdreamsrvrentals.com`. If any step looks like it would
+  touch that domain's DNS, its registrar, or its live site before the build is fully
+  tested and ready to replace it, stop and flag it before proceeding, don't just do it.
 - The secret key must live in the backend's environment only. It already never touches
   the `.dc.html` files, which is correct, keep it that way.
 - Test with Stripe's test cards, including ones that force a 3D Secure challenge and ones
