@@ -13,3 +13,6 @@ tests/.cache/
 # future backend
 dist/
 *.log
+
+# docker-compose local Postgres bind mount (see DATA_DIR in .env.example)
+/data/
