@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Brings up the app + Postgres stack and exposes it via a Cloudflare Quick
-# Tunnel for local Stripe webhook testing. No domain, no DNS change, no
-# Cloudflare account, no risk to sweetdreamsrvrentals.com (see punch list
-# Section 1). The printed https://*.trycloudflare.com URL is ephemeral and
-# changes every run, so re-register it as the Stripe webhook endpoint
-# (Dashboard > Developers > Webhooks) each time this restarts.
+# Brings up the app + Postgres stack, serves the static site same-origin
+# with the API (see dev-server.js - the site's fetch('/api/...') calls need
+# that), and exposes the whole thing via a Cloudflare Quick Tunnel. No
+# domain, no DNS change, no Cloudflare account, no risk to
+# sweetdreamsrvrentals.com (see punch list Section 1). The printed
+# https://*.trycloudflare.com URL is ephemeral and changes every run, so
+# re-register it as the Stripe webhook endpoint (Dashboard > Developers >
+# Webhooks) each time this restarts.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -13,5 +15,12 @@ docker compose up -d --build
 echo "Waiting for app health check..."
 until curl -sf http://127.0.0.1:3000/api/health > /dev/null; do sleep 1; done
 
-echo "App healthy. Starting Cloudflare Quick Tunnel..."
-exec cloudflared tunnel --url http://localhost:3000
+echo "App healthy. Starting the dev server..."
+node scripts/dev-server.js &
+DEV_SERVER_PID=$!
+trap "kill $DEV_SERVER_PID 2>/dev/null" EXIT
+
+until curl -sf http://127.0.0.1:4321/api/health > /dev/null; do sleep 1; done
+
+echo "Dev server up. Starting Cloudflare Quick Tunnel..."
+cloudflared tunnel --url http://localhost:4321
