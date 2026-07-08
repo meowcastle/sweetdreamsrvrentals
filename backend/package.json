@@ -1,0 +1,20 @@
+{
+  "name": "sweetdreamsrvrentals-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node/Express backend for Sweet Dreams RV Rentals: booking API, Stripe integration, admin auth.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "stripe": "^16.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
