@@ -36,10 +36,12 @@
         </label>
         <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
           <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Password</span>
-          <input type="password" placeholder="••••••••" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+          <input type="password" value="{{ loginPassword }}" onChange="{{ onLoginPassword }}" placeholder="••••••••" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
         </label>
-        <button onClick="{{ signIn }}" style="width:100%;margin-top:20px;padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Sign in</button>
-        <p style="margin:14px 0 0;text-align:center;font-size:11.5px;color:oklch(0.58 0.015 275);">Demo · any credentials sign in</p>
+        <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;padding:11px 13px;border-radius:12px;background:oklch(0.62 0.16 25 / 0.14);border:1px solid oklch(0.66 0.16 25 / 0.4);font-size:12.5px;color:oklch(0.86 0.09 30);">{{ loginErrorText }}</div>
+        </sc-if>
+        <button onClick="{{ signIn }}" style="width:100%;margin-top:20px;padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">{{ signInLabel }}</button>
       </div>
     </div>
   </sc-if>
@@ -891,7 +893,10 @@
 class Component extends DCLogic {
   // Merge saved delivered/returned/cancelled overrides into the INITIAL state so
   // they're present on the very first render (not applied a frame later via setState).
-  state = { authed: (function () { try { return localStorage.getItem('sd_admin_session') === '1'; } catch (e) { return false; } })(), loginEmail: '', sel: null,
+  // authed starts false and is confirmed by the server in componentDidMount:
+  // a real session lives in an httpOnly cookie, which client JS can't read,
+  // so there's no way to know it's valid without asking the backend first.
+  state = { authed: false, loginEmail: '', loginPassword: '', loginError: null, loginBusy: false, sel: null,
     status: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({ w02: 'out', w07: 'out' }, s.status || {}); } catch (e) { return { w02: 'out', w07: 'out' }; } })(),
     cancelled: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.cancelled || {}); } catch (e) { return {}; } })(),
     charges: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.charges || {}); } catch (e) { return {}; } })(),
@@ -944,6 +949,10 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     this.loadWebBookings();
+    fetch('/api/admin/session', { credentials: 'include' })
+      .then((res) => res.json())
+      .then((data) => { if (data && data.authed) this.setState({ authed: true }); })
+      .catch(() => {});
     // Deep-link support: ?view=list opens the list tab; ?sel=<id> opens a booking.
     try {
       const params = new URLSearchParams(location.search);
@@ -1561,8 +1570,31 @@ class Component extends DCLogic {
       authed: this.state.authed,
       loginEmail: this.state.loginEmail,
       onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
-      signIn: () => { try { localStorage.setItem('sd_admin_session', '1'); } catch (e) {} this.setState({ authed: true, view: 'calendar' }); },
-      signOut: () => { try { localStorage.removeItem('sd_admin_session'); } catch (e) {} this.setState({ authed: false, sel: null }); },
+      loginPassword: this.state.loginPassword,
+      onLoginPassword: (e) => this.setState({ loginPassword: e.target.value }),
+      loginError: !!this.state.loginError,
+      loginErrorText: this.state.loginError || '',
+      signInLabel: this.state.loginBusy ? 'Signing in…' : 'Sign in',
+      signIn: async () => {
+        if (this.state.loginBusy) return;
+        this.setState({ loginBusy: true, loginError: null });
+        try {
+          const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email: this.state.loginEmail, password: this.state.loginPassword }),
+          });
+          if (!res.ok) throw new Error('invalid credentials');
+          this.setState({ authed: true, loginBusy: false, loginPassword: '', loginError: null, view: 'calendar' });
+        } catch (e) {
+          this.setState({ loginBusy: false, loginError: 'Incorrect email or password.' });
+        }
+      },
+      signOut: () => {
+        fetch('/api/admin/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+        this.setState({ authed: false, sel: null });
+      },
 
       days, rows, stats, deliveries, pickups,
       rangeLabel: monthLabel,

@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 
 const checkoutRoutes = require('./routes/checkout');
 const webhookRoutes = require('./routes/webhooks');
@@ -16,6 +17,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/webhooks', express.raw({ type: 'application/json' }), webhookRoutes);
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api', checkoutRoutes);
 app.use('/api', mailerRoutes);
