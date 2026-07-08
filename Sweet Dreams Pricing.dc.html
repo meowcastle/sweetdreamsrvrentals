@@ -288,16 +288,34 @@ class Component extends DCLogic {
   monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
   state = {
-    authed: (function () { try { return localStorage.getItem('sd_admin_session') === '1'; } catch (e) { return false; } })(), loginEmail: '',
+    // null while the real session check is in flight — the redirect below
+    // must not fire on a stale/default guess, only on a confirmed "no".
+    // !null is true, so renderVals()'s existing "not authed" branch already
+    // covers both "checking" and "genuinely signed out" with the same
+    // portal-redirect message; only a confirmed true flips to the dashboard.
+    authed: null, loginEmail: '',
     cfg: (window.SDPricing ? window.SDPricing.load() : null),
     dirty: false, savedAt: null,
     previewTrailer: 'nola',
   };
 
   componentDidMount() {
-    // Admin stuff is portal-gated: no session here means bounce to the portal to sign in.
-    if (!this.state.authed) { try { location.replace('Sweet Dreams Admin.dc.html'); } catch (e) {} return; }
-    if (!this.state.cfg && window.SDPricing) { this.P = window.SDPricing; this.setState({ cfg: window.SDPricing.load() }); }
+    // Admin stuff is portal-gated: no real session here bounces to the portal.
+    fetch('/api/admin/session', { credentials: 'include' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.authed) {
+          this.setState({ authed: true });
+          if (!this.state.cfg && window.SDPricing) { this.P = window.SDPricing; this.setState({ cfg: window.SDPricing.load() }); }
+        } else {
+          this.setState({ authed: false });
+          try { location.replace('Sweet Dreams Admin.dc.html'); } catch (e) {}
+        }
+      })
+      .catch(() => {
+        this.setState({ authed: false });
+        try { location.replace('Sweet Dreams Admin.dc.html'); } catch (e) {}
+      });
   }
 
   clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -390,7 +408,11 @@ class Component extends DCLogic {
 
     return {
       needsLogin: false, authed: true,
-      signOut: () => { try { localStorage.removeItem('sd_admin_session'); } catch (e) {} try { location.replace('Sweet Dreams Admin.dc.html'); } catch (e) {} this.setState({ authed: false }); },
+      signOut: () => {
+        fetch('/api/admin/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+        try { location.replace('Sweet Dreams Admin.dc.html'); } catch (e) {}
+        this.setState({ authed: false });
+      },
       gridCols: 'minmax(0,1fr) 360px',
 
       trailerRows,

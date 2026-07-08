@@ -891,15 +891,14 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  // Merge saved delivered/returned/cancelled overrides into the INITIAL state so
-  // they're present on the very first render (not applied a frame later via setState).
+  // status/cancelled/charges/refunds now hydrate from the API (see
+  // componentDidMount) instead of localStorage, so they start empty and
+  // fill in a frame later — the same "authed starts false" tradeoff below.
   // authed starts false and is confirmed by the server in componentDidMount:
   // a real session lives in an httpOnly cookie, which client JS can't read,
   // so there's no way to know it's valid without asking the backend first.
   state = { authed: false, loginEmail: '', loginPassword: '', loginError: null, loginBusy: false, sel: null,
-    status: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({ w02: 'out', w07: 'out' }, s.status || {}); } catch (e) { return { w02: 'out', w07: 'out' }; } })(),
-    cancelled: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.cancelled || {}); } catch (e) { return {}; } })(),
-    charges: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.charges || {}); } catch (e) { return {}; } })(),
+    status: {}, cancelled: {}, charges: {}, refunds: {},
     autoOpen: false,
     autoNudge: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.nudge !== false; } catch (e) { return true; } })(),
     nudgeLead: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.lead || 3; } catch (e) { return 3; } })(),
@@ -907,39 +906,29 @@ class Component extends DCLogic {
     retryEvery: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.retryEvery || 2; } catch (e) { return 2; } })(),
     autoRefund: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.refund !== false; } catch (e) { return true; } })(),
     refundLead: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.refundLead || 1; } catch (e) { return 1; } })(),
-    refunds: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.refunds || {}); } catch (e) { return {}; } })(),
-    view: 'calendar', calViewMonth: null, blocks: [], blockOpen: false, payFilter: 'all',
+    view: 'calendar', calViewMonth: null, blockOpen: false, payFilter: 'all',
     bfTrailer: 'marylou', bfDate: '2026-07-07', bfNights: 2, bfReason: 'Maintenance', bfNote: '',
-    phoneBookings: [], cqOpen: false, cqStep: 'build',
+    cqOpen: false, cqStep: 'build',
     cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
     cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
     cqRate: 149, cqDelivery: 0, cqAdjust: 0,
-    cqPayStatus: 'full', cqPayMethod: 'cash', webBookings: [], toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true };
+    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true };
 
-  // ----- Live feed of bookings made on the customer website -----
-  WEB_KEY = 'sd_web_bookings';
-  STATUS_KEY = 'sd_admin_overrides';
-  OCC_KEY = 'sd_occupancy';
-  loadWebBookings = () => {
-    try {
-      const arr = JSON.parse(localStorage.getItem(this.WEB_KEY) || '[]');
-      // Only re-render if the set actually changed, to avoid needless churn.
-      if (JSON.stringify(arr) !== JSON.stringify(this.state.webBookings)) {
-        this.setState({ webBookings: arr });
-      }
-    } catch (e) {}
-  };
-  // Write overrides straight to localStorage inside each handler. componentDidUpdate
-  // is not a reliable persistence hook in this runtime, so we call this explicitly.
+  // Full-sync upsert to the API. Mirrors the old "write the whole blob"
+  // shape exactly (see backend/src/routes/overrides.js) so none of the
+  // dozen call sites below need to change, only the transport.
   persistOverrides(status, cancelled, charges, refunds) {
-    try {
-      localStorage.setItem(this.STATUS_KEY, JSON.stringify({
+    fetch('/api/overrides', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
         status: status || this.state.status,
         cancelled: cancelled || this.state.cancelled,
         charges: charges || this.state.charges,
         refunds: refunds || this.state.refunds,
-      }));
-    } catch (e) {}
+      }),
+    }).catch(() => {});
   }
   persistAutomations(patch) {
     try {
@@ -948,7 +937,6 @@ class Component extends DCLogic {
     } catch (e) {}
   }
   componentDidMount() {
-    this.loadWebBookings();
     fetch('/api/admin/session', { credentials: 'include' })
       .then((res) => res.json())
       .then((data) => { if (data && data.authed) this.setState({ authed: true }); })
@@ -961,12 +949,17 @@ class Component extends DCLogic {
       if (params.get('sel')) patch.sel = params.get('sel');
       if (Object.keys(patch).length) this.setState(patch);
     } catch (e) {}
-    // (Saved overrides are already merged into initial state — see the state initializer.)
-    this._onStorage = (e) => { if (!e || e.key === this.WEB_KEY) this.loadWebBookings(); };
-    window.addEventListener('storage', this._onStorage);
-    window.addEventListener('focus', this._onStorage);
-    // Same-tab writes don't fire 'storage', so poll as a fallback.
-    this._webPoll = setInterval(this.loadWebBookings, 2000);
+    // Bookings and overrides come from the API now (sd-bookings.js), which
+    // polls on its own — just re-render whenever it says something changed,
+    // and kick off the first load for each.
+    this._onBookings = () => this.forceUpdate();
+    this._onOverrides = () => {
+      const ov = window.SDBookings.loadOverrides();
+      this.setState({ status: ov.status, cancelled: ov.cancelled, charges: ov.charges, refunds: ov.refunds });
+    };
+    window.addEventListener('sd-bookings-changed', this._onBookings);
+    window.addEventListener('sd-overrides-changed', this._onOverrides);
+    if (window.SDBookings) { window.SDBookings.loadAll(); window.SDBookings.loadOverrides(); }
     // Roll the calendar over at midnight Pacific: check each minute whether
     // the PST calendar date has advanced, and re-anchor day 0 if so.
     this._dayPoll = setInterval(() => {
@@ -979,17 +972,9 @@ class Component extends DCLogic {
       }
     }, 60000);
   }
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.status !== this.state.status || prevState.cancelled !== this.state.cancelled || prevState.charges !== this.state.charges || prevState.refunds !== this.state.refunds) {
-      try {
-        localStorage.setItem(this.STATUS_KEY, JSON.stringify({ status: this.state.status, cancelled: this.state.cancelled, charges: this.state.charges, refunds: this.state.refunds }));
-      } catch (e) {}
-    }
-  }
   componentWillUnmount() {
-    window.removeEventListener('storage', this._onStorage);
-    window.removeEventListener('focus', this._onStorage);
-    clearInterval(this._webPoll);
+    window.removeEventListener('sd-bookings-changed', this._onBookings);
+    window.removeEventListener('sd-overrides-changed', this._onOverrides);
     if (this._dayPoll) clearInterval(this._dayPoll);
     if (this._toastTimer) clearTimeout(this._toastTimer);
   }
@@ -1013,24 +998,18 @@ class Component extends DCLogic {
     if (this._undoFn) this._undoFn();
     this.dismissToast();
   }
-  // Convert website bookings into the admin's internal booking shape.
-  webMapped() {
-    return (this.state.webBookings || []).map((w) => {
-      const d = w.arrival ? new Date(w.arrival + 'T00:00:00') : null;
-      if (!d || isNaN(d)) return null;
+  // Every booking (web, phone, admin block), from the one shared API list —
+  // this is the single merge point that used to be
+  // SEED.concat(blocks).concat(phoneBookings).concat(webMapped()).
+  // Converts each row's absolute `arrival` date into the day-offset `start`
+  // the calendar/list rendering already expects.
+  combinedBookings() {
+    const list = window.SDBookings ? window.SDBookings.loadAll() : [];
+    return list.map((b) => {
+      const d = new Date(b.arrival + 'T00:00:00');
       const start = Math.round((d.getTime() - this.baseDate.getTime()) / 86400000);
-      return {
-        id: w.id, trailer: w.trailer, start, nights: w.nights,
-        guest: w.guest, phone: w.phone || w.email || 'Online booking',
-        site: w.site, total: w.total, type: 'confirmed',
-        source: 'web', email: w.email,
-        plan: w.paymentPlan || 'full',
-        deposit: (w.deposit != null ? w.deposit : 1000),
-        paidToday: (w.dueToday != null ? w.dueToday : w.total),
-        pay: { status: (w.paymentPlan === 'firstnight' ? 'First night paid' : 'Paid in full'), method: 'Card online' },
-        addons: w.addons,
-      };
-    }).filter(Boolean);
+      return Object.assign({}, b, { start });
+    });
   }
 
   cqAddonsList = [
@@ -1077,8 +1056,6 @@ class Component extends DCLogic {
     billybob: 'oklch(0.66 0.14 115)',
   };
 
-  bookings = (window.SDBookings ? window.SDBookings.SEED : []);
-
   fmt(n) { return '$' + Number(n).toLocaleString('en-US'); }
   navTabStyle(active) {
     return "text-decoration:none;padding:7px 15px;border-radius:9999px;border:none;cursor:pointer;font-weight:600;font-size:12.5px;font-family:'Nunito Sans',sans-serif;" + (active
@@ -1104,7 +1081,7 @@ class Component extends DCLogic {
   // Shared refund action — used by the drawer button and the Deposits tab, after confirm.
   doRefund(id, amount, reason, sendEmail) {
     if (!id) return;
-    const all = this.bookings.concat(this.state.blocks).concat(this.state.phoneBookings).concat(this.webMapped());
+    const all = this.combinedBookings();
     const b = all.find((x) => x.id === id);
     const dep = this.depAmt(b);
     let amt = Number(amount);
@@ -1124,15 +1101,6 @@ class Component extends DCLogic {
   depAmt(b) { if (!b || b.type === 'block') return 0; return b.deposit != null ? b.deposit : 1000; }
   dLabel(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
   toISO(d) { const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
-  // Publish every live hold (bookings, phone bookings, and maintenance blocks) as
-  // absolute-date ranges so the customer website can check real availability.
-  publishOccupancy(live) {
-    try {
-      const occ = live.map((b) => ({ trailer: b.trailer, arrival: this.toISO(this.dateAt(b.start)), nights: b.nights, kind: b.type }));
-      const json = JSON.stringify(occ);
-      if (json !== this._lastOcc) { this._lastOcc = json; localStorage.setItem(this.OCC_KEY, json); }
-    } catch (e) {}
-  }
 
   renderVals() {
     const today0 = this.baseDate;
@@ -1156,9 +1124,8 @@ class Component extends DCLogic {
     // in full) is accepted automatically — only an unpaid invoice stays "pending review".
     const autoConfirm = (b) => (b.source === 'web' && b.type === 'pending' && b.pay && !/invoice|unpaid/i.test(b.pay.status))
       ? { ...b, type: 'confirmed', _autoConfirmed: true } : b;
-    const allItems = this.bookings.concat(this.state.blocks).concat(this.state.phoneBookings).concat(this.webMapped()).map(autoConfirm);
+    const allItems = this.combinedBookings().map(autoConfirm);
     const live = allItems.filter((b) => eff(b) !== 'cancelled');
-    this.publishOccupancy(live);
 
     // ---- Double-booking guard for the quote builder ----
     // Candidate trip (from the builder) vs everything already live on the same trailer.
@@ -1587,6 +1554,10 @@ class Component extends DCLogic {
           });
           if (!res.ok) throw new Error('invalid credentials');
           this.setState({ authed: true, loginBusy: false, loginPassword: '', loginError: null, view: 'calendar' });
+          // componentDidMount's initial loadAll()/loadOverrides() ran before
+          // this session existed and got 401s, so without this the dashboard
+          // sits empty until the next 10s poll tick picks up real data.
+          if (window.SDBookings) { window.SDBookings.refreshAll(); window.SDBookings.refreshOverrides(); }
         } catch (e) {
           this.setState({ loginBusy: false, loginError: 'Incorrect email or password.' });
         }
@@ -1818,26 +1789,36 @@ class Component extends DCLogic {
       onBfNote: (e) => this.setState({ bfNote: e.target.value }),
       incBfNights: () => this.setState((s) => ({ bfNights: Math.min(30, s.bfNights + 1) })),
       decBfNights: () => this.setState((s) => ({ bfNights: Math.max(1, s.bfNights - 1) })),
-      addBlock: () => {
+      addBlock: async () => {
         const s = this.state.bfDate ? new Date(this.state.bfDate + 'T00:00:00') : null;
         if (!s || isNaN(s)) return;
         const start = Math.round((s.getTime() - this.baseDate.getTime()) / 86400000);
-        // Defensive double-booking guard — never overlay an existing hold on the same trailer.
+        // Defensive double-booking guard — never overlay an existing hold on the
+        // same trailer. (The server re-checks this too, under a lock.)
         const end = start + this.state.bfNights;
         const clash = live.filter((b) => b.trailer === this.state.bfTrailer && start < (b.start + b.nights) && b.start < end);
         if (clash.length) return;
-        const block = {
-          id: 'ub' + Date.now(),
-          trailer: this.state.bfTrailer,
-          start,
-          nights: this.state.bfNights,
-          guest: this.state.bfReason,
-          phone: 'Internal',
-          site: this.state.bfNote || 'Blocked off the calendar',
-          total: 0,
-          type: 'block',
-        };
-        this.setState((st) => ({ blocks: st.blocks.concat([block]), blockOpen: false, bfNote: '' }));
+        try {
+          const res = await fetch('/api/bookings/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              trailer: this.state.bfTrailer,
+              arrival: this.toISO(s),
+              nights: this.state.bfNights,
+              guest: this.state.bfReason,
+              phone: 'Internal',
+              site: this.state.bfNote || 'Blocked off the calendar',
+              total: 0, type: 'block', source: 'admin',
+            }),
+          });
+          if (!res.ok) throw new Error('block failed');
+          window.SDBookings.refreshAll();
+          this.setState({ blockOpen: false, bfNote: '' });
+        } catch (e) {
+          this.showToast('Could not save the block. Please try again.');
+        }
       },
 
       // ----- create quote -----
@@ -1928,12 +1909,13 @@ class Component extends DCLogic {
       onCqAdjust: (e) => this.setState({ cqAdjust: e.target.value }),
       onCqPayMethod: (e) => this.setState({ cqPayMethod: e.target.value }),
       emailQuote: () => this.setState({ cqStep: 'sent' }),
-      confirmPhoneBooking: () => {
+      confirmPhoneBooking: async () => {
         const s = this.state.cqDate ? new Date(this.state.cqDate + 'T00:00:00') : null;
         if (!s || isNaN(s)) return;
         const start = Math.round((s.getTime() - this.baseDate.getTime()) / 86400000);
         // Guard: never write a booking that overlaps an existing hold on the same trailer.
-        const clash = this.bookings.concat(this.state.blocks).concat(this.state.phoneBookings).concat(this.webMapped())
+        // (The server re-checks this too, under a lock, in case of a real race.)
+        const clash = this.combinedBookings()
           .filter((b) => (this.state.cancelled[b.id] ? 'cancelled' : b.type) !== 'cancelled')
           .some((b) => b.trailer === this.state.cqTrailer && start < (b.start + b.nights) && b.start < (start + this.state.cqNights));
         if (clash) return;
@@ -1942,17 +1924,28 @@ class Component extends DCLogic {
         const total = rate * this.state.cqNights + 95 + del + add + adj;
         const stLabel = { full: 'Paid in full', deposit: 'Deposit taken', invoice: 'Invoice sent' }[this.state.cqPayStatus];
         const mLabel = { cash: 'Cash', check: 'Check', card: 'Card by phone', etransfer: 'E-transfer', other: 'Other' }[this.state.cqPayMethod];
-        const booking = {
-          id: 'pb' + Date.now(),
-          trailer: this.state.cqTrailer,
-          start, nights: this.state.cqNights,
-          guest: this.state.cqName || 'Phone booking',
-          phone: this.state.cqPhone || 'By phone',
-          site: this.state.cqSite || 'To be confirmed',
-          total, type: 'confirmed',
-          pay: { status: stLabel, method: mLabel },
-        };
-        this.setState((st) => ({ phoneBookings: st.phoneBookings.concat([booking]), cqStep: 'booked' }));
+        try {
+          const res = await fetch('/api/bookings/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              trailer: this.state.cqTrailer,
+              arrival: this.toISO(this.dateAt(start)),
+              nights: this.state.cqNights,
+              guest: this.state.cqName || 'Phone booking',
+              phone: this.state.cqPhone || 'By phone',
+              site: this.state.cqSite || 'To be confirmed',
+              total, type: 'confirmed', source: 'phone',
+              pay: { status: stLabel, method: mLabel },
+            }),
+          });
+          if (!res.ok) throw new Error('phone booking failed');
+          window.SDBookings.refreshAll();
+          this.setState({ cqStep: 'booked' });
+        } catch (e) {
+          this.showToast('Could not save the phone booking. Please try again.');
+        }
       },
       createAnotherQuote: () => this.setState({ cqStep: 'build', cqName: '', cqEmail: '', cqPhone: '', cqSite: '', cqAddons: {}, cqAdjust: 0 }),
       ...selVals,

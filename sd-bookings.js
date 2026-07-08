@@ -1,13 +1,11 @@
 /* ────────────────────────────────────────────────────────────────
-   Sweet Dreams RV — shared booking seed + "next up" queue helper.
-   Single source of truth for the demo booking dataset, used by the
-   owner admin (full calendar/list) and the pricing screen (next-up
-   cards). Live website bookings + status overrides are read from
-   localStorage so every screen shows the same queues.
+   Sweet Dreams RV — shared booking data access.
+   Backed by the real API now (GET /api/bookings/availability, GET
+   /api/bookings, GET /api/overrides), not localStorage. SEED stays defined
+   below purely as a local-dev/Playwright fixture — it is never merged into
+   the production data path, which reads only from the API.
    ──────────────────────────────────────────────────────────────── */
 (function () {
-  var WEB_KEY = 'sd_web_bookings';
-  var STATUS_KEY = 'sd_admin_overrides';
   var WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var TRAILER_NAMES = {
     charlie: 'Charlie', ella: 'Ella', virginia: 'Virginia', marylou: 'Mary Lou',
@@ -15,6 +13,7 @@
   };
 
   // Demo booking seed. start = day offset from "today" (day 0 = today, PST).
+  // Local-dev/Playwright fixture only — see the file comment above.
   var SEED = [
     { id: 'p70', trailer: 'patricia', start: -11, nights: 2, guest: 'Marcus Okafor', phone: '(406) 555-0158', site: 'Emigrant Lake · #8', total: 433, type: 'returned', source: 'phone', pay: { status: 'Paid in full', method: 'Card by phone' } },
     { id: 'p72', trailer: 'charlie', start: -11, nights: 6, guest: 'Big Sky club', phone: '(503) 555-0143', site: 'Indian Mary Park · #30', total: 989, type: 'returned', source: 'phone', pay: { status: 'Paid in full', method: 'Check' } },
@@ -127,37 +126,104 @@
     return new Date(get('year'), get('month') - 1, get('day'));
   }
 
-  function loadOverrides() {
-    var out = { status: {}, cancelled: {} };
-    try {
-      var s = JSON.parse(localStorage.getItem(STATUS_KEY) || '{}');
-      out.status = s.status || {};
-      out.cancelled = s.cancelled || {};
-    } catch (e) {}
-    return out;
+  // ── Public, PII-free: trailer/arrival/nights for every active booking.
+  // Used by the customer site's conflict/availability checks. Polls on its
+  // own so a booking made in one tab shows up as unavailable in another.
+  var availabilityCache = [];
+  var availabilityRefreshing = null;
+  var availabilityStarted = false;
+  function refreshAvailability() {
+    if (availabilityRefreshing) return availabilityRefreshing;
+    availabilityRefreshing = fetch('/api/bookings/availability')
+      .then(function (res) { return res.json(); })
+      .then(function (rows) {
+        availabilityCache = rows;
+        window.dispatchEvent(new CustomEvent('sd-bookings-changed'));
+        return availabilityCache;
+      })
+      .catch(function () {})
+      .finally(function () { availabilityRefreshing = null; });
+    return availabilityRefreshing;
+  }
+  function loadAvailability() {
+    if (!availabilityStarted) {
+      availabilityStarted = true;
+      refreshAvailability();
+      setInterval(refreshAvailability, 10000);
+    }
+    return availabilityCache;
   }
 
-  // Website bookings → internal booking shape (mirrors the admin's webMapped()).
-  function loadWeb(base) {
-    var arr = [];
-    try { arr = JSON.parse(localStorage.getItem(WEB_KEY) || '[]'); } catch (e) { arr = []; }
-    return arr.map(function (w) {
-      var d = w.arrival ? new Date(w.arrival + 'T00:00:00') : null;
-      if (!d || isNaN(d)) return null;
-      var start = Math.round((d.getTime() - base.getTime()) / 86400000);
-      return { id: w.id, trailer: w.trailer, start: start, nights: w.nights,
-        guest: w.guest, site: w.site, total: w.total, type: 'confirmed', source: 'web' };
-    }).filter(Boolean);
+  // ── Admin-only, full detail. Used by the owner dashboard and the pricing
+  // screen's next-up cards. Requires a valid admin session; 401s quietly
+  // (leaves the cache empty) if called from a page that isn't logged in.
+  var allCache = [];
+  var allRefreshing = null;
+  var allStarted = false;
+  function refreshAll() {
+    if (allRefreshing) return allRefreshing;
+    allRefreshing = fetch('/api/bookings', { credentials: 'include' })
+      .then(function (res) { if (!res.ok) throw new Error('unauthorized'); return res.json(); })
+      .then(function (rows) {
+        allCache = rows;
+        window.dispatchEvent(new CustomEvent('sd-bookings-changed'));
+        return allCache;
+      })
+      .catch(function () {})
+      .finally(function () { allRefreshing = null; });
+    return allRefreshing;
+  }
+  function loadAll() {
+    if (!allStarted) {
+      allStarted = true;
+      refreshAll();
+      setInterval(refreshAll, 10000);
+    }
+    return allCache;
+  }
+
+  var overridesCache = { status: {}, cancelled: {}, charges: {}, refunds: {} };
+  var overridesRefreshing = null;
+  var overridesStarted = false;
+  function refreshOverrides() {
+    if (overridesRefreshing) return overridesRefreshing;
+    overridesRefreshing = fetch('/api/overrides', { credentials: 'include' })
+      .then(function (res) { if (!res.ok) throw new Error('unauthorized'); return res.json(); })
+      .then(function (data) {
+        overridesCache = data;
+        window.dispatchEvent(new CustomEvent('sd-overrides-changed'));
+        return overridesCache;
+      })
+      .catch(function () {})
+      .finally(function () { overridesRefreshing = null; });
+    return overridesRefreshing;
+  }
+  function loadOverrides() {
+    if (!overridesStarted) {
+      overridesStarted = true;
+      refreshOverrides();
+      setInterval(refreshOverrides, 10000);
+    }
+    return overridesCache;
+  }
+
+  // Convert an absolute-date API row to the day-offset-from-today shape the
+  // calendar/queue rendering already expects (same conversion loadWeb() used
+  // to do for web bookings only; now applies to every booking).
+  function toRelative(b, base) {
+    var d = new Date(b.arrival + 'T00:00:00');
+    var start = Math.round((d.getTime() - base.getTime()) / 86400000);
+    return Object.assign({}, b, { start: start });
   }
 
   // Deliveries (confirmed, not yet out) + pickups (out on a trip), each sorted
   // by their date and capped. Returns plain data; callers render + style.
+  // Production data comes only from the API now — no SEED merge.
   function nextUp(cap) {
     var base = pstToday();
     var ov = loadOverrides();
-    // Admin seeds w02 & w07 as already "out" until an override says otherwise.
-    var status = Object.assign({ w02: 'out', w07: 'out' }, ov.status);
-    var all = SEED.concat(loadWeb(base));
+    var status = ov.status || {};
+    var all = loadAll().map(function (b) { return toRelative(b, base); });
     function eff(b) { return ov.cancelled[b.id] ? 'cancelled' : (b.type === 'block' ? 'block' : (status[b.id] || b.type)); }
     var live = all.filter(function (b) { return eff(b) !== 'cancelled'; });
     function dateAt(i) { return new Date(base.getTime() + i * 86400000); }
@@ -181,6 +247,10 @@
 
   window.SDBookings = {
     SEED: SEED, WD: WD, TRAILER_NAMES: TRAILER_NAMES,
-    pstToday: pstToday, loadOverrides: loadOverrides, loadWeb: loadWeb, nextUp: nextUp,
+    pstToday: pstToday,
+    loadAvailability: loadAvailability, refreshAvailability: refreshAvailability,
+    loadAll: loadAll, refreshAll: refreshAll,
+    loadOverrides: loadOverrides, refreshOverrides: refreshOverrides,
+    nextUp: nextUp,
   };
 })();

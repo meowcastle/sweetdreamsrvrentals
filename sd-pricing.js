@@ -52,18 +52,54 @@
     return d;
   }
 
+  // Backed by GET/PUT /api/pricing now, not localStorage. load() stays
+  // synchronous (it's called inline during render, same as before) by
+  // reading an in-memory cache; the cache is populated by an async fetch
+  // and callers find out it changed via the same 'sd-pricing-changed' event
+  // this module already dispatched for the old same-document localStorage
+  // case, so existing listeners in the RV/Pricing/Admin files don't need to
+  // change to pick up the real data once it arrives.
+  var cache = null;
+  var refreshing = null;
+
+  function refresh() {
+    if (refreshing) return refreshing;
+    refreshing = fetch('/api/pricing', { credentials: 'include' })
+      .then(function (res) { return res.json(); })
+      .then(function (cfg) {
+        cache = merge(cfg);
+        window.dispatchEvent(new CustomEvent('sd-pricing-changed', { detail: cache }));
+        return cache;
+      })
+      .catch(function () { /* keep whatever's already cached (or defaults) */ })
+      .finally(function () { refreshing = null; });
+    return refreshing;
+  }
+
   function load() {
-    try { return merge(JSON.parse(localStorage.getItem(KEY) || 'null')); }
-    catch (e) { return clone(DEFAULTS); }
+    if (cache === null) {
+      cache = clone(DEFAULTS);
+      refresh();
+    }
+    return cache;
   }
 
   function save(cfg) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(cfg));
-      // Same-document listeners (the 'storage' event only fires in OTHER docs).
-      window.dispatchEvent(new CustomEvent('sd-pricing-changed', { detail: cfg }));
-    } catch (e) {}
+    cache = cfg;
+    window.dispatchEvent(new CustomEvent('sd-pricing-changed', { detail: cfg }));
+    return fetch('/api/pricing', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(cfg),
+    }).catch(function () {});
   }
+
+  // Keep pricing fresh across tabs/sessions now that a 'storage' event
+  // between browsers can't do it — this module owns its own polling so
+  // every consumer (RV, Pricing, Admin) gets it for free.
+  refresh();
+  setInterval(refresh, 30000);
 
   // ── Pure pricing math ───────────────────────────────────────────
   function isSummer(d, cfg) {
@@ -99,7 +135,7 @@
 
   window.SDPricing = {
     KEY: KEY, DEFAULTS: DEFAULTS, clone: clone, merge: merge,
-    load: load, save: save,
+    load: load, save: save, refresh: refresh,
     isSummer: isSummer,
     nightlyRate: nightlyRate, stayRental: stayRental, fmt: fmt,
   };
