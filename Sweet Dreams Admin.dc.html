@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&amp;family=Archivo+Black&amp;display=swap" rel="stylesheet">
+<script src="./sd-bookings.js?v=100"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: oklch(0.11 0.02 264); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  h1,h2,h3,h4 { font-family:'Quicksand',sans-serif; }
+</style>
+</helmet>
+
+<div style="position:relative;min-height:100vh;font-family:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:oklch(0.86 0.012 270);background:radial-gradient(1200px 600px at 80% -10%, oklch(0.17 0.05 280 / 0.7), transparent 60%), oklch(0.11 0.02 264);">
+
+  <!-- ===== LOGIN GATE ===== -->
+  <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="width:100%;max-width:380px;background:oklch(0.16 0.02 264 / 0.7);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:32px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.7);">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+          <span style="width:52px;height:52px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;"><img src="trailer-white.png" alt="" style="width:34px;height:34px;object-fit:contain;"></span>
+          <h1 style="margin:16px 0 0;font-weight:700;font-size:20px;color:#fff;">Owner dashboard</h1>
+          <p style="margin:6px 0 0;font-size:13.5px;color:oklch(0.72 0.02 280);">Sweet Dreams RV Rentals · fleet &amp; bookings</p>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px;margin-top:24px;">
+          <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email</span>
+          <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="owner@sweetdreamsrvrentals.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+          <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Password</span>
+          <input type="password" placeholder="••••••••" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+        </label>
+        <button onClick="{{ signIn }}" style="width:100%;margin-top:20px;padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Sign in</button>
+        <p style="margin:14px 0 0;text-align:center;font-size:11.5px;color:oklch(0.58 0.015 275);">Demo · any credentials sign in</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== DASHBOARD ===== -->
+  <sc-if value="{{ authed }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1320px;margin:0 auto;padding:0;">
+
+      <!-- top bar -->
+      <header style="position:sticky;top:0;z-index:40;background:oklch(0.12 0.02 264 / 0.86);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid oklch(1 0 0 / 0.1);">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px clamp(16px,3vw,32px);">
+          <span style="width:38px;height:38px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><img src="trailer-white.png" alt="" style="width:24px;height:24px;object-fit:contain;"></span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.1;">Owner dashboard</div>
+            <div style="font-size:12px;color:oklch(0.66 0.02 280);">Sweet Dreams RV Rentals</div>
+          </div>
+          <div style="display:inline-flex;padding:4px;border-radius:9999px;background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.12);gap:3px;">
+            <button onClick="{{ setCalendarView }}" style="{{ navCalStyle }}">Calendar</button>
+            <button onClick="{{ setListView }}" style="{{ navListStyle }}">List</button>
+            <button onClick="{{ setDepositsView }}" style="{{ navDepositsStyle }}">Deposits{{ navDepositsBadge }}</button>
+            <a href="Sweet Dreams Pricing.dc.html" style="{{ navPricingStyle }}">Pricing</a>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.14);font-size:12.5px;color:oklch(0.82 0.015 270);"><span style="width:7px;height:7px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>{{ rangeLabel }}</span>
+          <span style="width:34px;height:34px;border-radius:9999px;background:oklch(0.3 0.04 300);display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none;">JS</span>
+          <button onClick="{{ signOut }}" style="padding:8px 13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Log out</button>
+        </div>
+      </header>
+
+      <div style="padding:clamp(16px,3vw,28px) clamp(16px,3vw,32px) 48px;">
+
+        <!-- stat cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="{{ s.cardStyle }}">
+              <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">{{ s.label }}</div>
+              <div style="margin-top:8px;font-family:'Archivo Black',sans-serif;font-size:28px;letter-spacing:-0.01em;color:{{ s.valueColor }};">{{ s.value }}</div>
+              <div style="margin-top:4px;font-size:12px;color:oklch(0.62 0.015 275);">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- view toggle -->
+        <div style="margin-top:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <h2 style="margin:0;font-weight:700;font-size:17px;color:#fff;">Bookings</h2>
+          <button onClick="{{ openAutomations }}" style="display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.5-6.5-1.4 1.4M7.9 16.1l-1.4 1.4m11.6 0-1.4-1.4M7.9 7.9 6.5 6.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.7"></circle></svg>Automations<sc-if value="{{ autoBtnBadge }}" hint-placeholder-val="{{ false }}"><span style="display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-size:11px;font-weight:700;">{{ autoBtnBadge }}</span></sc-if></button>
+        </div>
+
+        <!-- calendar -->
+        <sc-if value="{{ showCalendar }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:14px;background:oklch(0.15 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:20px;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);">
+            <div>
+              <h2 style="margin:0;font-weight:700;font-size:17px;color:#fff;">Fleet calendar</h2>
+              <p style="margin:3px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">8 trailers · {{ windowLabel }} · click a booking for details</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:12px;color:oklch(0.74 0.02 280);">
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:linear-gradient(90deg, oklch(0.62 0.17 250), oklch(0.64 0.15 150), oklch(0.66 0.16 55), oklch(0.64 0.19 355));"></span>Color = trailer</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:oklch(0.6 0.16 264);"></span>Confirmed</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:oklch(0.6 0.16 264);box-shadow:inset 3px 0 0 0 oklch(0.86 0.14 78);"></span>Reserved · balance due</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:oklch(0.6 0.16 264);box-shadow:inset 3px 0 0 0 oklch(0.62 0.22 25);"></span>Charge failed</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:oklch(0.6 0.16 264 / 0.24);border:1px solid oklch(0.6 0.16 264 / 0.65);"></span>Pending</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:oklch(0.6 0.16 264);box-shadow:inset 0 0 0 1.4px oklch(0.95 0.14 158 / 0.95);"></span>On trip</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:repeating-linear-gradient(45deg, oklch(0.4 0.01 280 / 0.6) 0 4px, oklch(0.28 0.01 280 / 0.6) 4px 8px);"></span>Maintenance</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:oklch(0.6 0.16 264 / 0.12);border:1px dashed oklch(0.6 0.16 264 / 0.5);"></span>Returned</span>
+              <div style="display:flex;gap:8px;">
+                <button onClick="{{ openCreateQuote }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:9999px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;box-shadow:0 8px 20px -8px oklch(0.5781 0.2303 264.8 / 0.7);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h11M4 12h11M4 18h7M17 15l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Create quote</button>
+                <button onClick="{{ openBlock }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg>Block a trailer</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);">
+            <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+              <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:17px;color:#fff;">{{ windowLabel }}</div>
+              <div style="display:flex;align-items:baseline;gap:7px;">
+                <span style="font-family:'Archivo Black',sans-serif;font-size:14px;color:oklch(0.82 0.12 152);">{{ monthRevenueLabel }}</span>
+                <span style="font-size:11.5px;color:oklch(0.62 0.02 280);">booked · {{ monthTripCount }} trips</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:12px;"></div>
+            <div style="display:inline-flex;align-items:center;gap:10px;">
+              <div style="display:inline-flex;align-items:center;border:1px solid oklch(1 0 0 / 0.14);border-radius:11px;overflow:hidden;background:oklch(1 0 0 / 0.04);">
+                <button onClick="{{ calPrev }}" aria-label="Previous month" style="{{ arrowPrevStyle }}" style-hover="background:oklch(1 0 0 / 0.08);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <button onClick="{{ calToday }}" title="Jump to the current month" style="{{ nowBtnStyle }}"><span style="{{ todayDotStyle }}"></span>{{ currentMonthLabel }}</button>
+                <button onClick="{{ calNext }}" aria-label="Next month" style="{{ arrowNextStyle }}" style-hover="background:oklch(1 0 0 / 0.08);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+              </div>
+              <select value="{{ calMonthSel }}" onChange="{{ calJumpMonth }}" aria-label="Jump to month" style="height:36px;padding:0 12px;border-radius:11px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;cursor:pointer;">
+                <sc-for list="{{ monthOptions }}" as="m" hint-placeholder-count="12">
+                  <option value="{{ m.value }}">{{ m.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <div style="min-width:{{ gridMin }};">
+              <!-- header days -->
+              <div style="display:grid;grid-template-columns:{{ gridCols }};border-bottom:1px solid oklch(1 0 0 / 0.08);">
+                <div style="padding:10px 14px;font-size:11px;font-weight:600;color:oklch(0.6 0.02 280);text-transform:uppercase;letter-spacing:0.04em;">Trailer</div>
+                <sc-for list="{{ days }}" as="d" hint-placeholder-count="14">
+                  <div style="{{ d.headStyle }}">
+                    <div style="font-size:10.5px;color:oklch(0.58 0.02 280);text-transform:uppercase;">{{ d.wd }}</div>
+                    <div style="font-size:13px;font-weight:700;color:oklch(0.84 0.015 270);">{{ d.num }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- trailer rows -->
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+                <div style="display:grid;grid-template-columns:{{ gridCols }};grid-template-rows:52px;border-bottom:1px solid oklch(1 0 0 / 0.06);">
+                  <div style="grid-column:1;grid-row:1;display:flex;flex-direction:column;justify-content:center;padding:0 14px;">
+                    <span style="display:flex;align-items:center;gap:7px;font-family:'Archivo Black',sans-serif;font-size:13px;color:#fff;"><span style="width:9px;height:9px;border-radius:9999px;flex:none;background:{{ r.color }};"></span>{{ r.name }}</span>
+                    <span style="font-size:11px;color:oklch(0.6 0.02 280);">{{ r.tag }}</span>
+                  </div>
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="14">
+                    <div style="{{ c.style }}"></div>
+                  </sc-for>
+                  <sc-for list="{{ r.bars }}" as="b" hint-placeholder-count="0">
+                    <button onClick="{{ b.onClick }}" title="{{ b.tooltip }}" style="{{ b.style }}">
+                      <sc-if value="{{ b.reserve }}" hint-placeholder-val="{{ false }}"><span style="width:6px;height:6px;border-radius:9999px;background:{{ b.reserveColor }};flex:none;margin-right:6px;box-shadow:0 0 0 2px oklch(0.86 0.14 78 / 0.3);"></span></sc-if>
+                      <span style="font-weight:700;font-size:12px;color:{{ b.textColor }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.label }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- list view -->
+        <sc-if value="{{ showList }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;background:oklch(0.15 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:20px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);">
+              <div>
+                <h3 style="margin:0;font-weight:700;font-size:15px;color:#fff;">All bookings</h3>
+                <p style="margin:3px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">{{ bookingCount }} on the calendar · sorted by arrival · click a row for details</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <div style="display:flex;gap:7px;">
+                  <button onClick="{{ setPayAll }}" style="{{ payFilterAllStyle }}">{{ payFilterAllLabel }}</button>
+                  <button onClick="{{ setPayUnpaid }}" style="{{ payFilterUnpaidStyle }}">{{ payFilterUnpaidLabel }}</button>
+                  <button onClick="{{ setPayPaid }}" style="{{ payFilterPaidStyle }}">{{ payFilterPaidLabel }}</button>
+                </div>
+                <div style="display:flex;gap:8px;">
+                <button onClick="{{ openCreateQuote }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:9999px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;box-shadow:0 8px 20px -8px oklch(0.5781 0.2303 264.8 / 0.7);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h11M4 12h11M4 18h7M17 15l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Create quote</button>
+                <button onClick="{{ openBlock }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg>Block a trailer</button>
+              </div>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <div style="min-width:820px;">
+                <div style="display:grid;grid-template-columns:1.1fr 1.4fr 1.2fr 1.7fr 0.8fr 1fr;gap:12px;padding:11px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);font-size:11px;font-weight:600;color:oklch(0.6 0.02 280);text-transform:uppercase;letter-spacing:0.04em;">
+                  <span>Trailer</span><span>Guest</span><span>Dates</span><span>Delivery site</span><span>Total</span><span>Status</span>
+                </div>
+                <sc-for list="{{ bookingList }}" as="b" hint-placeholder-count="10">
+                  <button onClick="{{ b.onClick }}" style="display:grid;grid-template-columns:1.1fr 1.4fr 1.2fr 1.7fr 0.8fr 1fr;gap:12px;align-items:center;width:100%;text-align:left;padding:14px 20px;border:none;border-top:1px solid oklch(1 0 0 / 0.06);background:transparent;cursor:pointer;" style-hover="background:oklch(1 0 0 / 0.04);">
+                    <span style="font-family:'Archivo Black',sans-serif;font-size:13px;color:#fff;">{{ b.trailer }}</span>
+                    <span style="font-size:13.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:7px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.guest }}</span><sc-if value="{{ b.isWeb }}" hint-placeholder-val="{{ false }}"><span title="Booked online" style="flex:none;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:9999px;background:oklch(0.5781 0.2303 264.8 / 0.18);color:oklch(0.84 0.11 300);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18" stroke="currentColor" stroke-width="2"></path></svg></span></sc-if></span>
+                    <span onClick="{{ b.goToMonth }}" title="View this trip on the calendar" style="font-size:13px;color:oklch(0.82 0.11 300);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;justify-self:start;" style-hover="color:oklch(0.9 0.13 300);">{{ b.dates }}</span>
+                    <span style="font-size:13px;color:oklch(0.72 0.02 280);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.site }}</span>
+                    <span style="display:flex;flex-direction:column;gap:2px;min-width:0;"><span style="font-size:13px;font-weight:600;color:#fff;">{{ b.total }}</span><sc-if value="{{ b.balanceDue }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;color:oklch(0.82 0.12 78);white-space:nowrap;">{{ b.balanceLabel }}</span></sc-if><sc-if value="{{ b.chargeFailed }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:700;color:oklch(0.78 0.18 25);white-space:nowrap;">{{ b.failedLabel }}</span></sc-if></span>
+                    <span><span style="{{ b.statusStyle }}">{{ b.status }}</span></span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- pending deposits view -->
+        <sc-if value="{{ showDeposits }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;background:oklch(0.15 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:20px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);">
+              <div>
+                <h3 style="margin:0;font-weight:700;font-size:15px;color:#fff;">Pending deposits</h3>
+                <p style="margin:3px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">Returned trailers with a hold still on file · refund via Stripe</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'Archivo Black',sans-serif;font-size:18px;color:#fff;">{{ pendingDepositTotalLabel }}</div>
+                <div style="font-size:11.5px;color:oklch(0.62 0.02 280);">{{ pendingDepositCountLabel }}</div>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <div style="min-width:760px;">
+                <div style="display:grid;grid-template-columns:1fr 1.4fr 1.3fr 0.9fr 1.2fr;gap:12px;padding:11px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);font-size:11px;font-weight:600;color:oklch(0.6 0.02 280);text-transform:uppercase;letter-spacing:0.04em;">
+                  <span>Trailer</span><span>Guest</span><span>Trip</span><span>Deposit</span><span>Action</span>
+                </div>
+                <sc-for list="{{ pendingDepositList }}" as="d" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:1fr 1.4fr 1.3fr 0.9fr 1.2fr;gap:12px;align-items:center;width:100%;padding:14px 20px;border-top:1px solid oklch(1 0 0 / 0.06);">
+                    <span style="font-family:'Archivo Black',sans-serif;font-size:13px;color:#fff;">{{ d.trailer }}</span>
+                    <button onClick="{{ d.openRow }}" style="text-align:left;border:none;background:transparent;cursor:pointer;font-size:13.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0;font-family:'Nunito Sans',sans-serif;" style-hover="color:oklch(0.84 0.11 300);">{{ d.guest }}</button>
+                    <span style="display:flex;flex-direction:column;gap:2px;min-width:0;"><span style="font-size:13px;color:oklch(0.72 0.02 280);white-space:nowrap;">{{ d.dates }}</span><span style="font-size:11.5px;color:oklch(0.6 0.02 280);">{{ d.returnedLabel }}</span></span>
+                    <span style="font-size:13.5px;font-weight:700;color:#fff;white-space:nowrap;">{{ d.deposit }}</span>
+                    <span><button onClick="{{ d.refund }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:12.5px;font-family:'Nunito Sans',sans-serif;box-shadow:0 8px 20px -8px oklch(0.5781 0.2303 264.8 / 0.7);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Refund via Stripe</button></span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ pendingDepositEmpty }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:44px 16px;text-align:center;font-size:13px;color:oklch(0.62 0.02 280);line-height:1.55;">No deposits pending refund.<br>When a trailer comes back, its hold shows up here to return.</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- schedule + occupancy -->
+        <div style="margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+          <div style="background:oklch(0.16 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:18px;padding:20px;">
+            <div style="display:flex;align-items:center;gap:9px;"><span style="width:30px;height:30px;border-radius:9px;background:oklch(0.55 0.12 244 / 0.3);display:grid;place-items:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" stroke="oklch(0.82 0.1 250)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><h3 style="margin:0;font-weight:700;font-size:15px;color:#fff;">Deliveries · next up</h3></div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px;">
+              <sc-for list="{{ deliveries }}" as="d" hint-placeholder-count="4">
+                <button onClick="{{ d.onClick }}" style="{{ d.rowStyle }}">
+                  <div style="width:44px;text-align:center;flex:none;"><div style="font-size:10px;color:{{ d.wdColor }};text-transform:uppercase;">{{ d.wd }}</div><div style="font-family:'Archivo Black',sans-serif;font-size:16px;color:{{ d.numColor }};">{{ d.num }}</div></div>
+                  <div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;"><span style="font-weight:600;font-size:13.5px;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ d.trailer }} → {{ d.guest }}</span><sc-if value="{{ d.today }}" hint-placeholder-val="{{ false }}"><span style="flex:none;padding:2px 8px;border-radius:9999px;background:oklch(0.6 0.23 27 / 0.9);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;">Today</span></sc-if></div><div style="font-size:12px;color:oklch(0.66 0.02 280);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.site }}</div></div>
+                </button>
+              </sc-for>
+              <sc-if value="{{ deliveriesEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:18px 12px;text-align:center;font-size:12.5px;color:oklch(0.6 0.02 280);line-height:1.5;">No deliveries queued.<br>Confirm a booking and it lands here.</div>
+              </sc-if>
+              <sc-if value="{{ deliveriesHasMore }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ showAllBookings }}" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px dashed oklch(1 0 0 / 0.14);background:transparent;cursor:pointer;width:100%;font-size:12.5px;font-weight:600;color:oklch(0.72 0.04 286);font-family:'Nunito Sans',sans-serif;">{{ deliveriesMoreLabel }}<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="background:oklch(0.16 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:18px;padding:20px;">
+            <div style="display:flex;align-items:center;gap:9px;"><span style="width:30px;height:30px;border-radius:9px;background:oklch(0.6 0.14 320 / 0.3);display:grid;place-items:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" stroke="oklch(0.82 0.13 322)" stroke-width="1.8" stroke-linecap="round"></path></svg></span><h3 style="margin:0;font-weight:700;font-size:15px;color:#fff;">Pickups · next up</h3></div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px;">
+              <sc-for list="{{ pickups }}" as="p" hint-placeholder-count="4">
+                <button onClick="{{ p.onClick }}" style="{{ p.rowStyle }}">
+                  <div style="width:44px;text-align:center;flex:none;"><div style="font-size:10px;color:{{ p.wdColor }};text-transform:uppercase;">{{ p.wd }}</div><div style="font-family:'Archivo Black',sans-serif;font-size:16px;color:{{ p.numColor }};">{{ p.num }}</div></div>
+                  <div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;"><span style="font-weight:600;font-size:13.5px;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ p.trailer }} ← {{ p.guest }}</span><sc-if value="{{ p.today }}" hint-placeholder-val="{{ false }}"><span style="flex:none;padding:2px 8px;border-radius:9999px;background:oklch(0.6 0.23 27 / 0.9);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;">Today</span></sc-if></div><div style="font-size:12px;color:oklch(0.66 0.02 280);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.site }}</div></div>
+                </button>
+              </sc-for>
+              <sc-if value="{{ pickupsEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:18px 12px;text-align:center;font-size:12.5px;color:oklch(0.6 0.02 280);line-height:1.5;">Nothing out right now.<br>Mark a trailer delivered and it moves here.</div>
+              </sc-if>
+              <sc-if value="{{ pickupsHasMore }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ showAllBookings }}" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:10px;border:1px dashed oklch(1 0 0 / 0.14);background:transparent;cursor:pointer;width:100%;font-size:12.5px;font-weight:600;color:oklch(0.72 0.04 286);font-family:'Nunito Sans',sans-serif;">{{ pickupsMoreLabel }}<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BOOKING DETAIL DRAWER ===== -->
+      <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:60;">
+          <div onClick="{{ closeDetail }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"></div>
+          <div style="position:absolute;top:0;right:0;bottom:0;width:min(420px,92vw);background:oklch(0.14 0.02 264 / 0.98);border-left:1px solid oklch(1 0 0 / 0.14);box-shadow:-30px 0 70px -20px oklch(0 0 0 / 0.7);overflow-y:auto;padding:24px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <span style="{{ selStatusStyle }}">{{ selStatusLabel }}</span>
+                  <sc-if value="{{ selIsWeb }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9999px;font-size:11px;font-weight:600;background:oklch(0.5781 0.2303 264.8 / 0.16);border:1px solid oklch(0.6 0.18 285 / 0.5);color:oklch(0.84 0.11 300);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"></circle><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18" stroke="currentColor" stroke-width="1.7"></path></svg>Booked online</span>
+                  </sc-if>
+                  <sc-if value="{{ selAutoConfirmed }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9999px;font-size:11px;font-weight:600;background:oklch(0.5 0.13 152 / 0.16);border:1px solid oklch(0.6 0.14 152 / 0.45);color:oklch(0.84 0.08 152);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Auto-confirmed on payment</span>
+                  </sc-if>
+                </div>
+                <h2 style="margin:12px 0 0;font-weight:700;font-size:22px;color:#fff;">{{ selGuest }}</h2>
+                <div style="font-size:13.5px;color:oklch(0.7 0.02 280);margin-top:2px;">{{ selTrailer }} · {{ selNights }} nights</div>
+              </div>
+              <button onClick="{{ closeDetail }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+
+            <div style="margin-top:20px;display:flex;flex-direction:column;gap:1px;border-radius:14px;overflow:hidden;border:1px solid oklch(1 0 0 / 0.1);">
+              <div style="display:flex;justify-content:space-between;padding:13px 15px;background:oklch(1 0 0 / 0.03);"><span style="font-size:13px;color:oklch(0.72 0.02 280);">Dates</span><span style="font-size:13.5px;font-weight:600;color:#fff;">{{ selDates }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:13px 15px;background:oklch(1 0 0 / 0.03);"><span style="font-size:13px;color:oklch(0.72 0.02 280);">Delivery site</span><span style="font-size:13.5px;font-weight:600;color:#fff;text-align:right;max-width:60%;">{{ selSite }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:13px 15px;background:oklch(1 0 0 / 0.03);"><span style="font-size:13px;color:oklch(0.72 0.02 280);">Contact</span><span style="font-size:13.5px;font-weight:600;color:#fff;">{{ selPhone }}</span></div>
+              <sc-if value="{{ selIsWeb }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;padding:13px 15px;background:oklch(1 0 0 / 0.03);"><span style="font-size:13px;color:oklch(0.72 0.02 280);">Email</span><span style="font-size:13.5px;font-weight:600;color:#fff;text-align:right;max-width:60%;overflow:hidden;text-overflow:ellipsis;">{{ selEmail }}</span></div>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ selIsBooking }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:14px;border-radius:14px;border:1px solid oklch(1 0 0 / 0.1);overflow:hidden;">
+                <!-- trip payment group -->
+                <div style="padding:14px 15px;display:flex;flex-direction:column;gap:10px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <span style="font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.6 0.02 280);">Trip payment</span>
+                    <sc-if value="{{ selHasPlan }}" hint-placeholder-val="{{ false }}"><span style="{{ selPlanBadgeStyle }}">{{ selPlanBadgeLabel }}</span></sc-if>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:13.5px;"><span style="color:oklch(0.72 0.02 280);">Trip total</span><span style="font-weight:700;color:#fff;">{{ selTotal }}</span></div>
+                  <sc-if value="{{ selHasPlan }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;justify-content:space-between;font-size:13.5px;"><span style="color:oklch(0.72 0.02 280);">Collected</span><span style="font-weight:600;color:oklch(0.84 0.1 152);">{{ selTripCollected }}</span></div>
+                    <sc-if value="{{ selBalanceDue }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;"><span style="color:oklch(0.72 0.02 280);">Balance due <span style="color:oklch(0.58 0.02 280);font-size:12px;">{{ selBalanceCaption }}</span></span><span style="font-weight:700;color:oklch(0.86 0.11 75);white-space:nowrap;">{{ selTripBalance }}</span></div>
+                      <sc-if value="{{ selNudgeShow }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:oklch(0.7 0.09 288);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>{{ selNudgeLabel }}</span></div>
+                      </sc-if>
+                    </sc-if>
+                    <sc-if value="{{ selPaidFull }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;justify-content:space-between;font-size:13.5px;"><span style="color:oklch(0.72 0.02 280);">Balance due</span><span style="font-weight:600;color:oklch(0.72 0.015 280);">Nothing owing</span></div>
+                    </sc-if>
+                    <sc-if value="{{ selChargeFailed }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;"><span style="color:oklch(0.72 0.02 280);">Balance due <span style="color:oklch(0.74 0.15 28);font-size:12px;font-weight:600;">· charge failed</span></span><span style="font-weight:700;color:oklch(0.78 0.18 25);white-space:nowrap;">{{ selFailedBalance }}</span></div>
+                    </sc-if>
+                  </sc-if>
+                </div>
+                <!-- refundable deposit group -->
+                <div style="padding:13px 15px;background:oklch(0.55 0.12 244 / 0.1);border-top:1px solid oklch(1 0 0 / 0.08);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                      <span style="font-size:13px;font-weight:600;color:#fff;">Security deposit</span>
+                      <span style="font-size:11.5px;color:oklch(0.72 0.06 244);">{{ selDepositCaption }}</span>
+                    </div>
+                    <span style="font-weight:700;font-size:14px;color:#fff;white-space:nowrap;">{{ selDepositLabel }}</span>
+                  </div>
+                  <sc-if value="{{ selRefundReminderShow }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:11px;display:flex;align-items:center;gap:7px;font-size:12px;color:oklch(0.8 0.09 288);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>{{ selRefundLabel }}</span></div>
+                  </sc-if>
+                  <sc-if value="{{ selRefundShow }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ markRefunded }}" style="margin-top:11px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:13.5px;font-family:'Nunito Sans',sans-serif;box-shadow:0 10px 24px -10px oklch(0.5781 0.2303 264.8 / 0.8);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Refund deposit via Stripe</button>
+                  </sc-if>
+                  <sc-if value="{{ selRefundDone }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:11px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:oklch(0.82 0.08 152);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>{{ selRefundedLabel }}</span></div>
+                    <div style="margin-top:5px;font-size:11.5px;color:oklch(0.66 0.02 280);padding-left:21px;">Reason: {{ selRefundReason }}</div>
+                    <sc-if value="{{ selRefundEmailed }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:3px;font-size:11.5px;color:oklch(0.66 0.02 280);padding-left:21px;">Receipt emailed to {{ selRefundEmail }}</div>
+                    </sc-if>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ selHasPay }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:11px 15px;border-top:1px solid oklch(1 0 0 / 0.08);display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:oklch(0.6 0.02 280);">Payment</span><span style="font-weight:600;color:oklch(0.8 0.015 280);">{{ selPayLabel }}</span></div>
+                </sc-if>
+              </div>
+
+              <sc-if value="{{ selChargeFailed }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:12px;border-radius:14px;border:1px solid oklch(0.6 0.17 25 / 0.5);background:oklch(0.5 0.17 25 / 0.14);padding:14px 15px;">
+                  <div style="display:flex;gap:10px;align-items:flex-start;">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.16 28)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <div style="min-width:0;">
+                      <div style="font-weight:700;font-size:13.5px;color:oklch(0.86 0.13 28);">Balance auto-charge failed</div>
+                      <div style="font-size:12.5px;color:oklch(0.82 0.07 32);line-height:1.5;margin-top:3px;">{{ selFailedCaption }}. The card on file was declined. Retry it, or contact the guest for a new card.</div>
+                      <sc-if value="{{ selRetryShow }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:9px;display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9999px;background:oklch(0.55 0.14 264 / 0.16);border:1px solid oklch(0.6 0.15 264 / 0.4);font-size:11.5px;font-weight:600;color:oklch(0.84 0.11 288);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M20 11a8 8 0 1 0-.9 4.5M20 5v5h-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ selRetryLabel }}</div>
+                      </sc-if>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-top:13px;">
+                    <button onClick="{{ retryCharge }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.55 0.19 25), oklch(0.62 0.17 15));color:#fff;font-weight:700;font-size:13.5px;font-family:'Nunito Sans',sans-serif;box-shadow:0 10px 24px -10px oklch(0.55 0.19 25 / 0.8);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 11a8 8 0 1 0-.9 4.5M20 5v5h-5" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>Retry charge</button>
+                    <button onClick="{{ contactGuest }}" style="flex:1;padding:12px;border-radius:11px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Contact guest</button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
+                <sc-if value="{{ selCanConfirm }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ confirmBooking }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Confirm booking</button>
+                </sc-if>
+                <sc-if value="{{ selCanDeliver }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ markDelivered }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Mark as delivered</button>
+                </sc-if>
+                <sc-if value="{{ selCanReturn }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ markReturned }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 14l-4-4 4-4M5 10h9a5 5 0 0 1 5 5v3" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>Mark as returned</button>
+                </sc-if>
+                <sc-if value="{{ selDone }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;background:oklch(0.4 0.01 280 / 0.32);border:1px solid oklch(1 0 0 / 0.12);color:oklch(0.8 0.015 280);font-weight:600;font-size:14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.06 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Trip complete · trailer returned</div>
+                </sc-if>
+                <div style="display:flex;gap:10px;">
+                  <button style="flex:1;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Message guest</button>
+                  <sc-if value="{{ selCanCancel }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ requestCancel }}" style="flex:1;padding:12px;border-radius:12px;border:1px solid oklch(0.6 0.16 25 / 0.4);background:oklch(0.5 0.16 25 / 0.12);color:oklch(0.82 0.13 25);font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Cancel</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ selIsBlock }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;border-radius:14px;border:1px solid oklch(1 0 0 / 0.1);padding:15px;font-size:13.5px;color:oklch(0.78 0.015 270);line-height:1.55;">This trailer is blocked off the calendar. No bookings can land on these nights.</div>
+              <button onClick="{{ cancelBooking }}" style="margin-top:18px;width:100%;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Clear this block</button>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== CANCEL CONFIRM MODAL ===== -->
+      <sc-if value="{{ showCancelConfirm }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div onClick="{{ dismissCancel }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
+          <div style="position:relative;width:100%;max-width:400px;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:20px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:24px;">
+            <span style="width:46px;height:46px;border-radius:9999px;background:oklch(0.5 0.16 25 / 0.16);border:1px solid oklch(0.6 0.16 25 / 0.45);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.15 30)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <h2 style="margin:15px 0 0;font-weight:700;font-size:19px;color:#fff;">Cancel this booking?</h2>
+            <p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);"><strong style="color:#fff;">{{ cancelConfirmName }}</strong>, {{ cancelConfirmMeta }}. This frees the trailer for those dates. You can undo it right after, but the guest should be notified separately.</p>
+            <div style="display:flex;gap:10px;margin-top:22px;">
+              <button onClick="{{ dismissCancel }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Keep booking</button>
+              <button onClick="{{ cancelBooking }}" style="flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.55 0.19 25), oklch(0.6 0.17 15));color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.55 0.19 25 / 0.8);">Cancel booking</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== REFUND CONFIRM MODAL ===== -->
+      <sc-if value="{{ showRefundConfirm }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div onClick="{{ dismissRefund }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
+          <div style="position:relative;width:100%;max-width:410px;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:20px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:26px;">
+            <span style="width:46px;height:46px;border-radius:9999px;background:oklch(0.5781 0.2303 264.8 / 0.16);border:1px solid oklch(0.6 0.16 288 / 0.45);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M7 15h4M6 4h12a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z" stroke="oklch(0.82 0.12 292)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <h2 style="margin:15px 0 0;font-weight:700;font-size:19px;color:#fff;">Refund deposit?</h2>
+            <p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);">Stripe refund to <strong style="color:#fff;">{{ refundConfirmName }}</strong> ({{ refundConfirmMeta }}). Deposit on file is <strong style="color:#fff;">{{ refundConfirmMaxLabel }}</strong> — refund all of it or a partial amount.</p>
+            <div style="margin-top:18px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;">
+                <span style="font-size:12px;font-weight:600;color:oklch(0.72 0.02 280);">Refund amount</span>
+                <div style="display:flex;gap:6px;">
+                  <button onClick="{{ setRefundHalf }}" style="padding:5px 11px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:11.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Half</button>
+                  <button onClick="{{ setRefundFull }}" style="padding:5px 11px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:11.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Full</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);">
+                <span style="font-size:16px;font-weight:700;color:oklch(0.72 0.02 280);">$</span>
+                <input type="number" min="1" value="{{ refundAmtValue }}" onInput="{{ onRefundAmt }}" style="flex:1;padding:13px 0;border:none;background:transparent;color:#fff;font-weight:700;font-size:16px;font-family:'Nunito Sans',sans-serif;outline:none;" />
+                <span style="font-size:11.5px;color:oklch(0.6 0.02 280);white-space:nowrap;">of {{ refundConfirmMaxLabel }}</span>
+              </div>
+              <sc-if value="{{ refundIsPartial }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:8px;font-size:12px;color:oklch(0.78 0.1 78);">Partial refund · the rest of the deposit is kept.</div>
+              </sc-if>
+            </div>
+            <div style="margin-top:16px;">
+              <div style="font-size:12px;font-weight:600;color:oklch(0.72 0.02 280);margin-bottom:7px;">Reason for refund</div>
+              <select value="{{ refundReasonValue }}" onChange="{{ onRefundReason }}" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-weight:600;font-size:13.5px;font-family:'Nunito Sans',sans-serif;outline:none;cursor:pointer;">
+                <sc-for list="{{ refundReasonOpts }}" as="o" hint-placeholder-count="6">
+                  <option value="{{ o.value }}">{{ o.label }}</option>
+                </sc-for>
+              </select>
+              <sc-if value="{{ refundReasonIsOther }}" hint-placeholder-val="{{ false }}">
+                <input type="text" value="{{ refundReasonNoteValue }}" onInput="{{ onRefundReasonNote }}" placeholder="Describe the reason" style="width:100%;margin-top:9px;padding:12px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-weight:500;font-size:13.5px;font-family:'Nunito Sans',sans-serif;outline:none;" />
+              </sc-if>
+            </div>
+            <sc-if value="{{ refundHasEmail }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.03);">
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:#fff;">Email refund receipt</div>
+                  <div style="font-size:11.5px;color:oklch(0.66 0.02 280);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">to {{ refundEmailAddr }}</div>
+                </div>
+                <button onClick="{{ toggleRefundEmail }}" style="{{ refundEmailTrack }}"><span style="{{ refundEmailKnob }}"></span></button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ refundNoEmail }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;padding:11px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);font-size:12px;color:oklch(0.64 0.02 280);">No email on file — receipt can't be sent automatically.</div>
+            </sc-if>
+            <div style="display:flex;gap:10px;margin-top:22px;">
+              <button onClick="{{ dismissRefund }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Not yet</button>
+              <button onClick="{{ confirmRefund }}" style="flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.5781 0.2303 264.8 / 0.8);">Refund {{ refundConfirmAmount }}</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== AUTOMATIONS MODAL ===== -->
+      <sc-if value="{{ autoOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div onClick="{{ closeAutomations }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);"></div>
+          <div style="position:relative;width:100%;max-width:460px;max-height:86vh;overflow-y:auto;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:22px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:24px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div style="display:flex;align-items:center;gap:11px;">
+                <span style="width:40px;height:40px;border-radius:12px;background:oklch(0.5781 0.2303 264.8 / 0.18);display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.5-6.5-1.4 1.4M7.9 16.1l-1.4 1.4m11.6 0-1.4-1.4M7.9 7.9 6.5 6.5" stroke="oklch(0.82 0.11 288)" stroke-width="1.7" stroke-linecap="round"></path><circle cx="12" cy="12" r="3.2" stroke="oklch(0.82 0.11 288)" stroke-width="1.7"></circle></svg></span>
+                <div><h2 style="margin:0;font-weight:700;font-size:19px;color:#fff;">Automations</h2><p style="margin:2px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">Hands-off guest follow-ups</p></div>
+              </div>
+              <button onClick="{{ closeAutomations }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);color:#fff;cursor:pointer;flex:none;display:grid;place-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+
+            <div style="margin-top:18px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:16px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="min-width:0;">
+                  <div style="font-weight:700;font-size:14.5px;color:#fff;">Balance due soon → nudge guest</div>
+                  <div style="margin-top:4px;font-size:12.5px;line-height:1.5;color:oklch(0.72 0.02 280);">{{ nudgeRuleDesc }}</div>
+                </div>
+                <button onClick="{{ toggleNudge }}" style="{{ nudgeSwitchTrack }}"><span style="{{ nudgeSwitchKnob }}"></span></button>
+              </div>
+              <div style="margin-top:15px;">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:oklch(0.6 0.02 280);margin-bottom:7px;">Lead time</div>
+                <div style="display:flex;gap:7px;padding:4px;border-radius:11px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.1);">
+                  <sc-for list="{{ leadOpts }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="margin-top:8px;font-size:11.5px;color:oklch(0.58 0.015 275);line-height:1.5;">Before the card on file is auto-charged — 14 days ahead of arrival.</div>
+              </div>
+            </div>
+
+            <div style="margin-top:18px;display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:oklch(0.78 0.02 280);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" stroke="oklch(0.7 0.09 288)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ autoSummary }}</div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ nudgeList }}" as="n" hint-placeholder-count="3">
+                <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:12px 13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.08);background:oklch(1 0 0 / 0.03);cursor:pointer;" style-hover="background:oklch(1 0 0 / 0.06);">
+                  <div style="min-width:0;">
+                    <div style="font-weight:600;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ n.guest }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.64 0.02 280);margin-top:1px;">{{ n.meta }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.7 0.06 288);margin-top:3px;">{{ n.when }}</div>
+                  </div>
+                  <span style="{{ n.statusStyle }}">{{ n.statusLabel }}</span>
+                </button>
+              </sc-for>
+              <sc-if value="{{ nudgeEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:18px 12px;text-align:center;font-size:12.5px;color:oklch(0.6 0.02 280);line-height:1.5;">No balances coming due. New first-night reserves are added here automatically.</div>
+              </sc-if>
+            </div>
+
+            <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:16px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="min-width:0;">
+                  <div style="font-weight:700;font-size:14.5px;color:#fff;">Charge fails → auto-retry</div>
+                  <div style="margin-top:4px;font-size:12.5px;line-height:1.5;color:oklch(0.72 0.02 280);">{{ retryRuleDesc }}</div>
+                </div>
+                <button onClick="{{ toggleRetry }}" style="{{ retrySwitchTrack }}"><span style="{{ retrySwitchKnob }}"></span></button>
+              </div>
+              <div style="margin-top:15px;">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:oklch(0.6 0.02 280);margin-bottom:7px;">Retry cadence</div>
+                <div style="display:flex;gap:7px;padding:4px;border-radius:11px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.1);">
+                  <sc-for list="{{ retryEveryOpts }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="margin-top:8px;font-size:11.5px;color:oklch(0.58 0.015 275);line-height:1.5;">Up to 3 attempts. After that the booking is flagged for manual follow-up.</div>
+              </div>
+            </div>
+
+            <div style="margin-top:18px;display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:oklch(0.78 0.02 280);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 11a8 8 0 1 0-.9 4.5M20 5v5h-5" stroke="oklch(0.7 0.09 288)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ retrySummary }}</div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ retryList }}" as="r" hint-placeholder-count="1">
+                <button onClick="{{ r.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:12px 13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.08);background:oklch(1 0 0 / 0.03);cursor:pointer;" style-hover="background:oklch(1 0 0 / 0.06);">
+                  <div style="min-width:0;">
+                    <div style="font-weight:600;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.guest }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.64 0.02 280);margin-top:1px;">{{ r.meta }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.7 0.06 288);margin-top:3px;">{{ r.when }}</div>
+                  </div>
+                  <span style="{{ r.statusStyle }}">{{ r.statusLabel }}</span>
+                </button>
+              </sc-for>
+              <sc-if value="{{ retryEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:18px 12px;text-align:center;font-size:12.5px;color:oklch(0.6 0.02 280);line-height:1.5;">No declined cards. Failed auto-charges show up here for automatic retry.</div>
+              </sc-if>
+            </div>
+
+            <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:16px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="min-width:0;">
+                  <div style="font-weight:700;font-size:14.5px;color:#fff;">Trip ends → refund deposit</div>
+                  <div style="margin-top:4px;font-size:12.5px;line-height:1.5;color:oklch(0.72 0.02 280);">{{ refundRuleDesc }}</div>
+                </div>
+                <button onClick="{{ toggleRefund }}" style="{{ refundSwitchTrack }}"><span style="{{ refundSwitchKnob }}"></span></button>
+              </div>
+              <div style="margin-top:15px;">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:oklch(0.6 0.02 280);margin-bottom:7px;">Remind after return</div>
+                <div style="display:flex;gap:7px;padding:4px;border-radius:11px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.1);">
+                  <sc-for list="{{ refundLeadOpts }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="margin-top:8px;font-size:11.5px;color:oklch(0.58 0.015 275);line-height:1.5;">Leaves time to inspect the trailer for damage before the hold is released.</div>
+              </div>
+            </div>
+
+            <div style="margin-top:18px;display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:oklch(0.78 0.02 280);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M7 15h4M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Z" stroke="oklch(0.7 0.09 288)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ refundSummary }}</div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ refundList }}" as="r" hint-placeholder-count="1">
+                <button onClick="{{ r.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:12px 13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.08);background:oklch(1 0 0 / 0.03);cursor:pointer;" style-hover="background:oklch(1 0 0 / 0.06);">
+                  <div style="min-width:0;">
+                    <div style="font-weight:600;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.guest }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.64 0.02 280);margin-top:1px;">{{ r.meta }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.7 0.06 288);margin-top:3px;">{{ r.when }}</div>
+                  </div>
+                  <span style="{{ r.statusStyle }}">{{ r.statusLabel }}</span>
+                </button>
+              </sc-for>
+              <sc-if value="{{ refundEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:18px 12px;text-align:center;font-size:12.5px;color:oklch(0.6 0.02 280);line-height:1.5;">No deposits waiting. Returned trips with a hold on file show up here to refund.</div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== UNDO TOAST ===== -->
+      <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;background:oklch(0.14 0.02 264 / 0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);">
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;width:min(92vw,420px);padding:36px 34px 30px;border-radius:22px;background:oklch(0.19 0.02 264 / 0.99);border:1px solid oklch(1 0 0 / 0.16);box-shadow:0 34px 90px -20px oklch(0 0 0 / 0.8);">
+            <button onClick="{{ dismissToast }}" style="position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);cursor:pointer;display:grid;place-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="oklch(0.8 0.02 280)" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            <span style="display:inline-grid;place-items:center;width:64px;height:64px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.2);border:1px solid oklch(0.6 0.14 152 / 0.4);"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.82 0.15 152)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <span style="margin-top:20px;font-size:21px;font-weight:700;color:#fff;line-height:1.3;">{{ toastMsg }}</span>
+            <button onClick="{{ undoToast }}" style="margin-top:26px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:15px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ toastUndoLabel }}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== CREATE QUOTE MODAL ===== -->
+      <sc-if value="{{ cqOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:70;display:flex;align-items:flex-start;justify-content:center;padding:clamp(12px,4vh,48px) 16px;overflow-y:auto;">
+          <div onClick="{{ closeQuote }}" style="position:fixed;inset:0;background:oklch(0.05 0.02 264 / 0.66);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);"></div>
+          <div style="position:relative;width:100%;max-width:560px;background:oklch(0.14 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);overflow:hidden;">
+
+            <div style="display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid oklch(1 0 0 / 0.1);">
+              <span style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 6h11M4 12h11M4 18h7M17 15l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.15;">Create a quote</div>
+                <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">Build it, then email it or book it over the phone</div>
+              </div>
+              <button onClick="{{ closeQuote }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+
+            <!-- BUILD -->
+            <sc-if value="{{ cqBuild }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:20px 22px 24px;">
+
+                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">Customer</div>
+                <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                  <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Name</span>
+                  <input type="text" value="{{ cqName }}" onChange="{{ onCqName }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                </label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email</span>
+                    <input type="email" value="{{ cqEmail }}" onChange="{{ onCqEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  </label>
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Phone</span>
+                    <input type="tel" value="{{ cqPhone }}" onChange="{{ onCqPhone }}" placeholder="(541) 000-0000" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  </label>
+                </div>
+
+                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);margin-top:22px;">Trip</div>
+                <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                  <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Trailer</span>
+                  <select value="{{ cqTrailer }}" onChange="{{ onCqTrailer }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                    <sc-for list="{{ cqTrailers }}" as="t" hint-placeholder-count="8">
+                      <option value="{{ t.id }}">{{ t.name }}</option>
+                    </sc-for>
+                  </select>
+                </label>
+                <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:12px;">
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Arrival date</span>
+                    <input type="date" value="{{ cqDate }}" onChange="{{ onCqDate }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;color-scheme:dark;">
+                  </label>
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Nights</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <button onClick="{{ decCqNights }}" style="width:38px;height:44px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                      <div style="flex:1;text-align:center;font-family:'Archivo Black',sans-serif;font-size:18px;color:#fff;">{{ cqNights }}</div>
+                      <button onClick="{{ incCqNights }}" style="width:38px;height:44px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                    </div>
+                  </label>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                  <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Delivery campground / site</span>
+                  <input type="text" value="{{ cqSite }}" onChange="{{ onCqSite }}" placeholder="e.g. Indian Mary Park, site 42" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                </label>
+                <div style="margin-top:14px;">
+                  <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Add-ons</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+                    <sc-for list="{{ cqAddonChips }}" as="a" hint-placeholder-count="8">
+                      <button onClick="{{ a.toggle }}" style="{{ a.chipStyle }}"><span>{{ a.name }}</span><span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span></button>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);margin-top:22px;">Pricing <span style="font-weight:400;color:oklch(0.6 0.02 280);text-transform:none;letter-spacing:0;">· edit any amount</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;">
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Rate / night</span>
+                    <input type="number" value="{{ cqRate }}" onChange="{{ onCqRate }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  </label>
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Delivery fee</span>
+                    <input type="number" value="{{ cqDelivery }}" onChange="{{ onCqDelivery }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  </label>
+                  <label style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Adjustment</span>
+                    <input type="number" value="{{ cqAdjust }}" onChange="{{ onCqAdjust }}" placeholder="0" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  </label>
+                </div>
+
+                <div style="margin-top:16px;border-radius:14px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.03);padding:15px;display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">{{ cqNightsLine }}</span><span style="font-weight:600;color:#fff;">{{ cqRentalLabel }}</span></div>
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Cleaning, prep &amp; stocking</span><span style="font-weight:600;color:#fff;">{{ cqPrepLabel }}</span></div>
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Delivery</span><span style="font-weight:600;color:#fff;">{{ cqDeliveryLabel }}</span></div>
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ cqAddonsLabel }}</span></div>
+                  <sc-if value="{{ cqHasAdjust }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Adjustment</span><span style="font-weight:600;color:oklch(0.8 0.11 75);">{{ cqAdjustLabel }}</span></div>
+                  </sc-if>
+                  <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:2px 0;"></div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="color:oklch(0.74 0.02 280);">Quote total</span><span style="font-family:'Archivo Black',sans-serif;font-size:20px;color:#fff;">{{ cqTotalLabel }}</span></div>
+                </div>
+
+                <!-- payment (phone bookings) -->
+                <div style="margin-top:16px;border-radius:14px;border:1px solid oklch(1 0 0 / 0.12);padding:15px;">
+                  <div style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Payment <span style="color:oklch(0.6 0.02 280);font-weight:400;">· for phone or in-person bookings</span></div>
+                  <div style="display:flex;gap:4px;margin-top:10px;padding:4px;border-radius:11px;background:oklch(1 0 0 / 0.05);">
+                    <sc-for list="{{ cqPayStatusOpts }}" as="o" hint-placeholder-count="3">
+                      <button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button>
+                    </sc-for>
+                  </div>
+                  <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                    <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Method</span>
+                    <select value="{{ cqPayMethod }}" onChange="{{ onCqPayMethod }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                      <option value="cash">Cash</option>
+                      <option value="check">Check</option>
+                      <option value="card">Card by phone</option>
+                      <option value="etransfer">E-transfer</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </label>
+                </div>
+
+                <!-- double-booking guard -->
+                <sc-if value="{{ cqConflict }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:16px;border-radius:14px;border:1px solid oklch(0.62 0.17 25 / 0.55);background:oklch(0.5 0.17 25 / 0.14);padding:13px 15px;display:flex;gap:11px;align-items:flex-start;">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.15 30)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <div style="min-width:0;">
+                      <div style="font-weight:700;font-size:13px;color:oklch(0.86 0.13 28);">{{ cqConflictName }} is already booked for these dates</div>
+                      <div style="font-size:12.5px;color:oklch(0.82 0.07 32);line-height:1.5;margin-top:3px;">{{ cqConflictLabel }}</div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- actions -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;">
+                  <button onClick="{{ emailQuote }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Email quote</button>
+                  <sc-if value="{{ cqNoConflict }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ confirmPhoneBooking }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Book over the phone</button>
+                  </sc-if>
+                  <sc-if value="{{ cqConflict }}" hint-placeholder-val="{{ false }}">
+                    <button disabled style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.12);cursor:not-allowed;background:oklch(1 0 0 / 0.04);color:oklch(0.6 0.02 280);font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Trailer unavailable</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- SENT -->
+            <sc-if value="{{ cqSent }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:32px 22px 28px;text-align:center;">
+                <span style="width:60px;height:60px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="oklch(0.8 0.16 152)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Quote emailed</h3>
+                <p style="margin:10px auto 0;font-size:14px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:38ch;">We sent the {{ cqSelName }} quote for <strong style="color:#fff;">{{ cqTotalLabel }}</strong> to <strong style="color:#fff;">{{ cqEmailTo }}</strong>. They can reserve online anytime from the email.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px;">
+                  <button onClick="{{ createAnotherQuote }}" style="padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Create another</button>
+                  <button onClick="{{ closeQuote }}" style="padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Done</button>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- BOOKED -->
+            <sc-if value="{{ cqBooked }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:32px 22px 28px;text-align:center;">
+                <span style="width:60px;height:60px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Booked over the phone</h3>
+                <p style="margin:10px auto 0;font-size:14px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:40ch;">{{ cqSelName }} is reserved for <strong style="color:#fff;">{{ cqBookName }}</strong>, {{ cqTripDates }}. Recorded as <strong style="color:oklch(0.84 0.06 152);">{{ cqPayResultLabel }}</strong> · {{ cqTotalLabel }}.</p>
+                <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:38ch;">It's on the calendar now, marked confirmed. No online payment needed.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px;">
+                  <button onClick="{{ createAnotherQuote }}" style="padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Create another</button>
+                  <button onClick="{{ closeQuote }}" style="padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Done</button>
+                </div>
+              </div>
+            </sc-if>
+
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== BLOCK-A-TRAILER MODAL ===== -->
+      <sc-if value="{{ blockOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;">
+          <div onClick="{{ closeBlock }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.66);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);"></div>
+          <div style="position:relative;width:100%;max-width:440px;background:oklch(0.14 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid oklch(1 0 0 / 0.1);">
+              <span style="width:40px;height:40px;border-radius:11px;background:repeating-linear-gradient(45deg, oklch(0.4 0.01 280 / 0.7) 0 5px, oklch(0.28 0.01 280 / 0.7) 5px 10px);border:1px solid oklch(1 0 0 / 0.12);display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6 6a1.5 1.5 0 0 0 2.1 2.1l6-6a4 4 0 0 0 5.4-5.4l-2.3 2.3-1.4-1.4 2.3-2.3ZM15 15l4 4" stroke="oklch(0.82 0.015 280)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.15;">Block a trailer</div>
+                <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">Hold it off the calendar so nothing can book</div>
+              </div>
+              <button onClick="{{ closeBlock }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+
+            <div style="padding:20px 22px 24px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Trailer</span>
+                <select value="{{ bfTrailer }}" onChange="{{ onBfTrailer }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  <sc-for list="{{ blockTrailers }}" as="t" hint-placeholder-count="8">
+                    <option value="{{ t.id }}">{{ t.name }}</option>
+                  </sc-for>
+                </select>
+              </label>
+
+              <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:12px;">
+                <label style="display:flex;flex-direction:column;gap:6px;">
+                  <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Start date</span>
+                  <input type="date" value="{{ bfDate }}" onChange="{{ onBfDate }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;color-scheme:dark;">
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;">
+                  <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Nights</span>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <button onClick="{{ decBfNights }}" style="width:38px;height:44px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                    <div style="flex:1;text-align:center;font-family:'Archivo Black',sans-serif;font-size:18px;color:#fff;">{{ bfNights }}</div>
+                    <button onClick="{{ incBfNights }}" style="width:38px;height:44px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+                  </div>
+                </label>
+              </div>
+
+              <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Reason</span>
+                <select value="{{ bfReason }}" onChange="{{ onBfReason }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  <option value="Maintenance">Maintenance</option>
+                  <option value="Deep clean">Deep clean</option>
+                  <option value="Owner use">Owner use</option>
+                  <option value="Repairs">Repairs</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+
+              <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Note <span style="color:oklch(0.6 0.02 280);font-weight:400;">(optional)</span></span>
+                <input type="text" value="{{ bfNote }}" onChange="{{ onBfNote }}" placeholder="e.g. Axle service at Grants Pass" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+              </label>
+
+              <sc-if value="{{ bfNoConflict }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:16px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:oklch(1 0 0 / 0.04);border:1px solid oklch(1 0 0 / 0.1);font-size:13px;color:oklch(0.82 0.015 270);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16h.01M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.8 0.11 75)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span>{{ blockPreview }}</span>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ bfConflict }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:16px;border-radius:12px;border:1px solid oklch(0.62 0.17 25 / 0.55);background:oklch(0.5 0.17 25 / 0.14);padding:13px 15px;display:flex;gap:11px;align-items:flex-start;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.16 28)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:13px;color:oklch(0.86 0.13 28);">{{ bfConflictName }} is already booked for these dates</div>
+                    <div style="font-size:12.5px;color:oklch(0.82 0.07 32);line-height:1.5;margin-top:3px;">{{ bfConflictLabel }}</div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ bfNoConflict }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ addBlock }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Block these nights</button>
+              </sc-if>
+              <sc-if value="{{ bfConflict }}" hint-placeholder-val="{{ false }}">
+                <button disabled style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.12);cursor:not-allowed;background:oklch(1 0 0 / 0.04);color:oklch(0.6 0.02 280);font-weight:600;font-size:15px;">Trailer unavailable</button>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  // Merge saved delivered/returned/cancelled overrides into the INITIAL state so
+  // they're present on the very first render (not applied a frame later via setState).
+  state = { authed: (function () { try { return localStorage.getItem('sd_admin_session') === '1'; } catch (e) { return false; } })(), loginEmail: '', sel: null,
+    status: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({ w02: 'out', w07: 'out' }, s.status || {}); } catch (e) { return { w02: 'out', w07: 'out' }; } })(),
+    cancelled: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.cancelled || {}); } catch (e) { return {}; } })(),
+    charges: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.charges || {}); } catch (e) { return {}; } })(),
+    autoOpen: false,
+    autoNudge: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.nudge !== false; } catch (e) { return true; } })(),
+    nudgeLead: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.lead || 3; } catch (e) { return 3; } })(),
+    autoRetry: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.retry !== false; } catch (e) { return true; } })(),
+    retryEvery: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.retryEvery || 2; } catch (e) { return 2; } })(),
+    autoRefund: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.refund !== false; } catch (e) { return true; } })(),
+    refundLead: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.refundLead || 1; } catch (e) { return 1; } })(),
+    refunds: (function () { try { const s = JSON.parse(localStorage.getItem('sd_admin_overrides') || '{}'); return Object.assign({}, s.refunds || {}); } catch (e) { return {}; } })(),
+    view: 'calendar', calViewMonth: null, blocks: [], blockOpen: false, payFilter: 'all',
+    bfTrailer: 'marylou', bfDate: '2026-07-07', bfNights: 2, bfReason: 'Maintenance', bfNote: '',
+    phoneBookings: [], cqOpen: false, cqStep: 'build',
+    cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
+    cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
+    cqRate: 149, cqDelivery: 0, cqAdjust: 0,
+    cqPayStatus: 'full', cqPayMethod: 'cash', webBookings: [], toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true };
+
+  // ----- Live feed of bookings made on the customer website -----
+  WEB_KEY = 'sd_web_bookings';
+  STATUS_KEY = 'sd_admin_overrides';
+  OCC_KEY = 'sd_occupancy';
+  loadWebBookings = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(this.WEB_KEY) || '[]');
+      // Only re-render if the set actually changed, to avoid needless churn.
+      if (JSON.stringify(arr) !== JSON.stringify(this.state.webBookings)) {
+        this.setState({ webBookings: arr });
+      }
+    } catch (e) {}
+  };
+  // Write overrides straight to localStorage inside each handler. componentDidUpdate
+  // is not a reliable persistence hook in this runtime, so we call this explicitly.
+  persistOverrides(status, cancelled, charges, refunds) {
+    try {
+      localStorage.setItem(this.STATUS_KEY, JSON.stringify({
+        status: status || this.state.status,
+        cancelled: cancelled || this.state.cancelled,
+        charges: charges || this.state.charges,
+        refunds: refunds || this.state.refunds,
+      }));
+    } catch (e) {}
+  }
+  persistAutomations(patch) {
+    try {
+      const base = { nudge: this.state.autoNudge, lead: this.state.nudgeLead, retry: this.state.autoRetry, retryEvery: this.state.retryEvery };
+      localStorage.setItem('sd_admin_automations', JSON.stringify(Object.assign(base, patch || {})));
+    } catch (e) {}
+  }
+  componentDidMount() {
+    this.loadWebBookings();
+    // Deep-link support: ?view=list opens the list tab; ?sel=<id> opens a booking.
+    try {
+      const params = new URLSearchParams(location.search);
+      const patch = {};
+      if (params.get('view') === 'list') patch.view = 'list';
+      if (params.get('sel')) patch.sel = params.get('sel');
+      if (Object.keys(patch).length) this.setState(patch);
+    } catch (e) {}
+    // (Saved overrides are already merged into initial state — see the state initializer.)
+    this._onStorage = (e) => { if (!e || e.key === this.WEB_KEY) this.loadWebBookings(); };
+    window.addEventListener('storage', this._onStorage);
+    window.addEventListener('focus', this._onStorage);
+    // Same-tab writes don't fire 'storage', so poll as a fallback.
+    this._webPoll = setInterval(this.loadWebBookings, 2000);
+    // Roll the calendar over at midnight Pacific: check each minute whether
+    // the PST calendar date has advanced, and re-anchor day 0 if so.
+    this._dayPoll = setInterval(() => {
+      const today = this.pstToday();
+      if (today.getTime() !== this.baseDate.getTime()) {
+        const monthChanged = today.getMonth() !== this.baseDate.getMonth() || today.getFullYear() !== this.baseDate.getFullYear();
+        this.baseDate = today;
+        // On the 1st of a new month (midnight PST), snap the view to the new current month.
+        if (monthChanged) this.setState({ calViewMonth: null }); else this.forceUpdate();
+      }
+    }, 60000);
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.status !== this.state.status || prevState.cancelled !== this.state.cancelled || prevState.charges !== this.state.charges || prevState.refunds !== this.state.refunds) {
+      try {
+        localStorage.setItem(this.STATUS_KEY, JSON.stringify({ status: this.state.status, cancelled: this.state.cancelled, charges: this.state.charges, refunds: this.state.refunds }));
+      } catch (e) {}
+    }
+  }
+  componentWillUnmount() {
+    window.removeEventListener('storage', this._onStorage);
+    window.removeEventListener('focus', this._onStorage);
+    clearInterval(this._webPoll);
+    if (this._dayPoll) clearInterval(this._dayPoll);
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+  }
+  // Instant action + Undo safety net. The undo callback lives on the instance,
+  // not in state — this runtime clones state and would drop a function.
+  showToast(msg, undoFn) {
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+    const tid = Date.now();
+    this._undoFn = undoFn;
+    this.setState({ toast: { msg, tid, undo: !!undoFn } });
+    this._toastTimer = setTimeout(() => {
+      this.setState((s) => (s.toast && s.toast.tid === tid ? { toast: null } : {}));
+    }, 6000);
+  }
+  dismissToast() {
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+    this._undoFn = null;
+    this.setState({ toast: null });
+  }
+  runUndo() {
+    if (this._undoFn) this._undoFn();
+    this.dismissToast();
+  }
+  // Convert website bookings into the admin's internal booking shape.
+  webMapped() {
+    return (this.state.webBookings || []).map((w) => {
+      const d = w.arrival ? new Date(w.arrival + 'T00:00:00') : null;
+      if (!d || isNaN(d)) return null;
+      const start = Math.round((d.getTime() - this.baseDate.getTime()) / 86400000);
+      return {
+        id: w.id, trailer: w.trailer, start, nights: w.nights,
+        guest: w.guest, phone: w.phone || w.email || 'Online booking',
+        site: w.site, total: w.total, type: 'confirmed',
+        source: 'web', email: w.email,
+        plan: w.paymentPlan || 'full',
+        deposit: (w.deposit != null ? w.deposit : 1000),
+        paidToday: (w.dueToday != null ? w.dueToday : w.total),
+        pay: { status: (w.paymentPlan === 'firstnight' ? 'First night paid' : 'Paid in full'), method: 'Card online' },
+        addons: w.addons,
+      };
+    }).filter(Boolean);
+  }
+
+  cqAddonsList = [
+    { id: 'kayak',  name: 'Kayak',           price: 45 },
+    { id: 'sup',    name: 'Paddleboard',     price: 45 },
+    { id: 'pedal',  name: 'Pedal boat',      price: 65 },
+    { id: 'cabana', name: 'Floating cabana', price: 120 },
+    { id: 'bikes',  name: 'Bikes',           price: 60 },
+    { id: 'grill',  name: 'Propane grill',   price: 25 },
+    { id: 'wood',   name: 'Firewood',        price: 20 },
+    { id: 'chairs', name: 'Camp chairs',     price: 15 },
+  ];
+
+  // day 0 = today in Pacific time (auto-advances at 12:00am PST/PDT)
+  pstToday() {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles', year: 'numeric', month: 'numeric', day: 'numeric',
+    }).formatToParts(new Date());
+    const get = (t) => +parts.find((p) => p.type === t).value;
+    return new Date(get('year'), get('month') - 1, get('day'));
+  }
+  baseDate = this.pstToday();
+  WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  trailers = [
+    { id: 'charlie',  name: 'Charlie',   tag: 'Sleeps 4 · $149',  rate: 149 },
+    { id: 'ella',     name: 'Ella',      tag: 'Sleeps 2–4 · $159', rate: 159 },
+    { id: 'virginia', name: 'Virginia',  tag: 'Sleeps 4 · $159',  rate: 159 },
+    { id: 'marylou',  name: 'Mary Lou',  tag: 'Sleeps 4–6 · $159', rate: 159 },
+    { id: 'jerry',    name: 'Jerry',     tag: 'Sleeps 6–8 · $169', rate: 169 },
+    { id: 'patricia', name: 'Patricia',  tag: 'Sleeps 6 · $169',  rate: 169 },
+    { id: 'nola',     name: 'Nola',      tag: 'Sleeps 8 · $169',  rate: 169 },
+    { id: 'billybob', name: 'Billy Bob', tag: 'Sleeps 8 · $169',  rate: 169 },
+  ];
+
+  trailerColors = {
+    charlie:  'oklch(0.62 0.17 250)',
+    ella:     'oklch(0.64 0.12 195)',
+    virginia: 'oklch(0.64 0.15 150)',
+    marylou:  'oklch(0.60 0.19 292)',
+    jerry:    'oklch(0.66 0.16 55)',
+    patricia: 'oklch(0.64 0.19 355)',
+    nola:     'oklch(0.58 0.18 275)',
+    billybob: 'oklch(0.66 0.14 115)',
+  };
+
+  bookings = (window.SDBookings ? window.SDBookings.SEED : []);
+
+  fmt(n) { return '$' + Number(n).toLocaleString('en-US'); }
+  navTabStyle(active) {
+    return "text-decoration:none;padding:7px 15px;border-radius:9999px;border:none;cursor:pointer;font-weight:600;font-size:12.5px;font-family:'Nunito Sans',sans-serif;" + (active
+      ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;'
+      : 'background:transparent;color:oklch(0.82 0.015 270);');
+  }
+  dateAt(i) { return new Date(this.baseDate.getTime() + i * 86400000); }
+  // A first-night reserve's balance auto-charge that didn't clear. Override 'paid' resolves it; 'failed' forces it.
+  chargeFailed(b) {
+    if (!b) return false;
+    const o = this.state.charges[b.id];
+    if (o === 'paid') return false;
+    if (o === 'failed') return true;
+    return !!b.balanceChargeFailed;
+  }
+  refundDone(b) { return !!(b && this.state.refunds[b.id]); }
+  refundReasons = ['No damage — full return', 'Cleaning fee deducted', 'Damage repair deducted', 'Late return fee', 'Goodwill gesture', 'Other'];
+  // Amount already refunded for a booking (partial supported; legacy `true` = full deposit).
+  refundedAmt(b) { const v = b && this.state.refunds[b.id]; if (v && typeof v === 'object') return v.amount; return typeof v === 'number' ? v : (v ? this.depAmt(b) : 0); }
+  refundReasonOf(b) { const v = b && this.state.refunds[b.id]; return (v && typeof v === 'object' && v.reason) ? v.reason : ''; }
+  refundEmailOf(b) { const v = b && this.state.refunds[b.id]; return (v && typeof v === 'object' && v.emailed) ? (v.email || '') : ''; }
+  emailFor(b) { return (b && b.email) ? b.email : ''; }
+  // Shared refund action — used by the drawer button and the Deposits tab, after confirm.
+  doRefund(id, amount, reason, sendEmail) {
+    if (!id) return;
+    const all = this.bookings.concat(this.state.blocks).concat(this.state.phoneBookings).concat(this.webMapped());
+    const b = all.find((x) => x.id === id);
+    const dep = this.depAmt(b);
+    let amt = Number(amount);
+    if (!isFinite(amt) || amt <= 0) amt = dep;
+    amt = Math.min(amt, dep);
+    const partial = amt < dep;
+    const rsn = (reason || '').trim() || 'No reason given';
+    const email = this.emailFor(b);
+    const emailed = !!(sendEmail && email);
+    const prev = this.state.refunds[id];
+    const next = { ...this.state.refunds, [id]: { amount: amt, reason: rsn, emailed: emailed, email: email } };
+    this.setState({ refunds: next, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', sel: null });
+    this.persistOverrides(this.state.status, this.state.cancelled, this.state.charges, next);
+    this.showToast('Stripe refund issued · ' + this.fmt(amt) + (partial ? ' (partial)' : '') + ' · ' + rsn + (emailed ? ' · receipt emailed' : ''), () => { const rx = { ...this.state.refunds }; if (prev === undefined) delete rx[id]; else rx[id] = prev; this.setState({ refunds: rx }); this.persistOverrides(this.state.status, this.state.cancelled, this.state.charges, rx); });
+  }
+  // Deposit amount for a booking (default $1000 hold when not explicitly set; never for blocks).
+  depAmt(b) { if (!b || b.type === 'block') return 0; return b.deposit != null ? b.deposit : 1000; }
+  dLabel(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+  toISO(d) { const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
+  // Publish every live hold (bookings, phone bookings, and maintenance blocks) as
+  // absolute-date ranges so the customer website can check real availability.
+  publishOccupancy(live) {
+    try {
+      const occ = live.map((b) => ({ trailer: b.trailer, arrival: this.toISO(this.dateAt(b.start)), nights: b.nights, kind: b.type }));
+      const json = JSON.stringify(occ);
+      if (json !== this._lastOcc) { this._lastOcc = json; localStorage.setItem(this.OCC_KEY, json); }
+    } catch (e) {}
+  }
+
+  renderVals() {
+    const today0 = this.baseDate;
+    const curMonth = today0.getFullYear() + '-' + String(today0.getMonth() + 1).padStart(2, '0');
+    const monthSel = this.state.calViewMonth || curMonth;
+    const mp = monthSel.split('-').map(Number);
+    const monthStart = new Date(mp[0], mp[1] - 1, 1);
+    const N = new Date(mp[0], mp[1], 0).getDate();     // days in the viewed month
+    const off = Math.round((monthStart.getTime() - today0.getTime()) / 86400000); // index of the 1st
+    const monthLabel = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const currentMonthLabel = 'Today';
+    const monthOptions = Array.from({ length: 18 }, (_, k) => {
+      const d = new Date(today0.getFullYear(), today0.getMonth() + k, 1);
+      return { value: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), label: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) };
+    });
+    const calMonthSel = monthSel;
+    const gridCols = '150px repeat(' + N + ', minmax(30px, 1fr))';
+    const gridMin = (150 + N * 34) + 'px';
+    const eff = (b) => this.state.cancelled[b.id] ? 'cancelled' : (b.type === 'block' ? 'block' : (this.state.status[b.id] || b.type));
+    // Auto-confirm: a web booking whose payment has processed (deposit/first-night/paid
+    // in full) is accepted automatically — only an unpaid invoice stays "pending review".
+    const autoConfirm = (b) => (b.source === 'web' && b.type === 'pending' && b.pay && !/invoice|unpaid/i.test(b.pay.status))
+      ? { ...b, type: 'confirmed', _autoConfirmed: true } : b;
+    const allItems = this.bookings.concat(this.state.blocks).concat(this.state.phoneBookings).concat(this.webMapped()).map(autoConfirm);
+    const live = allItems.filter((b) => eff(b) !== 'cancelled');
+    this.publishOccupancy(live);
+
+    // ---- Double-booking guard for the quote builder ----
+    // Candidate trip (from the builder) vs everything already live on the same trailer.
+    const cqStartDate = this.state.cqDate ? new Date(this.state.cqDate + 'T00:00:00') : null;
+    const cqStartIdx = (cqStartDate && !isNaN(cqStartDate)) ? Math.round((cqStartDate.getTime() - this.baseDate.getTime()) / 86400000) : null;
+    const cqEndIdx = cqStartIdx == null ? null : cqStartIdx + this.state.cqNights;
+    // Half-open interval overlap: [start, start+nights). Same-day turnaround (one out, one in) is allowed.
+    const cqConflictList = cqStartIdx == null ? [] : live.filter((b) =>
+      b.trailer === this.state.cqTrailer && cqStartIdx < (b.start + b.nights) && b.start < cqEndIdx
+    );
+
+    // ---- Double-booking guard for the maintenance block form ----
+    const bfStartDate = this.state.bfDate ? new Date(this.state.bfDate + 'T00:00:00') : null;
+    const bfStartIdx = (bfStartDate && !isNaN(bfStartDate)) ? Math.round((bfStartDate.getTime() - this.baseDate.getTime()) / 86400000) : null;
+    const bfEndIdx = bfStartIdx == null ? null : bfStartIdx + this.state.bfNights;
+    const bfConflictList = bfStartIdx == null ? [] : live.filter((b) =>
+      b.trailer === this.state.bfTrailer && bfStartIdx < (b.start + b.nights) && b.start < bfEndIdx
+    );
+
+    // days header
+    const days = Array.from({ length: N }, (_, i) => {
+      const d = this.dateAt(off + i);
+      const we = d.getDay() === 0 || d.getDay() === 6;
+      return {
+        wd: this.WD[d.getDay()],
+        num: d.getDate(),
+        headStyle: 'padding:8px 0;text-align:center;border-left:1px solid oklch(1 0 0 / 0.06);' + (we ? 'background:oklch(1 0 0 / 0.03);' : ''),
+      };
+    });
+
+    const alpha = (c, a) => c.replace(')', ' / ' + a + ')');
+    const barStyle = (type, color, reserve, failed) => {
+      const base = 'grid-row:1;z-index:2;margin:7px 3px;border-radius:9px;cursor:pointer;display:flex;align-items:center;padding:0 10px;overflow:hidden;';
+      if (type === 'block') return base + 'border:1px solid oklch(1 0 0 / 0.12);background:repeating-linear-gradient(45deg, oklch(0.4 0.01 280 / 0.7) 0 5px, oklch(0.28 0.01 280 / 0.7) 5px 10px);';
+      if (type === 'returned') return base + 'border:1px dashed ' + alpha(color, 0.5) + ';background:' + alpha(color, 0.12) + ';';
+      if (failed) return base + 'border:none;background:' + color + ';box-shadow:inset 4px 0 0 0 oklch(0.62 0.22 25), 0 6px 16px -8px ' + alpha(color, 0.8) + ';'; // confirmed · charge failed
+      if (type === 'pending') return base + 'border:1px solid ' + alpha(color, 0.65) + ';background:' + alpha(color, 0.24) + ';';
+      if (type === 'out') return base + 'border:none;background:' + color + ';box-shadow:inset 0 0 0 1.6px oklch(0.95 0.14 158 / 0.95), 0 6px 16px -8px ' + alpha(color, 0.8) + ';';
+      if (reserve) return base + 'border:none;background:' + color + ';box-shadow:inset 4px 0 0 0 oklch(0.84 0.14 75), 0 6px 16px -8px ' + alpha(color, 0.8) + ';'; // confirmed · balance due
+      return base + 'border:none;background:' + color + ';box-shadow:0 6px 16px -8px ' + alpha(color, 0.8) + ';'; // confirmed · paid
+    };
+    const textColor = (type) => (type === 'confirmed' || type === 'out') ? '#fff' : type === 'returned' ? 'oklch(0.62 0.02 280)' : type === 'block' ? 'oklch(0.78 0.015 280)' : 'oklch(0.95 0.02 280)';
+
+    const rows = this.trailers.map((t) => {
+      const tColor = this.trailerColors[t.id] || 'oklch(0.6 0.17 264)';
+      const cells = days.map((d, i) => ({
+        style: 'grid-column:' + (i + 2) + ';grid-row:1;border-left:1px solid oklch(1 0 0 / 0.05);' + ((this.dateAt(off + i).getDay() === 0 || this.dateAt(off + i).getDay() === 6) ? 'background:oklch(1 0 0 / 0.02);' : ''),
+      }));
+      const bars = live.filter((b) => b.trailer === t.id).map((b) => {
+        const type = eff(b);
+        const s0 = b.start - off;            // start relative to the visible window
+        const end = s0 + b.nights;           // exclusive end (checkout day)
+        const vStart = Math.max(s0, 0);      // clamp into the visible 14-day window
+        const vEnd = Math.min(end, N);
+        if (vEnd <= vStart) return null;     // entirely before/after the window
+        const span = vEnd - vStart;
+        const clipL = s0 < 0;
+        const clipR = end > N;
+        let extra = '';
+        if (clipL) extra += 'border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0;';   // started earlier — flush left
+        if (clipR) extra += 'border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0;'; // runs past — flush right
+        // First-night reserve whose balance hasn't auto-charged yet (fires ~14 days out).
+        const chFailed = this.chargeFailed(b);
+        const reserve = b.plan === 'firstnight' && type === 'confirmed' && b.start > 14 && !chFailed;
+        return {
+          label: b.guest,
+          reserve: reserve || chFailed,
+          reserveColor: chFailed ? 'oklch(0.7 0.2 25)' : 'oklch(0.86 0.14 78)',
+          tooltip: b.guest + ' \u00b7 ' + this.dLabel(this.dateAt(b.start)) + ' \u2013 ' + this.dLabel(this.dateAt(b.start + b.nights)) + (chFailed ? ' \u00b7 balance auto-charge failed' : reserve ? ' \u00b7 reserved with first night, balance due' : ''),
+          textColor: textColor(type),
+          style: barStyle(type, tColor, reserve, chFailed) + 'grid-column:' + (2 + vStart) + ' / span ' + span + ';' + extra,
+          onClick: () => this.setState({ sel: b.id }),
+        };
+      }).filter(Boolean);
+      return { name: t.name, tag: t.tag, color: tColor, cells, bars };
+    });
+
+    // stats (occupancy is scoped to the visible month)
+    const winStart = off, winEnd = off + N;
+    const committed = live.reduce((s, b) => s + Math.max(0, Math.min(b.start + b.nights, winEnd) - Math.max(b.start, winStart)), 0);
+    const occ = Math.round((committed / (this.trailers.length * N)) * 100);
+    const confirmedCount = live.filter((b) => eff(b) === 'confirmed').length;
+    const outCount = live.filter((b) => eff(b) === 'out').length;
+    const pendingCount = live.filter((b) => eff(b) === 'pending').length;
+    const revenue = live.filter((b) => b.type !== 'block').reduce((s, b) => s + b.total, 0);
+    // Deposits held = deposits actually collected and not yet refunded (via Stripe).
+    // Full-payment bookings collect the deposit up front; a first-night reserve collects
+    // it WITH the balance auto-charge (~14 days before arrival) — so a reserve that is
+    // still >14 days out (or whose charge failed) has NOT posted a deposit yet.
+    // Pending/quote holds haven't paid either. A refunded deposit is no longer held.
+    const depCollected = (b) => {
+      if (b.type === 'block') return false;
+      const e = eff(b);
+      if (e === 'pending' || e === 'cancelled') return false;
+      if (this.refundDone(b)) return false;
+      if (b.plan === 'firstnight' && (b.start > 14 || this.chargeFailed(b))) return false;
+      return this.depAmt(b) > 0;
+    };
+    const depositsHeldList = live.filter(depCollected);
+    const deposits = depositsHeldList.reduce((s, b) => s + this.depAmt(b), 0);
+    const depositsHeldCount = depositsHeldList.length;
+    // Returned trailers whose deposit hold is still on file (not yet refunded via Stripe).
+    const pendingDepositRaw = live
+      .filter((b) => b.type !== 'block' && eff(b) === 'returned' && this.depAmt(b) > 0 && !this.refundDone(b))
+      .sort((a, c) => (a.start + a.nights) - (c.start + c.nights));
+    // ---- refund confirm (supports partial amounts) ----
+    const rcB = allItems.find((b) => b.id === this.state.refundConfirm);
+    const rcDep = rcB ? this.depAmt(rcB) : 0;
+    let rcAmt = Number(this.state.refundAmt);
+    if (!isFinite(rcAmt) || rcAmt <= 0) rcAmt = rcDep;
+    rcAmt = Math.min(rcAmt, rcDep);
+    // Uncollected trip balances: first-night reserves whose balance hasn't auto-charged
+    // yet (auto-charge fires ~14 days before arrival, i.e. while start > 14).
+    const toCollect = live.reduce((s, b) => {
+      if (b.type === 'block' || eff(b) === 'returned') return s;
+      if (b.plan === 'firstnight' && b.start > 14) return s + Math.max(0, b.total - (b.paidToday != null ? b.paidToday : 0));
+      return s;
+    }, 0);
+    // Revenue booked for the month currently in view (each trip counts in its arrival month).
+    const monthTrips = live.filter((b) => b.type !== 'block' && b.start >= off && b.start < off + N);
+    const monthRevenue = monthTrips.reduce((s, b) => s + (b.total || 0), 0);
+    // Overdue = money past due: unpaid invoices whose trip has started/finished, plus first-night balances whose auto-charge failed.
+    const overdueList = live.filter((b) => b.type !== 'block' && eff(b) !== 'returned' && (
+      (b.pay && /invoice|unpaid/i.test(b.pay.status) && b.start <= 0) || this.chargeFailed(b)
+    ));
+    const overdue = overdueList.reduce((s, b) => s + (this.chargeFailed(b) ? Math.max(0, b.total - (b.paidToday || 0)) : (b.total || 0)), 0);
+    const overdueCount = overdueList.length;
+    const baseCard = 'background:oklch(0.16 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:18px;padding:18px 20px;';
+    const overdueCard = 'background:oklch(0.24 0.08 25 / 0.32);border:1px solid oklch(0.6 0.17 25 / 0.5);border-radius:18px;padding:18px 20px;';
+    const stats = [
+      { label: 'This month’s occupancy', value: occ + '%', sub: committed + ' of ' + (this.trailers.length * N) + ' trailer-nights', cardStyle: baseCard, valueColor: '#fff' },
+      { label: 'Confirmed bookings', value: String(confirmedCount), sub: pendingCount + ' pending · ' + outCount + ' out on trips', cardStyle: baseCard, valueColor: '#fff' },
+      { label: 'Revenue on the books', value: this.fmt(revenue), sub: 'Contracted · trip value', cardStyle: baseCard, valueColor: '#fff' },
+      { label: 'Balance to collect', value: this.fmt(toCollect), sub: 'First-night reserves · auto-charged', cardStyle: baseCard, valueColor: '#fff' },
+      { label: 'Overdue balances', value: this.fmt(overdue), sub: overdueCount === 0 ? 'Nothing past due' : (overdueCount + (overdueCount === 1 ? ' account' : ' accounts') + ' · failed charge / past due'), cardStyle: overdue > 0 ? overdueCard : baseCard, valueColor: overdue > 0 ? 'oklch(0.78 0.18 25)' : '#fff' },
+      { label: 'Deposits held', value: this.fmt(deposits), sub: depositsHeldCount + (depositsHeldCount === 1 ? ' hold on file' : ' holds on file') + ' · auto-refunded on return', cardStyle: baseCard, valueColor: '#fff' },
+    ];
+
+    const trailerName = (id) => (this.trailers.find((t) => t.id === id) || {}).name || id;
+    const QCAP = 4;
+    const queueItems = (stage, sortKey) => live.filter((b) => b.type !== 'block' && eff(b) === stage).slice().sort((a, c) => sortKey(a) - sortKey(c)).map((b) => {
+      const idx = sortKey(b);
+      const d = this.dateAt(idx);
+      const today = idx === 0; // day 0 = today in Pacific time
+      return {
+        wd: this.WD[d.getDay()], num: d.getDate(),
+        trailer: trailerName(b.trailer), guest: b.guest, site: b.site,
+        today,
+        rowStyle: 'display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;cursor:pointer;text-align:left;width:100%;' + (today
+          ? 'border:1px solid oklch(0.62 0.22 27 / 0.6);background:oklch(0.6 0.23 27 / 0.16);box-shadow:0 0 0 1px oklch(0.62 0.22 27 / 0.35) inset;'
+          : 'border:1px solid oklch(1 0 0 / 0.08);background:oklch(1 0 0 / 0.03);'),
+        wdColor: today ? 'oklch(0.78 0.17 27)' : 'oklch(0.6 0.02 280)',
+        numColor: today ? 'oklch(0.72 0.21 27)' : '#fff',
+        onClick: () => this.setState({ sel: b.id }),
+      };
+    });
+    // Deliveries = confirmed, not yet out · sorted by arrival day
+    const deliveriesAll = queueItems('confirmed', (b) => b.start);
+    const deliveries = deliveriesAll.slice(0, QCAP);
+    const deliveriesMore = deliveriesAll.length - deliveries.length;
+    // Pickups = out on a trip · sorted by return day
+    const pickupsAll = queueItems('out', (b) => b.start + b.nights);
+    const pickups = pickupsAll.slice(0, QCAP);
+    const pickupsMore = pickupsAll.length - pickups.length;
+
+    // bookings list
+    const badgeLabel = { confirmed: 'Confirmed', pending: 'Pending', block: 'Maintenance', out: 'Out on trip', returned: 'Returned' };
+    const badgeStyle = (type) => 'display:inline-block;padding:4px 11px;border-radius:9999px;font-size:11px;font-weight:600;' + ({
+      confirmed: 'background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);color:oklch(0.84 0.06 152);',
+      pending: 'background:oklch(0.72 0.14 70 / 0.16);border:1px solid oklch(0.72 0.14 70 / 0.5);color:oklch(0.86 0.11 75);',
+      block: 'background:oklch(0.4 0.01 280 / 0.4);border:1px solid oklch(1 0 0 / 0.14);color:oklch(0.8 0.015 280);',
+      out: 'background:oklch(0.5 0.12 205 / 0.18);border:1px solid oklch(0.6 0.13 205 / 0.5);color:oklch(0.84 0.1 208);',
+      returned: 'background:oklch(0.4 0.01 280 / 0.32);border:1px solid oklch(1 0 0 / 0.12);color:oklch(0.72 0.015 280);',
+    }[type]);
+    const bookingList = live.slice().sort((a, c) => a.start - c.start).map((b) => {
+      const type = eff(b);
+      const s = this.dateAt(b.start);
+      const e = this.dateAt(b.start + b.nights);
+      // First-night reserve with balance still to auto-charge (fires ~14 days out).
+      const chFailed = this.chargeFailed(b);
+      const reserve = b.plan === 'firstnight' && type === 'confirmed' && b.start > 14 && !chFailed;
+      const tripBal = (reserve || chFailed) ? Math.max(0, b.total - (b.paidToday != null ? b.paidToday : 0)) : 0;
+      return {
+        trailer: trailerName(b.trailer),
+        guest: b.guest,
+        dates: this.dLabel(s) + ' – ' + this.dLabel(e),
+        site: b.site,
+        total: b.type === 'block' ? 'Blocked' : this.fmt(b.total),
+        balanceDue: reserve,
+        balanceLabel: reserve ? (this.fmt(tripBal) + ' due ' + this.dLabel(this.dateAt(b.start - 14))) : '',
+        chargeFailed: chFailed,
+        failedLabel: chFailed ? (this.fmt(tripBal) + ' · charge failed') : '',
+        _isBlock: b.type === 'block',
+        _unpaid: reserve || chFailed || !!(b.pay && /invoice|unpaid/i.test(b.pay.status)),
+        status: badgeLabel[type],
+        statusStyle: badgeStyle(type),
+        isWeb: b.source === 'web',
+        onClick: () => this.setState({ sel: b.id }),
+        goToMonth: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.setState({ view: 'calendar', calViewMonth: s.getFullYear() + '-' + String(s.getMonth() + 1).padStart(2, '0') }); },
+      };
+    });
+    // paid/unpaid filter (blocks are excluded from the paid & unpaid views)
+    const payFilter = this.state.payFilter || 'all';
+    const unpaidCount = bookingList.filter((b) => !b._isBlock && b._unpaid).length;
+    const paidCount = bookingList.filter((b) => !b._isBlock && !b._unpaid).length;
+    const bookingListAll = bookingList;
+    const bookingListShown = payFilter === 'unpaid' ? bookingListAll.filter((b) => !b._isBlock && b._unpaid)
+      : payFilter === 'paid' ? bookingListAll.filter((b) => !b._isBlock && !b._unpaid)
+      : bookingListAll;
+    const payChip = (key, active) => 'padding:6px 13px;border-radius:9999px;cursor:pointer;font-weight:600;font-size:12px;font-family:\'Nunito Sans\',sans-serif;white-space:nowrap;' + (active
+      ? 'border:1px solid oklch(0.6 0.16 264 / 0.6);background:oklch(0.5781 0.2303 264.8 / 0.2);color:#fff;'
+      : 'border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.04);color:oklch(0.74 0.02 280);');
+
+    // ---- Auto-nudge: reminders sent before a first-night balance is auto-charged ----
+    const nudgeLead = this.state.nudgeLead || 3;
+    const autoNudge = this.state.autoNudge;
+    const nudgeItems = live
+      .filter((b) => b.plan === 'firstnight' && eff(b) === 'confirmed' && b.start > 14 && !this.chargeFailed(b))
+      .map((b) => {
+        const chargeIdx = b.start - 14;
+        const nudgeIdx = chargeIdx - nudgeLead;
+        return { id: b.id, guest: b.guest, trailer: trailerName(b.trailer), nudgeIdx,
+          balance: this.fmt(Math.max(0, b.total - (b.paidToday != null ? b.paidToday : 0))),
+          nudgeDate: this.dLabel(this.dateAt(nudgeIdx)), chargeDate: this.dLabel(this.dateAt(chargeIdx)), sent: nudgeIdx <= 0 };
+      })
+      .sort((a, c) => a.nudgeIdx - c.nudgeIdx);
+    const nudgeScheduled = nudgeItems.filter((n) => !n.sent).length;
+    const nudgeList = nudgeItems.map((n) => ({
+      guest: n.guest, meta: n.trailer + ' · balance ' + n.balance,
+      when: (n.sent ? 'Reminded ' : 'Reminds ') + n.nudgeDate + ' · auto-charges ' + n.chargeDate,
+      statusLabel: n.sent ? 'Sent' : 'Scheduled',
+      statusStyle: 'flex:none;padding:3px 9px;border-radius:9999px;font-size:10.5px;font-weight:600;' + (n.sent
+        ? 'background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);color:oklch(0.84 0.06 152);'
+        : 'background:oklch(0.55 0.14 264 / 0.18);border:1px solid oklch(0.6 0.15 264 / 0.45);color:oklch(0.82 0.11 288);'),
+      onClick: () => this.setState({ sel: n.id, autoOpen: false }),
+    }));
+    const leadOpts = [2, 3, 5].map((d) => ({
+      label: d + ' days', on: nudgeLead === d,
+      style: 'flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:12.5px;font-family:\'Nunito Sans\',sans-serif;' + (nudgeLead === d
+        ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;'
+        : 'background:oklch(1 0 0 / 0.05);color:oklch(0.74 0.02 280);'),
+      onClick: () => { this.setState({ nudgeLead: d }); this.persistAutomations({ lead: d }); },
+    }));
+
+    // ---- Auto-retry: re-run a declined card on a schedule before flagging for manual follow-up ----
+    const autoRetry = this.state.autoRetry;
+    const retryEvery = this.state.retryEvery || 2;
+    const retryMax = 3;
+    const retryItems = live
+      .filter((b) => b.type !== 'block' && eff(b) !== 'returned' && this.chargeFailed(b))
+      .map((b) => {
+        const failIdx = b.start - 14;
+        const attempts = [1, 2, 3].map((k) => failIdx + retryEvery * k);
+        const made = attempts.filter((i) => i <= 0).length;
+        const nextIdx = attempts.find((i) => i > 0);
+        const exhausted = nextIdx === undefined;
+        return { id: b.id, guest: b.guest, trailer: trailerName(b.trailer),
+          balance: this.fmt(Math.max(0, b.total - (b.paidToday != null ? b.paidToday : 0))),
+          made: made, exhausted: exhausted, nextIdx: nextIdx,
+          nextDate: nextIdx !== undefined ? this.dLabel(this.dateAt(nextIdx)) : '' };
+      });
+    const retryActiveCount = retryItems.filter((r) => !r.exhausted).length;
+    const retryList = retryItems.map((r) => ({
+      guest: r.guest, meta: r.trailer + ' · balance ' + r.balance,
+      when: r.exhausted ? ('All ' + retryMax + ' attempts failed · needs manual follow-up') : ('Attempt ' + (r.made + 1) + ' of ' + retryMax + ' · retries ' + r.nextDate),
+      statusLabel: r.exhausted ? 'Action needed' : 'Retrying',
+      statusStyle: 'flex:none;padding:3px 9px;border-radius:9999px;font-size:10.5px;font-weight:600;' + (r.exhausted
+        ? 'background:oklch(0.5 0.16 25 / 0.16);border:1px solid oklch(0.6 0.17 25 / 0.5);color:oklch(0.82 0.15 28);'
+        : 'background:oklch(0.55 0.14 264 / 0.18);border:1px solid oklch(0.6 0.15 264 / 0.45);color:oklch(0.82 0.11 288);'),
+      onClick: () => this.setState({ sel: r.id, autoOpen: false }),
+    }));
+    const retryEveryOpts = [2, 3, 5].map((d) => ({
+      label: 'Every ' + d + 'd', on: retryEvery === d,
+      style: 'flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:12.5px;font-family:\'Nunito Sans\',sans-serif;' + (retryEvery === d
+        ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;'
+        : 'background:oklch(1 0 0 / 0.05);color:oklch(0.74 0.02 280);'),
+      onClick: () => { this.setState({ retryEvery: d }); this.persistAutomations({ retryEvery: d }); },
+    }));
+
+    // ---- Deposit refund reminder: prompt to return the hold once a trip is back ----
+    const autoRefund = this.state.autoRefund;
+    const refundLead = this.state.refundLead || 1;
+    const refundItems = live
+      .filter((b) => b.type !== 'block' && eff(b) === 'returned' && this.depAmt(b) > 0 && !this.refundDone(b))
+      .map((b) => {
+        const backIdx = b.start + b.nights;
+        const remindIdx = backIdx + refundLead;
+        return { id: b.id, guest: b.guest, trailer: trailerName(b.trailer), deposit: this.fmt(this.depAmt(b)),
+          remindIdx: remindIdx, due: remindIdx <= 0,
+          remindDate: this.dLabel(this.dateAt(remindIdx)) };
+      })
+      .sort((a, c) => a.remindIdx - c.remindIdx);
+    const refundActiveCount = refundItems.length;
+    const refundList = refundItems.map((r) => ({
+      guest: r.guest, meta: r.trailer + ' · deposit ' + r.deposit,
+      when: (r.due ? 'Refund due · flagged ' : 'Reminds ') + r.remindDate,
+      statusLabel: r.due ? 'Refund due' : 'Scheduled',
+      statusStyle: 'flex:none;padding:3px 9px;border-radius:9999px;font-size:10.5px;font-weight:600;' + (r.due
+        ? 'background:oklch(0.72 0.14 70 / 0.16);border:1px solid oklch(0.72 0.14 70 / 0.5);color:oklch(0.86 0.11 75);'
+        : 'background:oklch(0.55 0.14 264 / 0.18);border:1px solid oklch(0.6 0.15 264 / 0.45);color:oklch(0.82 0.11 288);'),
+      onClick: () => this.setState({ sel: r.id, autoOpen: false }),
+    }));
+    const refundLeadOpts = [1, 2, 3].map((d) => ({
+      label: d === 1 ? 'Next day' : (d + ' days'), on: refundLead === d,
+      style: 'flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:12.5px;font-family:\'Nunito Sans\',sans-serif;' + (refundLead === d
+        ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;'
+        : 'background:oklch(1 0 0 / 0.05);color:oklch(0.74 0.02 280);'),
+      onClick: () => { this.setState({ refundLead: d }); this.persistAutomations({ refundLead: d }); },
+    }));
+    const selB = allItems.find((b) => b.id === this.state.sel);
+    let selVals = {};
+    if (selB) {
+      const start = this.dateAt(selB.start);
+      const end = this.dateAt(selB.start + selB.nights);
+      const type = eff(selB);
+      const statusMap = {
+        confirmed: 'background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);color:oklch(0.84 0.06 152);',
+        pending: 'background:oklch(0.72 0.14 70 / 0.16);border:1px solid oklch(0.72 0.14 70 / 0.5);color:oklch(0.86 0.11 75);',
+        block: 'background:oklch(0.4 0.01 280 / 0.4);border:1px solid oklch(1 0 0 / 0.14);color:oklch(0.8 0.015 280);',
+      };
+      Object.assign(statusMap, {
+        out: 'background:oklch(0.5 0.12 205 / 0.18);border:1px solid oklch(0.6 0.13 205 / 0.5);color:oklch(0.84 0.1 208);',
+        returned: 'background:oklch(0.4 0.01 280 / 0.32);border:1px solid oklch(1 0 0 / 0.12);color:oklch(0.72 0.015 280);',
+      });
+      const labelMap = { confirmed: 'Confirmed', pending: 'Pending review', block: 'Maintenance block', out: 'Out on trip', returned: 'Returned · trip complete' };
+      // ----- money delineation: trip payment vs refundable deposit -----
+      const dep = this.depAmt(selB);
+      const hasPlan = !!selB.plan;
+      const isFN = selB.plan === 'firstnight';
+      const chFailed = this.chargeFailed(selB);
+      // First-night balance auto-charges ~14 days before arrival (while start > 14) — unless that charge failed.
+      const balanceCharged = isFN && selB.start <= 14 && !chFailed;
+      const tripCollected = !hasPlan ? selB.total
+        : isFN ? (balanceCharged ? selB.total : (selB.paidToday != null ? selB.paidToday : 0))
+        : selB.total;
+      const tripBalance = Math.max(0, selB.total - tripCollected);
+      const balanceDue = hasPlan && tripBalance > 0 && !chFailed;
+      const depReturned = type === 'returned';
+      const depRefunded = this.refundDone(selB);
+      const refundedAmount = this.refundedAmt(selB);
+      // Deposit is only "collected" once money is in: full-pay up front; first-night
+      // reserve WITH the balance auto-charge (~14 days out). Pending holds haven't paid.
+      const depCollected = dep > 0 && type !== 'pending' && (!isFN || balanceCharged);
+      const refundRemindIdx = selB.start + selB.nights + (this.state.refundLead || 1);
+      const chargeDate = this.dateAt(selB.start - 14);
+      selVals = {
+        selGuest: selB.guest,
+        selTrailer: trailerName(selB.trailer),
+        selNights: selB.nights,
+        selDates: this.dLabel(start) + ' – ' + this.dLabel(end),
+        selSite: selB.site,
+        selPhone: selB.phone,
+        selTotal: this.fmt(selB.total),
+        selBalance: this.fmt(Math.max(0, selB.total)),
+        selHasPlan: hasPlan,
+        selTripCollected: this.fmt(tripCollected),
+        selTripBalance: this.fmt(tripBalance),
+        selBalanceDue: balanceDue,
+        selPaidFull: hasPlan && !balanceDue && !chFailed,
+        selChargeFailed: chFailed,
+        selFailedBalance: this.fmt(tripBalance),
+        selFailedCaption: 'Auto-charge on ' + this.dLabel(chargeDate) + ' was declined',
+        selRetryShow: chFailed && this.state.autoRetry,
+        selRetryLabel: (() => { const rE = this.state.retryEvery || 2; const failIdx = selB.start - 14; const attempts = [1, 2, 3].map((k) => failIdx + rE * k); const made = attempts.filter((i) => i <= 0).length; const nextIdx = attempts.find((i) => i > 0); return nextIdx === undefined ? 'All 3 auto-retries failed — needs manual follow-up' : ('Auto-retry ' + (made + 1) + ' of 3 · next attempt ' + this.dLabel(this.dateAt(nextIdx))); })(),
+        selBalanceCaption: (balanceDue && isFN) ? ('auto-charges ' + this.dLabel(chargeDate)) : '',
+        selNudgeShow: balanceDue && isFN && this.state.autoNudge,
+        selNudgeLabel: (() => { const ni = selB.start - 14 - (this.state.nudgeLead || 3); return (ni <= 0 ? 'Reminder sent ' : 'Reminder sends ') + this.dLabel(this.dateAt(ni)); })(),
+        selPlanBadgeLabel: chFailed ? 'Charge failed' : (balanceDue ? 'First-night reserve' : 'Paid in full'),
+        selPlanBadgeStyle: 'display:inline-flex;align-items:center;padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:600;' + (chFailed
+          ? 'background:oklch(0.5 0.16 25 / 0.16);border:1px solid oklch(0.6 0.17 25 / 0.5);color:oklch(0.82 0.15 28);'
+          : balanceDue
+          ? 'background:oklch(0.72 0.14 70 / 0.16);border:1px solid oklch(0.72 0.14 70 / 0.5);color:oklch(0.86 0.11 75);'
+          : 'background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);color:oklch(0.84 0.06 152);'),
+        selDepositLabel: depRefunded ? (this.fmt(refundedAmount) + ' refunded' + (refundedAmount < dep ? ' of ' + this.fmt(dep) : '')) : (this.fmt(dep) + (depCollected ? ' · held' : ' · not yet collected')),
+        selRefundedLabel: 'Refunded ' + this.fmt(refundedAmount) + (refundedAmount < dep ? ' of ' + this.fmt(dep) : '') + ' to guest via Stripe',
+        selRefundReason: this.refundReasonOf(selB) || 'No reason given',
+        selRefundEmailed: !!this.refundEmailOf(selB),
+        selRefundEmail: this.refundEmailOf(selB),
+        selDepositCaption: depRefunded ? 'Refunded to guest via Stripe'
+          : depReturned ? 'Trip back · ready to refund via Stripe'
+          : (!depCollected && isFN) ? 'Collected with the balance auto-charge, 14 days out'
+          : !depCollected ? 'Collected when the booking is paid'
+          : 'Held on file · auto-refunded after the trip',
+        selRefundShow: depReturned && depCollected && !depRefunded,
+        selRefundReminderShow: depReturned && depCollected && !depRefunded && this.state.autoRefund,
+        selRefundDone: depReturned && (dep > 0) && depRefunded,
+        selRefundLabel: refundRemindIdx <= 0 ? 'Refund flagged — return the hold to the guest' : ('Refund reminder sends ' + this.dLabel(this.dateAt(refundRemindIdx))),
+        selStatusLabel: labelMap[type],
+        selStatusStyle: 'display:inline-block;padding:5px 11px;border-radius:9999px;font-size:11.5px;font-weight:600;' + statusMap[type],
+        selIsBooking: selB.type !== 'block',
+        selIsBlock: selB.type === 'block',
+        selCanConfirm: selB.type !== 'block' && type === 'pending',
+        selAutoConfirmed: !!selB._autoConfirmed && type === 'confirmed',
+        // Deliver only on/after the arrival day; return only on/after the checkout day.
+        selCanDeliver: selB.type !== 'block' && type === 'confirmed' && selB.start <= 0,
+        selCanReturn: selB.type !== 'block' && type === 'out' && (selB.start + selB.nights) <= 0,
+        selDone: selB.type !== 'block' && type === 'returned',
+        // Cancel only while the trip is still upcoming or active — not once returned or past.
+        selCanCancel: selB.type !== 'block' && type !== 'returned' && (selB.start + selB.nights) > 0,
+        selHasPay: !!selB.pay,
+        selPayLabel: selB.pay ? (selB.pay.status + ' · ' + selB.pay.method) : '',
+        selIsWeb: selB.source === 'web',
+        selEmail: selB.email || '',
+      };
+    }
+
+    return {
+      needsLogin: !this.state.authed,
+      authed: this.state.authed,
+      loginEmail: this.state.loginEmail,
+      onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      signIn: () => { try { localStorage.setItem('sd_admin_session', '1'); } catch (e) {} this.setState({ authed: true, view: 'calendar' }); },
+      signOut: () => { try { localStorage.removeItem('sd_admin_session'); } catch (e) {} this.setState({ authed: false, sel: null }); },
+
+      days, rows, stats, deliveries, pickups,
+      rangeLabel: monthLabel,
+      windowLabel: monthLabel,
+      monthRevenueLabel: this.fmt(monthRevenue),
+      monthTripCount: monthTrips.length,
+      monthOptions,
+      calMonthSel,
+      gridCols,
+      gridMin,
+      calToday: () => this.setState({ calViewMonth: null }),
+      currentMonthLabel,
+      atCurrentMonth: monthSel === curMonth,
+      calPrev: () => { const d = new Date(mp[0], mp[1] - 2, 1); const v = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); if (v >= curMonth) this.setState({ calViewMonth: v }); },
+      calNext: () => { const d = new Date(mp[0], mp[1], 1); this.setState({ calViewMonth: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') }); },
+      arrowPrevStyle: 'width:36px;height:36px;border:none;background:transparent;display:grid;place-items:center;border-right:1px solid oklch(1 0 0 / 0.1);' + (monthSel === curMonth ? 'opacity:0.28;cursor:default;color:#fff;' : 'cursor:pointer;color:#fff;'),
+      arrowNextStyle: 'width:36px;height:36px;border:none;background:transparent;display:grid;place-items:center;cursor:pointer;color:#fff;border-left:1px solid oklch(1 0 0 / 0.1);',
+      nowBtnStyle: 'height:36px;padding:0 15px;border:none;cursor:pointer;font-weight:700;font-size:12.5px;font-family:\'Nunito Sans\',sans-serif;letter-spacing:0.01em;transition:background .12s ease;display:inline-flex;align-items:center;gap:6px;' + (monthSel === curMonth ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;' : 'background:transparent;color:oklch(0.84 0.02 280);'),
+      todayDotStyle: 'width:5px;height:5px;border-radius:50%;flex:none;transition:opacity .12s ease;' + (monthSel === curMonth ? 'opacity:0;width:0;' : 'opacity:1;background:oklch(0.72 0.16 155);box-shadow:0 0 5px oklch(0.72 0.16 155 / 0.7);'),
+      calJumpMonth: (e) => this.setState({ calViewMonth: e.target.value }),
+      bookingCount: bookingListShown.length,
+      bookingList: bookingListShown,
+      payFilterAllStyle: payChip('all', payFilter === 'all'),
+      payFilterUnpaidStyle: payChip('unpaid', payFilter === 'unpaid'),
+      payFilterPaidStyle: payChip('paid', payFilter === 'paid'),
+      payFilterAllLabel: 'All ' + bookingListAll.length,
+      payFilterUnpaidLabel: 'Balance due ' + unpaidCount,
+      payFilterPaidLabel: 'Paid ' + paidCount,
+      setPayAll: () => this.setState({ payFilter: 'all' }),
+      setPayUnpaid: () => this.setState({ payFilter: 'unpaid' }),
+      setPayPaid: () => this.setState({ payFilter: 'paid' }),
+      deliveriesEmpty: deliveries.length === 0,
+      pickupsEmpty: pickups.length === 0,
+      deliveriesHasMore: deliveriesMore > 0,
+      pickupsHasMore: pickupsMore > 0,
+      deliveriesMoreLabel: '+' + deliveriesMore + ' more ' + (deliveriesMore === 1 ? 'delivery' : 'deliveries'),
+      pickupsMoreLabel: '+' + pickupsMore + ' more ' + (pickupsMore === 1 ? 'pickup' : 'pickups'),
+      showAllBookings: () => this.setState({ view: 'list' }),
+
+      showCalendar: this.state.view === 'calendar',
+      showList: this.state.view === 'list',
+      showDeposits: this.state.view === 'deposits',
+      calTabStyle: 'padding:8px 18px;border-radius:9999px;border:none;cursor:pointer;font-weight:600;font-size:13px;font-family:\'Nunito Sans\',sans-serif;' + (this.state.view === 'calendar' ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;' : 'background:transparent;color:oklch(0.74 0.02 280);'),
+      listTabStyle: 'padding:8px 18px;border-radius:9999px;border:none;cursor:pointer;font-weight:600;font-size:13px;font-family:\'Nunito Sans\',sans-serif;' + (this.state.view === 'list' ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;' : 'background:transparent;color:oklch(0.74 0.02 280);'),
+      setCalendarView: () => this.setState({ view: 'calendar' }),
+      setListView: () => this.setState({ view: 'list' }),
+      setDepositsView: () => this.setState({ view: 'deposits' }),
+      navCalStyle: this.navTabStyle(this.state.view === 'calendar'),
+      navListStyle: this.navTabStyle(this.state.view === 'list'),
+      navDepositsStyle: this.navTabStyle(this.state.view === 'deposits'),
+      navDepositsBadge: pendingDepositRaw.length ? (' · ' + pendingDepositRaw.length) : '',
+      pendingDepositList: pendingDepositRaw.map((b) => {
+        const backIdx = b.start + b.nights;
+        return {
+          trailer: trailerName(b.trailer),
+          guest: b.guest,
+          dates: this.dLabel(this.dateAt(b.start)) + ' – ' + this.dLabel(this.dateAt(backIdx)),
+          returnedLabel: (backIdx <= 0 ? 'Returned ' : 'Returns ') + this.dLabel(this.dateAt(backIdx)),
+          deposit: this.fmt(this.depAmt(b)),
+          openRow: () => this.setState({ sel: b.id }),
+          refund: () => this.setState({ refundConfirm: b.id, refundAmt: String(this.depAmt(b)), refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true }),
+        };
+      }),
+      pendingDepositEmpty: pendingDepositRaw.length === 0,
+      pendingDepositTotalLabel: this.fmt(pendingDepositRaw.reduce((s, b) => s + this.depAmt(b), 0)),
+      pendingDepositCountLabel: pendingDepositRaw.length + (pendingDepositRaw.length === 1 ? ' deposit pending' : ' deposits pending'),
+      navPricingStyle: this.navTabStyle(false),
+
+      hasSelection: !!selB,
+      closeDetail: () => this.setState({ sel: null }),
+      confirmBooking: () => {
+        const id = this.state.sel, name = selB ? selB.guest : 'Booking';
+        const next = { ...this.state.status, [id]: 'confirmed' };
+        this.setState({ status: next });
+        this.persistOverrides(next, this.state.cancelled);
+        this.showToast(name + ' confirmed', () => { const st = { ...this.state.status }; delete st[id]; this.setState({ status: st }); this.persistOverrides(st, this.state.cancelled); });
+      },
+      markDelivered: () => {
+        const id = this.state.sel, name = selB ? selB.guest : 'Trailer';
+        const next = { ...this.state.status, [id]: 'out' };
+        this.setState({ status: next, sel: null });
+        this.persistOverrides(next, this.state.cancelled);
+        this.showToast(name + ' marked delivered', () => { const st = { ...this.state.status, [id]: 'confirmed' }; this.setState({ status: st }); this.persistOverrides(st, this.state.cancelled); });
+      },
+      markReturned: () => {
+        const id = this.state.sel, name = selB ? selB.guest : 'Trailer';
+        const next = { ...this.state.status, [id]: 'returned' };
+        this.setState({ status: next, sel: null });
+        this.persistOverrides(next, this.state.cancelled);
+        this.showToast(name + ' marked returned', () => { const st = { ...this.state.status, [id]: 'out' }; this.setState({ status: st }); this.persistOverrides(st, this.state.cancelled); });
+      },
+      cancelBooking: () => {
+        const id = this.state.sel, name = selB ? selB.guest : 'Booking';
+        const next = { ...this.state.cancelled, [id]: true };
+        this.setState({ cancelled: next, sel: null, cancelConfirm: false });
+        this.persistOverrides(this.state.status, next);
+        this.showToast(name + ' cancelled', () => { const cx = { ...this.state.cancelled, [id]: false }; this.setState({ cancelled: cx }); this.persistOverrides(this.state.status, cx); });
+      },
+      requestCancel: () => this.setState({ cancelConfirm: true }),
+      dismissCancel: () => this.setState({ cancelConfirm: false }),
+      retryCharge: () => {
+        const id = this.state.sel, b = allItems.find((x) => x.id === id);
+        const amt = b ? Math.max(0, b.total - (b.paidToday || 0)) : 0;
+        const name = b ? b.guest : 'Balance';
+        const next = { ...this.state.charges, [id]: 'paid' };
+        this.setState({ charges: next, sel: null });
+        this.persistOverrides(this.state.status, this.state.cancelled, next);
+        this.showToast('Balance charged · ' + this.fmt(amt) + ' collected from ' + name, () => { const cx = { ...this.state.charges }; delete cx[id]; this.setState({ charges: cx }); this.persistOverrides(this.state.status, this.state.cancelled, cx); });
+      },
+      contactGuest: () => {
+        const id = this.state.sel, b = allItems.find((x) => x.id === id);
+        this.showToast('Payment reminder sent to ' + (b ? b.guest : 'the guest'));
+      },
+      showCancelConfirm: this.state.cancelConfirm && !!selB,
+      cancelConfirmName: selB ? selB.guest : '',
+      cancelConfirmMeta: selB ? (trailerName(selB.trailer) + ' · ' + this.dLabel(this.dateAt(selB.start)) + ' – ' + this.dLabel(this.dateAt(selB.start + selB.nights))) : '',
+      showRefundConfirm: !!rcB,
+      refundConfirmName: rcB ? rcB.guest : '',
+      refundConfirmMeta: rcB ? (trailerName(rcB.trailer) + ' · ' + this.dLabel(this.dateAt(rcB.start)) + ' – ' + this.dLabel(this.dateAt(rcB.start + rcB.nights))) : '',
+      refundConfirmAmount: this.fmt(rcAmt),
+      refundConfirmMaxLabel: this.fmt(rcDep),
+      refundIsPartial: rcAmt > 0 && rcAmt < rcDep,
+      refundAmtValue: this.state.refundAmt,
+      refundAmtInvalid: !(Number(this.state.refundAmt) > 0) || Number(this.state.refundAmt) > rcDep,
+      onRefundAmt: (e) => this.setState({ refundAmt: e.target.value }),
+      setRefundFull: () => this.setState({ refundAmt: String(rcDep) }),
+      setRefundHalf: () => this.setState({ refundAmt: String(Math.round(rcDep / 2)) }),
+      refundReasonValue: this.state.refundReason,
+      refundReasonOpts: this.refundReasons.map((r) => ({ value: r, label: r })),
+      onRefundReason: (e) => this.setState({ refundReason: e.target.value }),
+      refundReasonIsOther: this.state.refundReason === 'Other',
+      refundReasonNoteValue: this.state.refundReasonNote,
+      onRefundReasonNote: (e) => this.setState({ refundReasonNote: e.target.value }),
+      refundHasEmail: !!(rcB && rcB.email),
+      refundEmailAddr: (rcB && rcB.email) ? rcB.email : '',
+      refundEmailOn: this.state.refundEmail && !!(rcB && rcB.email),
+      refundNoEmail: !!rcB && !(rcB && rcB.email),
+      toggleRefundEmail: () => this.setState({ refundEmail: !this.state.refundEmail }),
+      refundEmailTrack: 'flex:none;width:42px;height:24px;border-radius:9999px;border:none;cursor:pointer;position:relative;transition:background .15s ease;' + ((this.state.refundEmail && !!(rcB && rcB.email)) ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));' : 'background:oklch(1 0 0 / 0.16);'),
+      refundEmailKnob: 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:9999px;background:#fff;transition:transform .15s ease;transform:translateX(' + ((this.state.refundEmail && !!(rcB && rcB.email)) ? '18px' : '0') + ');',
+      hasToast: !!this.state.toast,
+      toastMsg: this.state.toast ? this.state.toast.msg : '',
+      toastUndoLabel: (this.state.toast && this.state.toast.undo) ? 'Undo' : 'Got it',
+      // ----- automations -----
+      autoOpen: this.state.autoOpen,
+      autoNudge: autoNudge,
+      nudgeList: nudgeList,
+      nudgeEmpty: nudgeList.length === 0,
+      leadOpts: leadOpts,
+      nudgeRuleDesc: 'Email a friendly reminder ' + nudgeLead + ' days before the card on file is auto-charged.',
+      autoSummary: autoNudge
+        ? (nudgeScheduled === 0 ? 'On · no reminders queued right now' : ('On · ' + nudgeScheduled + ' reminder' + (nudgeScheduled === 1 ? '' : 's') + ' scheduled'))
+        : 'Paused · guests won’t be reminded',
+      autoBtnBadge: (autoNudge && nudgeScheduled > 0) ? String(nudgeScheduled) : '',
+      nudgeSwitchTrack: 'position:relative;width:44px;height:26px;border-radius:9999px;cursor:pointer;flex:none;transition:background .15s ease;border:none;' + (autoNudge ? 'background:oklch(0.62 0.19 152);' : 'background:oklch(1 0 0 / 0.16);'),
+      nudgeSwitchKnob: 'position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:9999px;background:#fff;transition:transform .15s ease;transform:translateX(' + (autoNudge ? '18px' : '0') + ');',
+      retryList: retryList,
+      retryEmpty: retryList.length === 0,
+      retryEveryOpts: retryEveryOpts,
+      autoRetry: autoRetry,
+      retryRuleDesc: 'Automatically re-run a declined card every ' + retryEvery + ' days, up to ' + retryMax + ' tries, then flag for manual follow-up.',
+      retrySummary: autoRetry
+        ? (retryActiveCount === 0 ? 'On · no cards being retried' : ('On · ' + retryActiveCount + ' card' + (retryActiveCount === 1 ? '' : 's') + ' retrying'))
+        : 'Paused · declined cards won’t retry',
+      retrySwitchTrack: 'position:relative;width:44px;height:26px;border-radius:9999px;cursor:pointer;flex:none;transition:background .15s ease;border:none;' + (autoRetry ? 'background:oklch(0.62 0.19 152);' : 'background:oklch(1 0 0 / 0.16);'),
+      retrySwitchKnob: 'position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:9999px;background:#fff;transition:transform .15s ease;transform:translateX(' + (autoRetry ? '18px' : '0') + ');',
+      toggleRetry: () => { const v = !this.state.autoRetry; this.setState({ autoRetry: v }); this.persistAutomations({ retry: v }); },
+      // ----- deposit refund reminder -----
+      autoRefund: autoRefund,
+      refundList: refundList,
+      refundEmpty: refundList.length === 0,
+      refundLeadOpts: refundLeadOpts,
+      refundRuleDesc: 'Flag returned trips to refund the ' + this.fmt(1000) + ' hold ' + (refundLead === 1 ? 'the next day' : (refundLead + ' days after')) + ' the trailer is back and checked.',
+      refundSummary: autoRefund
+        ? (refundActiveCount === 0 ? 'On · no deposits to return' : ('On · ' + refundActiveCount + ' deposit' + (refundActiveCount === 1 ? '' : 's') + ' to return'))
+        : 'Paused · deposits won’t be flagged',
+      refundSwitchTrack: 'position:relative;width:44px;height:26px;border-radius:9999px;cursor:pointer;flex:none;transition:background .15s ease;border:none;' + (autoRefund ? 'background:oklch(0.62 0.19 152);' : 'background:oklch(1 0 0 / 0.16);'),
+      refundSwitchKnob: 'position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:9999px;background:#fff;transition:transform .15s ease;transform:translateX(' + (autoRefund ? '18px' : '0') + ');',
+      toggleRefund: () => { const v = !this.state.autoRefund; this.setState({ autoRefund: v }); this.persistAutomations({ refund: v }); },
+      markRefunded: () => { const b = allItems.find((x) => x.id === this.state.sel); this.setState({ refundConfirm: this.state.sel, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true }); },
+      requestRefund: (id) => { const b = allItems.find((x) => x.id === id); this.setState({ refundConfirm: id, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true }); },
+      confirmRefund: () => this.doRefund(this.state.refundConfirm, this.state.refundAmt, this.state.refundReason === 'Other' ? (this.state.refundReasonNote || 'Other') : this.state.refundReason, this.state.refundEmail),
+      dismissRefund: () => this.setState({ refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '' }),
+      openAutomations: () => this.setState({ autoOpen: true }),
+      closeAutomations: () => this.setState({ autoOpen: false }),
+      toggleNudge: () => { const v = !this.state.autoNudge; this.setState({ autoNudge: v }); this.persistAutomations({ nudge: v }); },
+      undoToast: () => this.runUndo(),
+      dismissToast: () => this.dismissToast(),
+
+      // ----- block-a-trailer -----
+      blockOpen: this.state.blockOpen,
+      blockTrailers: this.trailers.map((t) => ({ id: t.id, name: t.name })),
+      bfTrailer: this.state.bfTrailer,
+      bfDate: this.state.bfDate,
+      bfNights: this.state.bfNights,
+      bfReason: this.state.bfReason,
+      bfNote: this.state.bfNote,
+      blockPreview: (() => {
+        const tname = (this.trailers.find((t) => t.id === this.state.bfTrailer) || {}).name || 'This trailer';
+        const s = this.state.bfDate ? new Date(this.state.bfDate + 'T00:00:00') : null;
+        if (!s || isNaN(s)) return 'Pick a start date to block ' + tname + '.';
+        const e = new Date(s.getTime() + this.state.bfNights * 86400000);
+        return tname + ' blocked ' + this.dLabel(s) + ' – ' + this.dLabel(e) + ' · ' + this.state.bfNights + ' nights.';
+      })(),
+      bfConflict: bfConflictList.length > 0,
+      bfNoConflict: bfConflictList.length === 0,
+      bfConflictName: (this.trailers.find((t) => t.id === this.state.bfTrailer) || {}).name || 'This trailer',
+      bfConflictLabel: (() => {
+        if (!bfConflictList.length) return '';
+        const c = bfConflictList[0];
+        const range = this.dLabel(this.dateAt(c.start)) + ' – ' + this.dLabel(this.dateAt(c.start + c.nights));
+        const who = c.type === 'block' ? (c.guest || 'another block') : (c.guest || 'a booking');
+        const more = bfConflictList.length > 1 ? ' (+' + (bfConflictList.length - 1) + ' more)' : '';
+        return 'Already held for ' + who + ', ' + range + more + '. Pick another trailer or shift the dates.';
+      })(),
+      openBlock: () => this.setState({ blockOpen: true }),
+      closeBlock: () => this.setState({ blockOpen: false }),
+      onBfTrailer: (e) => this.setState({ bfTrailer: e.target.value }),
+      onBfDate: (e) => this.setState({ bfDate: e.target.value }),
+      onBfReason: (e) => this.setState({ bfReason: e.target.value }),
+      onBfNote: (e) => this.setState({ bfNote: e.target.value }),
+      incBfNights: () => this.setState((s) => ({ bfNights: Math.min(30, s.bfNights + 1) })),
+      decBfNights: () => this.setState((s) => ({ bfNights: Math.max(1, s.bfNights - 1) })),
+      addBlock: () => {
+        const s = this.state.bfDate ? new Date(this.state.bfDate + 'T00:00:00') : null;
+        if (!s || isNaN(s)) return;
+        const start = Math.round((s.getTime() - this.baseDate.getTime()) / 86400000);
+        // Defensive double-booking guard — never overlay an existing hold on the same trailer.
+        const end = start + this.state.bfNights;
+        const clash = live.filter((b) => b.trailer === this.state.bfTrailer && start < (b.start + b.nights) && b.start < end);
+        if (clash.length) return;
+        const block = {
+          id: 'ub' + Date.now(),
+          trailer: this.state.bfTrailer,
+          start,
+          nights: this.state.bfNights,
+          guest: this.state.bfReason,
+          phone: 'Internal',
+          site: this.state.bfNote || 'Blocked off the calendar',
+          total: 0,
+          type: 'block',
+        };
+        this.setState((st) => ({ blocks: st.blocks.concat([block]), blockOpen: false, bfNote: '' }));
+      },
+
+      // ----- create quote -----
+      cqOpen: this.state.cqOpen,
+      cqBuild: this.state.cqStep === 'build',
+      cqSent: this.state.cqStep === 'sent',
+      cqBooked: this.state.cqStep === 'booked',
+      cqTrailers: this.trailers.map((t) => ({ id: t.id, name: t.name })),
+      cqName: this.state.cqName,
+      cqEmail: this.state.cqEmail,
+      cqPhone: this.state.cqPhone,
+      cqSite: this.state.cqSite,
+      cqTrailer: this.state.cqTrailer,
+      cqDate: this.state.cqDate,
+      cqNights: this.state.cqNights,
+      cqRate: this.state.cqRate,
+      cqDelivery: this.state.cqDelivery,
+      cqAdjust: this.state.cqAdjust,
+      cqPayMethod: this.state.cqPayMethod,
+      cqRentalLabel: this.fmt((Number(this.state.cqRate) || 0) * this.state.cqNights),
+      cqNightsLine: this.state.cqNights + ' nights × ' + this.fmt(Number(this.state.cqRate) || 0),
+      cqPrepLabel: this.fmt(95),
+      cqDeliveryLabel: (Number(this.state.cqDelivery) || 0) ? this.fmt(Number(this.state.cqDelivery)) : 'Included',
+      cqAddonsLabel: (() => { const a = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((s, x) => s + x.price, 0); return a ? this.fmt(a) : '$0'; })(),
+      cqHasAdjust: (Number(this.state.cqAdjust) || 0) !== 0,
+      cqAdjustLabel: (() => { const v = Number(this.state.cqAdjust) || 0; return (v < 0 ? '−' : '+') + this.fmt(Math.abs(v)); })(),
+      cqTotalLabel: (() => {
+        const rate = Number(this.state.cqRate) || 0, del = Number(this.state.cqDelivery) || 0, adj = Number(this.state.cqAdjust) || 0;
+        const add = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((s, x) => s + x.price, 0);
+        return this.fmt(rate * this.state.cqNights + 95 + del + add + adj);
+      })(),
+      cqTripDates: (() => {
+        const s = this.state.cqDate ? new Date(this.state.cqDate + 'T00:00:00') : null;
+        if (!s || isNaN(s)) return 'dates TBD';
+        return this.dLabel(s) + ' – ' + this.dLabel(new Date(s.getTime() + this.state.cqNights * 86400000));
+      })(),
+      cqConflict: cqConflictList.length > 0,
+      cqNoConflict: cqConflictList.length === 0,
+      cqConflictName: this.trailers.find((t) => t.id === this.state.cqTrailer).name,
+      cqConflictLabel: (() => {
+        if (!cqConflictList.length) return '';
+        const c = cqConflictList[0];
+        const range = this.dLabel(this.dateAt(c.start)) + ' – ' + this.dLabel(this.dateAt(c.start + c.nights));
+        const who = c.type === 'block' ? (c.guest || 'a maintenance block') : (c.guest || 'another booking');
+        const more = cqConflictList.length > 1 ? ' (+' + (cqConflictList.length - 1) + ' more)' : '';
+        return 'Already held for ' + who + ', ' + range + more + '. Pick another trailer or shift the dates.';
+      })(),
+      cqSelName: this.trailers.find((t) => t.id === this.state.cqTrailer).name,
+      cqEmailTo: this.state.cqEmail || 'the customer',
+      cqBookName: this.state.cqName || 'the guest',
+      cqPayResultLabel: (() => {
+        const st = { full: 'Paid in full', deposit: 'Deposit taken', invoice: 'Invoice sent (unpaid)' }[this.state.cqPayStatus];
+        const m = { cash: 'Cash', check: 'Check', card: 'Card by phone', etransfer: 'E-transfer', other: 'Other' }[this.state.cqPayMethod];
+        return st + ' · ' + m;
+      })(),
+      cqAddonChips: this.cqAddonsList.map((a) => {
+        const on = !!this.state.cqAddons[a.id];
+        return {
+          name: a.name, priceLabel: '$' + a.price,
+          chipStyle: 'display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9999px;font-weight:500;font-size:12.5px;cursor:pointer;color:#fff;font-family:\'Nunito Sans\',sans-serif;transition:all .12s ease;' + (on ? 'background:oklch(0.34 0.03 264 / 0.7);border:1.5px solid oklch(1 0 0 / 0.85);' : 'background:oklch(0.22 0.02 264 / 0.5);border:1.5px solid oklch(1 0 0 / 0.14);'),
+          toggle: () => this.setState((s) => ({ cqAddons: { ...s.cqAddons, [a.id]: !s.cqAddons[a.id] } })),
+        };
+      }),
+      cqPayStatusOpts: [
+        { key: 'full', label: 'Paid in full' },
+        { key: 'deposit', label: 'Deposit taken' },
+        { key: 'invoice', label: 'Invoice / unpaid' },
+      ].map((o) => {
+        const on = this.state.cqPayStatus === o.key;
+        return {
+          label: o.label,
+          style: 'flex:1;padding:9px 6px;border-radius:9px;border:none;cursor:pointer;font-weight:600;font-size:12px;font-family:\'Nunito Sans\',sans-serif;' + (on ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;' : 'background:transparent;color:oklch(0.72 0.02 280);'),
+          onClick: () => this.setState({ cqPayStatus: o.key }),
+        };
+      }),
+      openCreateQuote: () => this.setState({ cqOpen: true, cqStep: 'build' }),
+      closeQuote: () => this.setState({ cqOpen: false }),
+      onCqName: (e) => this.setState({ cqName: e.target.value }),
+      onCqEmail: (e) => this.setState({ cqEmail: e.target.value }),
+      onCqPhone: (e) => this.setState({ cqPhone: e.target.value }),
+      onCqSite: (e) => this.setState({ cqSite: e.target.value }),
+      onCqTrailer: (e) => { const t = this.trailers.find((x) => x.id === e.target.value); this.setState({ cqTrailer: e.target.value, cqRate: t ? t.rate : this.state.cqRate }); },
+      onCqDate: (e) => this.setState({ cqDate: e.target.value }),
+      incCqNights: () => this.setState((s) => ({ cqNights: Math.min(30, s.cqNights + 1) })),
+      decCqNights: () => this.setState((s) => ({ cqNights: Math.max(1, s.cqNights - 1) })),
+      onCqRate: (e) => this.setState({ cqRate: e.target.value }),
+      onCqDelivery: (e) => this.setState({ cqDelivery: e.target.value }),
+      onCqAdjust: (e) => this.setState({ cqAdjust: e.target.value }),
+      onCqPayMethod: (e) => this.setState({ cqPayMethod: e.target.value }),
+      emailQuote: () => this.setState({ cqStep: 'sent' }),
+      confirmPhoneBooking: () => {
+        const s = this.state.cqDate ? new Date(this.state.cqDate + 'T00:00:00') : null;
+        if (!s || isNaN(s)) return;
+        const start = Math.round((s.getTime() - this.baseDate.getTime()) / 86400000);
+        // Guard: never write a booking that overlaps an existing hold on the same trailer.
+        const clash = this.bookings.concat(this.state.blocks).concat(this.state.phoneBookings).concat(this.webMapped())
+          .filter((b) => (this.state.cancelled[b.id] ? 'cancelled' : b.type) !== 'cancelled')
+          .some((b) => b.trailer === this.state.cqTrailer && start < (b.start + b.nights) && b.start < (start + this.state.cqNights));
+        if (clash) return;
+        const rate = Number(this.state.cqRate) || 0, del = Number(this.state.cqDelivery) || 0, adj = Number(this.state.cqAdjust) || 0;
+        const add = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((sum, x) => sum + x.price, 0);
+        const total = rate * this.state.cqNights + 95 + del + add + adj;
+        const stLabel = { full: 'Paid in full', deposit: 'Deposit taken', invoice: 'Invoice sent' }[this.state.cqPayStatus];
+        const mLabel = { cash: 'Cash', check: 'Check', card: 'Card by phone', etransfer: 'E-transfer', other: 'Other' }[this.state.cqPayMethod];
+        const booking = {
+          id: 'pb' + Date.now(),
+          trailer: this.state.cqTrailer,
+          start, nights: this.state.cqNights,
+          guest: this.state.cqName || 'Phone booking',
+          phone: this.state.cqPhone || 'By phone',
+          site: this.state.cqSite || 'To be confirmed',
+          total, type: 'confirmed',
+          pay: { status: stLabel, method: mLabel },
+        };
+        this.setState((st) => ({ phoneBookings: st.phoneBookings.concat([booking]), cqStep: 'booked' }));
+      },
+      createAnotherQuote: () => this.setState({ cqStep: 'build', cqName: '', cqEmail: '', cqPhone: '', cqSite: '', cqAddons: {}, cqAdjust: 0 }),
+      ...selVals,
+    };
+  }
+}
+</script>
+</body>
+</html>

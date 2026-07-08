@@ -1,0 +1,47 @@
+/* ============================================================
+   THE SSH — Spacing, layout, radii, motion
+   Broadcast minimalism: a strict 4px grid, generous air,
+   hairline rules instead of heavy frames, square corners
+   (pills are the only exception), restrained motion.
+   ============================================================ */
+:root {
+  /* --- Spacing scale (4px base) --- */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   24px;
+  --space-6:   32px;
+  --space-7:   48px;
+  --space-8:   64px;
+  --space-9:   96px;
+  --space-10:  128px;
+
+  /* --- Section rhythm (fluid) --- */
+  --section-y:   clamp(56px, 9vw, 130px); /* @kind spacing */
+  --gutter:      clamp(18px, 4vw, 64px);  /* @kind spacing */
+  --max-width:   1320px;
+
+  /* --- Radii (mostly square; pills only) --- */
+  --radius-0:    0px;
+  --radius-sm:   2px;
+  --radius-pill: 999px;
+
+  /* --- Borders --- */
+  --border:        1px solid var(--line-strong);  /* the editorial hairline-as-structure */
+  --border-hair:   1px solid var(--line);
+  --border-hair-2: 1px solid var(--line-2);
+
+  /* --- Elevation (minimal; mostly flat) --- */
+  --shadow-none:  none;
+  --shadow-sm:    0 1px 2px rgba(23, 19, 13, 0.06);
+  --shadow-card:  0 12px 32px -16px rgba(23, 19, 13, 0.30);
+
+  /* --- Motion --- */
+  --ease-out:   cubic-bezier(0.2, 0.7, 0.2, 1); /* @kind other */
+  --ease-std:   cubic-bezier(0.4, 0, 0.2, 1);   /* @kind other */
+  --dur-fast:   140ms; /* @kind other */
+  --dur-base:   240ms; /* @kind other */
+  --dur-slow:   420ms; /* @kind other */
+}

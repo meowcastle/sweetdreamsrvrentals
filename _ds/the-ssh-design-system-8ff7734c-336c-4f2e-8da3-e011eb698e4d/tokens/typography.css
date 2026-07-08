@@ -1,0 +1,51 @@
+/* ============================================================
+   THE SSH — Typography tokens
+   Display: Basement Grotesque Black (tight, uppercase, owned).
+   Text:    Space Grotesk (calm, humanist grotesque).
+   Mono:    Space Mono — broadcast metadata, labels, timecodes.
+   The minimalist take: heavy display used sparingly and large,
+   surrounded by air; mono labels do the structural talking.
+   ============================================================ */
+:root {
+  /* --- Families --- */
+  --font-display: 'Basement Grotesque', 'Arial Narrow', sans-serif;
+  --font-body:    'Space Grotesk', system-ui, sans-serif;
+  --font-mono:    'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* --- Fluid display scale (clamp: min, vw, max) --- */
+  --text-mega:  clamp(64px, 13vw, 200px);  /* footer / hero wordmark */
+  --text-d1:    clamp(44px, 8vw, 116px);   /* section headlines      */
+  --text-d2:    clamp(34px, 5.2vw, 72px);  /* sub headlines          */
+  --text-d3:    clamp(26px, 3.4vw, 44px);  /* card titles            */
+
+  /* --- Text scale --- */
+  --text-lead:  clamp(19px, 2vw, 27px);    /* manifesto lede         */
+  --text-lg:    20px;
+  --text-md:    16px;                      /* body default           */
+  --text-sm:    14px;
+  --text-xs:    12px;
+
+  /* --- Mono label scale --- */
+  --label-lg:   14px;
+  --label-md:   12px;
+  --label-sm:   11px;
+
+  /* --- Weights --- */
+  --weight-display: 900;
+  --weight-bold:    700;
+  --weight-medium:  500;
+  --weight-regular: 400;
+
+  /* --- Line heights --- */
+  --leading-display: 0.86;
+  --leading-tight:   1.08;
+  --leading-snug:    1.35;
+  --leading-body:    1.55;
+
+  /* --- Tracking --- */
+  --tracking-display: -0.015em;
+  --tracking-tight:   -0.01em;
+  --tracking-normal:  0;
+  --tracking-label:   0.22em;   /* mono eyebrows / labels */
+  --tracking-wide:    0.3em;
+}

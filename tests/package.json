@@ -1,0 +1,19 @@
+{
+  "name": "sweet-dreams-rv-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright chaos + invariant test suite for the Sweet Dreams RV booking UI",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:smoke": "playwright test specs/smoke.spec.js",
+    "test:flow": "playwright test specs/booking-flow.spec.js",
+    "test:logic": "playwright test specs/date-logic.spec.js specs/required-fields.spec.js",
+    "test:chaos": "playwright test specs/chaos.spec.js",
+    "report": "playwright show-report",
+    "install:browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0"
+  }
+}

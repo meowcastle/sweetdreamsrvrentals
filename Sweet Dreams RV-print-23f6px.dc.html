@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style data-omelette-print-defaults>
+@media print {
+  @page { margin: 0; }
+  body { padding: 0.5in; box-sizing: border-box; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  figure, table, pre, blockquote, img, svg, tr, [class~="card" i] { break-inside: avoid; }
+  img, svg { max-width: 100%; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: oklch(0.08 0.02 264); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  a:hover { opacity: 0.86; }
+  image-slot { display: block; }
+</style>
+</helmet>
+
+<div data-screen-label="Sweet Dreams RV — Home" style="position:relative;z-index:0;font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:oklch(0.86 0.012 270);min-height:100vh;overflow-x:hidden;">
+
+  <!-- fixed night-sky backdrop (viewport-sized = stays sharp) -->
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-2;background:url('hero-night-sky.jpg') center center / cover no-repeat;"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg, oklch(0.10 0.03 264 / 0.30) 0%, oklch(0.09 0.025 264 / 0.50) 50%, oklch(0.07 0.02 264 / 0.72) 100%);"></div>
+
+  <!-- ===== NAV ===== -->
+  <header style="position:sticky;top:0;z-index:50;background:oklch(0.10 0.03 264 / 0.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid oklch(1 0 0 / 0.1);">
+    <div style="max-width:1180px;margin:0 auto;padding:13px clamp(16px,4vw,40px);display:flex;align-items:center;gap:18px;">
+      <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:#fff;">
+        <span style="width:36px;height:36px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;box-shadow:0 6px 16px -6px oklch(0.5781 0.2303 264.8 / 0.6);flex:none;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="#fff"></path><circle cx="16.5" cy="6.5" r="1.1" fill="#fff"></circle></svg>
+        </span>
+        <span style="font-weight:700;font-size:17px;letter-spacing:-0.02em;">Sweet Dreams <span style="font-weight:500;color:oklch(0.72 0.02 280);">RV</span></span>
+      </a>
+      <nav style="margin-left:auto;display:flex;align-items:center;gap:clamp(8px,1.8vw,24px);flex-wrap:wrap;justify-content:flex-end;">
+        <a href="#how" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">How it works</a>
+        <a href="#quote" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">Rates</a>
+        <a href="#faq" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">FAQs</a>
+        <a href="#quote" style="display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;text-decoration:none;box-shadow:0 6px 18px -6px oklch(0.5781 0.2303 264.8 / 0.6);">Get a quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section id="top" data-screen-label="Hero" style="position:relative;scroll-margin-top:80px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(36px,6vw,84px) clamp(16px,4vw,40px) clamp(44px,6vw,76px);">
+
+    <!-- Direction A: editorial split -->
+    <sc-if value="{{ heroSplit }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(24px,4vw,56px);align-items:center;">
+        <div>
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.18);font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.86 0.015 270);">
+            <span style="width:6px;height:6px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>Grants Pass &amp; Merlin · Southern Oregon
+          </span>
+          <h1 style="margin:18px 0 0;font-weight:700;font-size:clamp(34px,5.4vw,56px);line-height:1.03;letter-spacing:-0.025em;color:#fff;text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">Southern Oregon's <span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">only fully-outfitted</span> RV trailer rental.</h1>
+          <p style="margin:18px 0 0;font-size:clamp(16px,1.5vw,18px);line-height:1.55;color:oklch(0.86 0.012 270);max-width:46ch;text-shadow:0 1px 16px oklch(0.06 0.02 264 / 0.8);">We deliver the trailer to your campsite and set it up — or you tow it yourself. Stocked, ready, waiting. <strong style="color:#fff;">When adventure calls… we deliver.</strong></p>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:22px;">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:500;font-size:13px;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Delivered &amp; set up</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:500;font-size:13px;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Fully outfitted</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:500;font-size:13px;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Or tow it yourself</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;">
+            <a href="#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+            <a href="#how" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">How it works</a>
+          </div>
+        </div>
+        <div style="position:relative;">
+          <image-slot id="sdrv-hero-split" style="width:100%;aspect-ratio:4/5;box-shadow:0 24px 48px -12px oklch(0 0 0 / 0.5);border-radius:24px;border:1px solid oklch(1 0 0 / 0.14);" shape="rounded" radius="24" placeholder="Drop a hero photo — trailer at a Rogue Valley campsite"></image-slot>
+          <div style="position:absolute;left:-14px;bottom:26px;background:oklch(0.16 0.02 264 / 0.7);backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.14);border-radius:16px;padding:13px 16px;box-shadow:0 16px 32px -10px oklch(0 0 0 / 0.5);display:flex;align-items:center;gap:11px;animation:floaty 5s ease-in-out infinite;">
+            <span style="width:38px;height:38px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <div><div style="font-weight:700;font-size:14px;color:#fff;">8 named trailers</div><div style="font-size:12.5px;color:oklch(0.72 0.02 280);">From $149 / night</div></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- Direction B: immersive overlay -->
+    <sc-if value="{{ heroImmersive }}" hint-placeholder-val="{{ false }}">
+      <div style="position:relative;border-radius:28px;overflow:hidden;box-shadow:0 24px 48px -12px oklch(0 0 0 / 0.5);min-height:clamp(440px,62vh,640px);display:flex;align-items:flex-end;border:1px solid oklch(1 0 0 / 0.12);">
+        <image-slot id="sdrv-hero-immersive" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a full-bleed campsite photo"></image-slot>
+        <div style="position:absolute;inset:0;background:linear-gradient(to top, oklch(0 0 0 / 0.62), oklch(0 0 0 / 0.08) 55%, oklch(0 0 0 / 0.18));pointer-events:none;"></div>
+        <div style="position:relative;margin:clamp(18px,3.5vw,44px);max-width:560px;background:oklch(0.14 0.02 264 / 0.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;padding:clamp(22px,3vw,34px);box-shadow:0 20px 40px -12px oklch(0 0 0 / 0.5);">
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.1);font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.84 0.015 270);">Southern Oregon · we deliver</span>
+          <h1 style="margin:16px 0 0;font-weight:700;font-size:clamp(30px,4.4vw,48px);line-height:1.05;letter-spacing:-0.025em;color:#fff;">The trailer comes to <span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">you</span> — fully outfitted.</h1>
+          <p style="margin:15px 0 0;font-size:16px;line-height:1.55;color:oklch(0.84 0.012 270);">We deliver and set it up at your campsite, or you tow it yourself. Everything's stocked and ready. When adventure calls… we deliver.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;">
+            <a href="#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+            <a href="#how" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.12);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">How it works</a>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- Direction C: centered statement -->
+    <sc-if value="{{ heroStatement }}" hint-placeholder-val="{{ true }}">
+      <div style="text-align:center;max-width:860px;margin:0 auto;color:oklch(0.9 0.012 270);text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.18);font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.86 0.015 270);text-shadow:none;">Grants Pass &amp; Merlin · Southern Oregon</span>
+        <h1 style="margin:20px 0 0;font-weight:700;font-size:clamp(38px,6.2vw,66px);line-height:1.0;letter-spacing:-0.03em;color:#fff;">When adventure calls…<br><span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">we deliver.</span></h1>
+        <p style="margin:20px auto 0;font-size:clamp(16px,1.6vw,19px);line-height:1.55;color:oklch(0.88 0.012 270);max-width:56ch;">Southern Oregon's only fully-outfitted RV trailer rental</p><div>delivered to your campsite and set up, or towed by you.&nbsp;</div><p></p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px;">
+          <a href="#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;text-shadow:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+          <a href="#how" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:15px;text-decoration:none;text-shadow:none;border:1px solid oklch(1 0 0 / 0.25);">How it works</a>
+        </div>
+      </div>
+      <image-slot id="sdrv-hero-statement" style="width:100%;aspect-ratio:21/9;margin-top:clamp(28px,4vw,48px);box-shadow:0 24px 48px -12px oklch(0 0 0 / 0.5);border-radius:24px;border:1px solid oklch(1 0 0 / 0.14);" shape="rounded" radius="24" placeholder="Drop a wide hero photo — Crater Lake country"></image-slot>
+    </sc-if>
+    </div>
+  </section>
+
+  <!-- ===== DIFFERENTIATOR BAND ===== -->
+  <section style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(20px,3vw,40px) clamp(16px,4vw,40px);">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;">
+      <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:24px;box-shadow:0 8px 28px -10px oklch(0 0 0 / 0.5);">
+        <span style="width:44px;height:44px;border-radius:12px;background:oklch(0.55 0.12 244 / 0.35);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" stroke="oklch(0.82 0.1 250)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+        <h3 style="margin:16px 0 0;font-weight:700;font-size:18px;color:#fff;">We deliver &amp; set it up</h3>
+        <p style="margin:7px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Pick your campground and we'll tow the trailer there, level it, and have it ready before you arrive. No hitch, no backing in.</p>
+      </div>
+      <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:24px;box-shadow:0 8px 28px -10px oklch(0 0 0 / 0.5);">
+        <span style="width:44px;height:44px;border-radius:12px;background:oklch(0.55 0.12 160 / 0.32);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 9h16M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3m-1 0v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9M10 13h4" stroke="oklch(0.82 0.13 158)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+        <h3 style="margin:16px 0 0;font-weight:700;font-size:18px;color:#fff;">Fully outfitted</h3>
+        <p style="margin:7px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Kitchen, bedding, towels, the works — stocked and ready. Add kayaks, paddleboards, bikes, a grill and more to make it a real trip.</p>
+      </div>
+      <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:24px;box-shadow:0 8px 28px -10px oklch(0 0 0 / 0.5);">
+        <span style="width:44px;height:44px;border-radius:12px;background:oklch(0.6 0.14 320 / 0.32);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 17h3l3-4-2-5h-4M14 17H4V6h10v11Zm0 0V8m-7 9a2 2 0 1 0 0 .01M17 17a2 2 0 1 0 0 .01" stroke="oklch(0.82 0.13 322)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+        <h3 style="margin:16px 0 0;font-weight:700;font-size:18px;color:#fff;">Or tow it yourself</h3>
+        <p style="margin:7px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Prefer to haul your own? Charlie weighs under 4,533 lbs — light enough for a mid-size SUV. We'll walk you through it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how" style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(34px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:80px;">
+    <div style="text-align:center;max-width:620px;margin:0 auto;">
+      <span style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Three easy steps</span>
+      <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,36px);letter-spacing:-0.02em;color:#fff;">Booking a trip is simple</h2>
+      <p style="margin:12px 0 0;font-size:15.5px;line-height:1.55;color:oklch(0.8 0.015 270);">Choose a spot, choose a trailer, add the fun. We handle the heavy part.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:34px;">
+      <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:24px;box-shadow:0 8px 28px -10px oklch(0 0 0 / 0.5);">
+        <div style="display:flex;align-items:center;gap:11px;"><span style="width:34px;height:34px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;">1</span><span style="font-weight:700;font-size:17px;color:#fff;">Choose your campground</span></div>
+        <p style="margin:13px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Book your own site at a campground or RV park in Southern Oregon. Not sure where? We curate favorites near Crater Lake and the Rogue River.</p>
+      </div>
+      <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:24px;box-shadow:0 8px 28px -10px oklch(0 0 0 / 0.5);">
+        <div style="display:flex;align-items:center;gap:11px;"><span style="width:34px;height:34px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;">2</span><span style="font-weight:700;font-size:17px;color:#fff;">Choose your trailer</span></div>
+        <p style="margin:13px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Eight trailers, from nimble Charlie for couples to roomy Nola and Billy Bob for the whole gang. Pick the one that fits your crew.</p>
+      </div>
+      <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:24px;box-shadow:0 8px 28px -10px oklch(0 0 0 / 0.5);">
+        <div style="display:flex;align-items:center;gap:11px;"><span style="width:34px;height:34px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;">3</span><span style="font-weight:700;font-size:17px;color:#fff;">Customize with add-ons</span></div>
+        <p style="margin:13px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Kayaks, paddleboards, a pedal boat, the floating island cabana, bikes, a grill and firewood. Build the trip you actually want.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== INSTANT QUOTE / RATES ===== -->
+  <section id="quote" data-screen-label="Instant quote" style="position:relative;border-top:1px solid oklch(1 0 0 / 0.08);border-bottom:1px solid oklch(1 0 0 / 0.08);background:oklch(0.07 0.02 264 / 0.32);scroll-margin-top:72px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,68px) clamp(16px,4vw,40px);">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div style="max-width:560px;">
+          <span style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Rates &amp; reserve</span>
+          <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.02em;color:#fff;">Build your instant quote</h2>
+          <p style="margin:12px 0 0;font-size:15.5px;line-height:1.55;color:oklch(0.8 0.015 270);">No waiting on an email. Configure your trip and see an estimate in real time — then reserve or send it over for the final word.</p>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:oklch(1 0 0 / 0.08);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);border-radius:9999px;padding:9px 15px;font-weight:500;font-size:13px;color:oklch(0.84 0.015 270);"><span style="width:7px;height:7px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>Summer nightly rates · $149–$169</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:clamp(18px,2.5vw,28px);margin-top:30px;align-items:start;">
+
+        <!-- CONFIGURATOR -->
+        <div style="display:flex;flex-direction:column;gap:18px;">
+
+          <!-- 1 trailer -->
+          <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;">
+            <div style="font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.03 282);">1 · Pick your trailer</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:14px;">
+              <sc-for list="{{ trailers }}" as="t" hint-placeholder-count="8">
+                <button onClick="{{ t.pick }}" style="{{ t.cardStyle }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="font-weight:700;font-size:15px;color:#fff;">{{ t.name }}</span>
+                    <span style="width:16px;height:16px;border-radius:9999px;flex:none;{{ t.dotStyle }}"></span>
+                  </div>
+                  <span style="font-size:12px;color:oklch(0.74 0.02 280);line-height:1.35;">{{ t.tag }}</span>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:2px;">
+                    <span style="font-size:12px;color:oklch(0.64 0.015 275);">{{ t.sleeps }}</span>
+                    <span style="font-weight:600;font-size:13px;color:#fff;">{{ t.rateLabel }}</span>
+                  </div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- 2 nights -->
+          <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+            <div>
+              <div style="font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.03 282);">2 · How many nights</div>
+              <div style="margin-top:6px;font-size:13px;color:oklch(0.72 0.02 280);">3-night minimum · up to 14 nights</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <button onClick="{{ decNights }}" style="width:42px;height:42px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+              <div style="min-width:64px;text-align:center;"><div style="font-weight:700;font-size:26px;line-height:1;color:#fff;">{{ nights }}</div><div style="font-size:11.5px;color:oklch(0.64 0.015 275);margin-top:3px;">nights</div></div>
+              <button onClick="{{ incNights }}" style="width:42px;height:42px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+          </div>
+
+          <!-- 3 delivery -->
+          <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;">
+            <div style="font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.03 282);">3 · Delivery</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;">
+              <button onClick="{{ setIncluded }}" style="border-radius:14px;padding:14px;cursor:pointer;background:oklch(1 0 0 / 0.05);text-align:left;{{ delIncStyle }}">
+                <div style="font-weight:600;font-size:14.5px;color:#fff;">Within 100 mi</div>
+                <div style="font-size:12.5px;color:oklch(0.72 0.02 280);margin-top:3px;">Around Grants Pass &amp; Merlin — <span style="color:oklch(0.8 0.16 152);font-weight:600;">included</span></div>
+              </button>
+              <button onClick="{{ setExtended }}" style="border-radius:14px;padding:14px;cursor:pointer;background:oklch(1 0 0 / 0.05);text-align:left;{{ delExtStyle }}">
+                <div style="font-weight:600;font-size:14.5px;color:#fff;">Beyond 100 mi</div>
+                <div style="font-size:12.5px;color:oklch(0.72 0.02 280);margin-top:3px;">Farther out — est. delivery added (+$120)</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 add-ons -->
+          <sc-if value="{{ showAddons }}" hint-placeholder-val="{{ true }}">
+            <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div style="font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.03 282);">4 · Add the fun</div>
+                <div style="font-size:12px;color:oklch(0.64 0.015 275);">Toys &amp; extras · est. pricing</div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:14px;">
+                <sc-for list="{{ addons }}" as="a" hint-placeholder-count="8">
+                  <button onClick="{{ a.toggle }}" style="{{ a.chipStyle }}">
+                    <span>{{ a.name }}</span>
+                    <span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- SUMMARY -->
+        <div style="position:sticky;top:84px;background:oklch(0.16 0.02 264 / 0.66);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;padding:24px;box-shadow:0 24px 48px -16px oklch(0 0 0 / 0.6);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:700;font-size:19px;color:#fff;">{{ selectedName }}</div><div style="font-size:13px;color:oklch(0.72 0.02 280);">{{ nightlyLabel }}</div></div>
+            <span style="width:40px;height:40px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="#fff"></path></svg></span>
+          </div>
+          <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:18px 0;"></div>
+          <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+            <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">{{ nightsLineLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Cleaning, prep &amp; stocking</span><span style="font-weight:600;color:#fff;">{{ prepLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Delivery</span><span style="font-weight:600;color:#fff;">{{ deliveryLabel }}</span></div>
+            <sc-if value="{{ showAddons }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div>
+            </sc-if>
+          </div>
+          <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:18px 0;"></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-weight:600;font-size:14px;color:oklch(0.78 0.015 270);">Estimated total</span>
+            <span style="font-weight:700;font-size:30px;letter-spacing:-0.02em;background:linear-gradient(105deg, oklch(0.8 0.13 300), oklch(0.74 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">{{ totalLabel }}</span>
+          </div>
+          <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:oklch(0.64 0.015 275);">Plus a <strong style="color:oklch(0.82 0.015 270);">$1,000 fully refundable</strong> security deposit. Insurance and delivery beyond 100 mi are quoted separately.</p>
+          <a href="#contact" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;padding:14px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Check availability &amp; reserve</a>
+          <a href="#contact" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:13px;border-radius:9999px;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.2);">Email me this quote</a>
+          <div style="display:flex;align-items:center;gap:7px;justify-content:center;margin-top:13px;font-size:12px;color:oklch(0.64 0.015 275);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Self-serve estimate — no waiting on email</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq" data-screen-label="FAQs" style="position:relative;max-width:820px;margin:0 auto;padding:clamp(36px,5vw,68px) clamp(16px,4vw,40px);scroll-margin-top:80px;">
+    <div style="text-align:center;">
+      <span style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Good to know</span>
+      <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.02em;color:#fff;">Frequently asked questions</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:30px;">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+        <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:16px;overflow:hidden;">
+          <button onClick="{{ f.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:transparent;border:none;cursor:pointer;text-align:left;">
+            <span style="font-weight:600;font-size:15.5px;color:#fff;">{{ f.q }}</span>
+            <span style="flex:none;transition:transform .2s ease;{{ f.chevStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="oklch(0.72 0.02 280)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          </button>
+          <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;padding:0 20px 19px;font-size:14.5px;line-height:1.6;color:oklch(0.78 0.015 270);">{{ f.a }}</p>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT / FOOTER ===== -->
+  <section id="contact" data-screen-label="Contact" style="position:relative;background:oklch(0.07 0.02 264 / 0.55);border-top:1px solid oklch(1 0 0 / 0.08);color:#fff;scroll-margin-top:80px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(40px,5vw,72px) clamp(16px,4vw,40px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(24px,4vw,48px);align-items:center;">
+        <div>
+          <h2 style="margin:0;font-weight:700;font-size:clamp(28px,3.6vw,40px);letter-spacing:-0.02em;color:#fff;">Ready when you are.</h2>
+          <p style="margin:14px 0 0;font-size:15.5px;line-height:1.6;color:oklch(0.82 0.015 270);max-width:42ch;">Reserve through the instant quote, or reach out and we'll handle the details. We typically reply within 24–48 hours. Plan your trip around Crater Lake, the Rogue River, Ashland &amp; Medford.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:11px;margin-top:24px;">
+            <a href="mailto:info@sweetdreamsrvrentals.com" style="display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:9999px;background:#fff;color:oklch(0.12 0.02 264);font-weight:600;font-size:14.5px;text-decoration:none;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>info@sweetdreamsrvrentals.com</a>
+            <a href="tel:15416304795" style="display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:9999px;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>(541) 630-4795</a>
+          </div>
+        </div>
+        <div style="background:oklch(0.18 0.02 264 / 0.6);backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:28px;">
+          <div style="display:flex;align-items:center;gap:11px;">
+            <span style="width:40px;height:40px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" fill="#fff"></path></svg></span>
+            <div><div style="font-weight:700;font-size:16px;color:#fff;">Sweet Dreams RV Rentals</div><div style="font-size:13px;color:oklch(0.64 0.015 275);">Grants Pass &amp; Merlin, Oregon</div></div>
+          </div>
+          <p style="margin:18px 0 0;font-size:14px;line-height:1.6;color:oklch(0.82 0.015 270);"><em>When adventure calls… we deliver.</em> Southern Oregon's only fully-outfitted RV trailer rental — delivered and set up, or towed by you.</p>
+        </div>
+      </div>
+      <div style="margin-top:40px;padding-top:22px;border-top:1px solid oklch(1 0 0 / 0.1);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:12.5px;color:oklch(0.6 0.015 275);">
+        <span>© 2026 Sweet Dreams RV Rentals</span>
+        <span>Photo: John · Crater Lake Country · Rogue Valley</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;heroVariant&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;split&quot;, &quot;immersive&quot;, &quot;statement&quot;],
+    &quot;default&quot;: &quot;statement&quot;,
+    &quot;tsType&quot;: &quot;'split' | 'immersive' | 'statement'&quot;
+  },
+  &quot;showAddons&quot;: {
+    &quot;editor&quot;: &quot;boolean&quot;,
+    &quot;default&quot;: true,
+    &quot;tsType&quot;: &quot;boolean&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = { nights: 4, trailerId: 'charlie', delivery: 'included', addons: {}, openFaq: 0 };
+
+  trailers = [
+    { id: 'charlie',  name: 'Charlie',   rate: 149, tag: 'Mid-size SUV tow · under 4,533 lbs', sleeps: 'Sleeps 4' },
+    { id: 'ella',     name: 'Ella',      rate: 159, tag: "Couples' getaway",                   sleeps: 'Sleeps 2–4' },
+    { id: 'virginia', name: 'Virginia',  rate: 159, tag: 'Easy weekender',                     sleeps: 'Sleeps 4' },
+    { id: 'marylou',  name: 'Mary Lou',  rate: 159, tag: 'Family-friendly',                    sleeps: 'Sleeps 4–6' },
+    { id: 'jerry',    name: 'Jerry',     rate: 169, tag: 'Bring the gang',                     sleeps: 'Sleeps 6–8' },
+    { id: 'patricia', name: 'Patricia',  rate: 169, tag: 'Roomy · slide-out',                  sleeps: 'Sleeps 6' },
+    { id: 'nola',     name: 'Nola',      rate: 169, tag: 'Roomiest · bunk room',               sleeps: 'Sleeps 8' },
+    { id: 'billybob', name: 'Billy Bob', rate: 169, tag: 'Multiple slide-outs',                sleeps: 'Sleeps 8' },
+  ];
+
+  addonsList = [
+    { id: 'kayak',  name: 'Kayak',                 price: 45 },
+    { id: 'sup',    name: 'Paddleboard',           price: 45 },
+    { id: 'pedal',  name: 'Pedal boat',            price: 65 },
+    { id: 'cabana', name: 'Floating island cabana', price: 120 },
+    { id: 'bikes',  name: 'Bikes (pair)',          price: 60 },
+    { id: 'grill',  name: 'Propane grill',         price: 25 },
+    { id: 'wood',   name: 'Firewood bundle',       price: 20 },
+    { id: 'chairs', name: 'Camp chairs (set)',     price: 15 },
+  ];
+
+  faqs = [
+    { q: 'How does it actually work?', a: 'You book your own campsite at a campground or RV park, then we deliver the trailer there and set it up before you arrive. You show up to a ready-to-go home base — no towing, no leveling, no fuss.' },
+    { q: 'Where do you deliver?', a: 'Our base delivery fee covers roughly 100 miles around Merlin and Grants Pass. Anywhere farther out is still very doable — we just add a delivery charge based on distance, which we confirm with your quote.' },
+    { q: 'How long can I book?', a: 'Stays run from a 3-night minimum up to 14 nights. Planning something longer or a special occasion? Just ask.' },
+    { q: 'What fees should I expect?', a: 'A $95 cleaning, prep & stocking fee and a $1,000 fully refundable security deposit. Delivery beyond 100 miles and insurance are quoted separately. Summer nightly rates run $149–$169 and are seasonal.' },
+    { q: 'When is check-in and check-out?', a: 'Check-in is after 3 PM and check-out is between 11 AM and 12 PM, so we have time to deliver, set up, and turn the trailer over fresh for the next guests.' },
+    { q: 'Can I bring my dog?', a: 'Yes — a house-mannered dog is welcome with a $45 pet fee. We just ask that pets are clean and well-behaved inside the trailer.' },
+    { q: "What's your cancellation policy?", a: 'Cancel free of charge up to 14 days before your arrival date. Closer than that, different terms apply — see the full policy or reach out.' },
+    { q: 'Any house rules?', a: 'Strictly no smoking or vaping inside the trailers. And no Burning Man, sorry — other festivals may be approved with applicable fees.' },
+    { q: 'Can I tow it myself?', a: "Absolutely. Several trailers tow easily — Charlie comes in under 4,533 lbs, light enough for a mid-size SUV. We'll walk you through hitching and towing before you head out." },
+  ];
+
+  fmt(n) { return '$' + Number(n).toLocaleString('en-US'); }
+
+  renderVals() {
+    const t = this.trailers.find((x) => x.id === this.state.trailerId) || this.trailers[0];
+    const nights = this.state.nights;
+    const rental = t.rate * nights;
+    const prep = 95;
+    const delivery = this.state.delivery === 'extended' ? 120 : 0;
+    const addonsTotal = this.addonsList.filter((a) => this.state.addons[a.id]).reduce((s, a) => s + a.price, 0);
+    const total = rental + prep + delivery + addonsTotal;
+    const hv = this.props.heroVariant || 'split';
+
+    const cardBase = 'display:flex;flex-direction:column;gap:5px;border-radius:14px;padding:13px 14px;cursor:pointer;text-align:left;transition:transform .12s ease, box-shadow .12s ease;background:oklch(0.24 0.025 264 / 0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
+    const chipBase = 'display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:9999px;font-weight:500;font-size:13.5px;cursor:pointer;color:#fff;background:oklch(0.24 0.025 264 / 0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all .12s ease;';
+
+    return {
+      heroSplit: hv === 'split',
+      heroImmersive: hv === 'immersive',
+      heroStatement: hv === 'statement',
+      showAddons: this.props.showAddons !== false,
+
+      trailers: this.trailers.map((x) => {
+        const on = x.id === this.state.trailerId;
+        return {
+          ...x,
+          rateLabel: 'from $' + x.rate,
+          cardStyle: cardBase + (on
+            ? 'border:2px solid oklch(1 0 0 / 0.92);box-shadow:0 10px 26px -10px oklch(0.5781 0.2303 264.8 / 0.7);'
+            : 'border:1px solid oklch(1 0 0 / 0.12);'),
+          dotStyle: on
+            ? 'background:#fff;'
+            : 'background:transparent;border:1.5px solid oklch(1 0 0 / 0.4);',
+          pick: () => this.setState({ trailerId: x.id }),
+        };
+      }),
+
+      nights,
+      nightsLineLabel: nights + ' nights × $' + t.rate,
+      decNights: () => this.setState((s) => ({ nights: Math.max(3, s.nights - 1) })),
+      incNights: () => this.setState((s) => ({ nights: Math.min(14, s.nights + 1) })),
+
+      selectedName: t.name,
+      nightlyLabel: '$' + t.rate + ' / night',
+      rentalLabel: this.fmt(rental),
+      prepLabel: this.fmt(prep),
+      deliveryLabel: delivery ? '+' + this.fmt(delivery) : 'Included',
+      addonsTotalLabel: addonsTotal ? '+' + this.fmt(addonsTotal) : '$0',
+      totalLabel: this.fmt(total),
+
+      delIncStyle: this.state.delivery === 'included' ? 'border:2px solid oklch(1 0 0 / 0.9);' : 'border:1px solid oklch(1 0 0 / 0.14);',
+      delExtStyle: this.state.delivery === 'extended' ? 'border:2px solid oklch(1 0 0 / 0.9);' : 'border:1px solid oklch(1 0 0 / 0.14);',
+      setIncluded: () => this.setState({ delivery: 'included' }),
+      setExtended: () => this.setState({ delivery: 'extended' }),
+
+      addons: this.addonsList.map((a) => {
+        const on = !!this.state.addons[a.id];
+        return {
+          ...a,
+          priceLabel: '$' + a.price,
+          chipStyle: chipBase + (on
+            ? 'border:1.5px solid oklch(1 0 0 / 0.85);background:oklch(0.34 0.03 264 / 0.6);'
+            : 'border:1.5px solid oklch(1 0 0 / 0.14);'),
+          toggle: () => this.setState((s) => ({ addons: { ...s.addons, [a.id]: !s.addons[a.id] } })),
+        };
+      }),
+
+      faqs: this.faqs.map((f, i) => {
+        const open = this.state.openFaq === i;
+        return {
+          ...f,
+          open,
+          chevStyle: open ? 'transform:rotate(180deg);' : 'transform:rotate(0deg);',
+          toggle: () => this.setState((s) => ({ openFaq: s.openFaq === i ? -1 : i })),
+        };
+      }),
+    };
+  }
+}
+</script>
+<script>
+(async () => {
+  if (!document.title || !document.title.trim()) document.title = "Sweet Dreams RV";
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  @page { margin: 0.5cm; }\n  figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    print-color-adjust: exact; -webkit-print-color-adjust: exact;\n    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        !settleRoot.querySelector('.sc-placeholder');
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  // Reveal content gated on scroll or visibility before printing. Lazy <img>,
+  // IntersectionObserver fade-ins, and collapsed <details> don't render while
+  // off-screen, so a long page would print with them blank or closed. Open
+  // every <details>, force native-lazy images eager, and scroll the document
+  // through its full height to trip lazy-load + IO; then wait (bounded) for the
+  // newly-triggered images. Inert for deck-stage (slides aren't scroll-gated).
+  try {
+    for (const d of document.querySelectorAll('details')) d.open = true;
+    for (const img of document.querySelectorAll('img[loading="lazy"]'))
+      img.loading = 'eager';
+    const scroller = document.scrollingElement || document.documentElement;
+    const full = Math.max(scroller.scrollHeight, document.body.scrollHeight);
+    const step = window.innerHeight || 800;
+    for (let y = 0; y <= full; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    window.scrollTo(0, 0);
+    await Promise.race([
+      Promise.all(
+        [...document.images].map((img) =>
+          img.complete
+            ? null
+            : new Promise((res) => {
+                img.addEventListener('load', res, { once: true });
+                img.addEventListener('error', res, { once: true });
+              })
+        )
+      ),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {}
+  try { await document.fonts.ready; } catch (e) {}
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  // Re-append deck-stage's @page last so no author @page can add a margin and
+  // spill each full-bleed slide onto two sheets. Backstop for old copies.
+  if (ds) {
+    let pg = document.getElementById('deck-stage-print-page');
+    if (!pg) {
+      pg = document.createElement('style');
+      pg.textContent = '@page{size:' + (+ds.getAttribute('width') || 1920) +
+        'px ' + (+ds.getAttribute('height') || 1080) + 'px;margin:0}';
+    }
+    document.body.appendChild(pg);
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+  } catch (e) {}
+  // Relax break-inside on oversized elements. An element taller than a
+  // printable page can't honor break-inside: avoid — browsers either overflow
+  // it or push it whole to the next page, leaving a blank gap, then break it
+  // anyway at an arbitrary point. After the final layout (content revealed,
+  // animations jumped), find elements taller than a page that still compute
+  // break-inside: avoid and reset them to auto, so the browser breaks them at
+  // their children's boundaries instead (children keep their own avoid). PAGE_PX
+  // is a conservative portrait estimate at 96 CSS px/in — Letter/A4 usable
+  // height minus our 0.5in margins — so only clearly-oversized elements are
+  // touched and under-page elements still stay whole. Skipped for decks, whose
+  // slides are sized to the page.
+  try {
+    if (!document.querySelector('deck-stage')) {
+      const PAGE_PX = 1024;
+      // Our print defaults add a body padding inset only when we also zero the
+      // @page margin; computed style can't tell us (it reports screen media),
+      // so read the injected rule directly.
+      const defaults = document.querySelector('style[data-omelette-print-defaults]');
+      const pageInset = /body\s*\{[^}]*padding/.test(defaults ? defaults.textContent || '' : '');
+      const SEL = 'section,article,figure,table,pre,blockquote,[class~="card" i],[class~="page" i],[class~="sheet" i]';
+      for (const el of document.body.querySelectorAll(SEL)) {
+        if (el instanceof HTMLElement && el.offsetHeight > PAGE_PX) {
+          el.setAttribute('data-om-oversized', '');
+          // Fake-paged docs simulate sheets with over-tall break-after:page
+          // boxes; honoring the break spills half-blank pages and ends a
+          // colored box mid-sheet. Flow them, and (only when we own the page
+          // inset) drop the redundant padding/background via the rule below.
+          const cs = getComputedStyle(el);
+          if (cs.breakAfter === 'page' || cs.pageBreakAfter === 'always') {
+            el.setAttribute('data-om-fakepage', '');
+          }
+        }
+      }
+      const ost = document.createElement('style');
+      ost.textContent = '@media print{' +
+        '[data-om-oversized]{break-inside:auto !important;page-break-inside:auto !important}' +
+        '[data-om-fakepage]{break-after:auto !important;page-break-after:auto !important}' +
+        (pageInset ? '[data-om-fakepage]{padding:0 !important;background:none !important}' : '') +
+        '}';
+      document.head.appendChild(ost);
+    }
+  } catch (e) {}
+  // macOS Preview renders Skia-PDF Luminosity soft-masks as opaque grey boxes;
+  // swap the CSS that triggers them for Preview-safe forms.
+  try {
+    for (const el of document.body.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+
+      if (cs.boxShadow !== 'none' && cs.filter === 'none') {
+        const outs = [], kept = [];
+        for (const s of cs.boxShadow.split(/,(?![^(]*[)])/)) {
+          const t = s.trim();
+          const m = t.match(/^(rgba?[(][^)]+[)]) (-?[0-9.]+px) (-?[0-9.]+px) ([0-9.]+px) -?[0-9.]+px$/);
+          if (m && parseFloat(m[4]) > 0) outs.push('drop-shadow(' + m[2] + ' ' + m[3] + ' ' + m[4] + ' ' + m[1] + ')');
+          else kept.push(t);
+        }
+        if (outs.length) {
+          el.style.setProperty('filter', outs.join(' '), 'important');
+          el.style.setProperty('box-shadow', kept.join(', ') || 'none', 'important');
+        }
+      }
+
+      const mask = cs.maskImage && cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage;
+      if (mask && mask !== 'none' && cs.filter === 'none') el.style.setProperty('filter', 'opacity(1)', 'important');
+    }
+  } catch (e) {}
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>

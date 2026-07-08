@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=Archivo+Black&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  a { -webkit-tap-highlight-color: transparent; }
+</style>
+</helmet>
+
+<div style="position:relative;min-height:100vh;font-family:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:oklch(0.86 0.012 270);">
+
+  <!-- fixed night-sky backdrop -->
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-2;background:url('hero-night-sky.jpg') center center / cover no-repeat;filter:brightness(1.32) saturate(1.12);"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg, oklch(0.32 0.07 275 / 0.16) 0%, oklch(0.26 0.07 285 / 0.26) 45%, oklch(0.2 0.06 290 / 0.42) 100%);"></div>
+
+  <!-- ===== NAV ===== -->
+  <header style="position:sticky;top:0;z-index:50;background:oklch(0.22 0.05 280 / 0.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid oklch(1 0 0 / 0.12);">
+    <div style="width:100%;margin:0;padding:13px clamp(20px,3vw,44px);display:flex;align-items:center;gap:18px;">
+      <a href="Sweet Dreams RV.dc.html" style="display:flex;align-items:center;text-decoration:none;color:#fff;">
+        <img src="trailer-white.png" alt="Sweet Dreams RV Rentals" style="height:46px;width:auto;display:block;">
+      </a>
+      <nav style="margin-left:auto;display:flex;align-items:center;gap:clamp(8px,1.8vw,24px);flex-wrap:wrap;justify-content:flex-end;">
+        <a href="Sweet Dreams RV.dc.html#how" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">How it works</a>
+        <a href="Our Trailers.dc.html" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">Meet the fleet</a>
+        <a href="#top" style="text-decoration:none;color:#fff;font-weight:700;font-size:14px;">Campgrounds</a>
+        <a href="Sweet Dreams RV.dc.html#faq" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">FAQs</a>
+        <a href="Sweet Dreams RV.dc.html#quote" style="display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;text-decoration:none;box-shadow:0 6px 18px -6px oklch(0.5781 0.2303 264.8 / 0.6);">Get a quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section id="top" style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(34px,5vw,68px) clamp(16px,4vw,40px) clamp(20px,3vw,32px);">
+    <div style="max-width:680px;">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Explore · Southern Oregon</span>
+      <h1 style="margin:14px 0 0;font-family:'Quicksand',sans-serif;font-weight:700;font-size:clamp(34px,5vw,54px);line-height:1.03;letter-spacing:-0.02em;color:#fff;text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">Campgrounds &amp; RV Parks</h1>
+      <p style="margin:16px 0 0;font-size:clamp(16px,1.5vw,18px);line-height:1.6;color:oklch(0.86 0.012 270);max-width:52ch;text-shadow:0 1px 16px oklch(0.06 0.02 264 / 0.8);">You don't have to look far in Southern Oregon to find a beautiful place to camp — from state and county campgrounds to private RV parks, there's something for everyone. <strong style="color:#fff;">You book the site, we deliver the trailer.</strong></p>
+    </div>
+    <div style="position:relative;width:100%;aspect-ratio:21/8;margin-top:clamp(22px,3vw,34px);box-shadow:0 24px 48px -16px oklch(0 0 0 / 0.55);border-radius:24px;border:1px solid oklch(1 0 0 / 0.14);overflow:hidden;">
+      <image-slot id="cg-hero" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a wide campsite photo — a trailer at a Rogue Valley site"></image-slot>
+    </div>
+  </section>
+
+  <!-- ===== FILTER BAR ===== -->
+  <div style="position:sticky;top:66px;z-index:40;background:oklch(0.09 0.025 264 / 0.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid oklch(1 0 0 / 0.08);border-bottom:1px solid oklch(1 0 0 / 0.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:12px clamp(16px,4vw,40px);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.66 0.03 282);margin-right:4px;">Filter</span>
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+        <button onClick="{{ c.pick }}" style="{{ c.style }}">
+          <span style="width:7px;height:7px;border-radius:9999px;{{ c.dotStyle }}"></span>{{ c.label }}
+        </button>
+      </sc-for>
+      <span style="margin-left:auto;font-size:13px;color:oklch(0.66 0.02 280);">{{ countLabel }}</span>
+    </div>
+  </div>
+
+  <!-- ===== LOCAL FAVORITES ===== -->
+  <sc-if value="{{ hasLocal }}" hint-placeholder-val="{{ true }}">
+  <section style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(30px,4vw,52px) clamp(16px,4vw,40px) clamp(10px,2vw,18px);">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
+      <h2 style="margin:0;font-family:'Quicksand',sans-serif;font-weight:700;font-size:clamp(24px,3vw,34px);letter-spacing:-0.02em;color:#fff;">Local Favorites</h2>
+      <span style="font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.75 0.15 152);">Get out!</span>
+      <span style="font-size:14px;color:oklch(0.72 0.02 280);">Inside our regular delivery zone</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:18px;">
+      <sc-for list="{{ localParks }}" as="p" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;background:oklch(0.18 0.02 264 / 0.58);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px -14px oklch(0 0 0 / 0.55);">
+          <image-slot id="{{ p.slotId }}" style="width:100%;aspect-ratio:3/2;" shape="rect" placeholder="{{ p.placeholder }}"></image-slot>
+          <div style="padding:15px 16px 17px;display:flex;flex-direction:column;gap:8px;flex:1;">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-family:'Archivo Black',sans-serif;font-size:9.5px;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.8 0.015 280);"><span style="width:7px;height:7px;border-radius:9999px;{{ p.dotStyle }}"></span>{{ p.badgeLabel }}</span>
+            <h3 style="margin:0;font-family:'Quicksand',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;color:#fff;">{{ p.name }}</h3>
+            <p style="margin:0;font-size:13.5px;line-height:1.5;color:oklch(0.8 0.015 270);flex:1;">{{ p.blurb }}</p>
+            <a href="{{ p.url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-weight:700;font-size:13.5px;color:oklch(0.82 0.09 300);text-decoration:none;">Visit site<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ===== BEYOND LOCAL ===== -->
+  <sc-if value="{{ hasBeyond }}" hint-placeholder-val="{{ true }}">
+  <section style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(24px,3vw,40px) clamp(16px,4vw,40px) clamp(10px,2vw,18px);">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
+      <h2 style="margin:0;font-family:'Quicksand',sans-serif;font-weight:700;font-size:clamp(24px,3vw,34px);letter-spacing:-0.02em;color:#fff;">Beyond Local</h2>
+      <span style="font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.8 0.13 80);">Stay out!</span>
+      <span style="font-size:14px;color:oklch(0.72 0.02 280);">Worth the trip — may include a delivery fee</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:18px;">
+      <sc-for list="{{ beyondParks }}" as="p" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;background:oklch(0.18 0.02 264 / 0.58);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px -14px oklch(0 0 0 / 0.55);">
+          <image-slot id="{{ p.slotId }}" style="width:100%;aspect-ratio:3/2;" shape="rect" placeholder="{{ p.placeholder }}"></image-slot>
+          <div style="padding:15px 16px 17px;display:flex;flex-direction:column;gap:8px;flex:1;">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-family:'Archivo Black',sans-serif;font-size:9.5px;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.8 0.015 280);"><span style="width:7px;height:7px;border-radius:9999px;{{ p.dotStyle }}"></span>{{ p.badgeLabel }}</span>
+            <h3 style="margin:0;font-family:'Quicksand',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;color:#fff;">{{ p.name }}</h3>
+            <p style="margin:0;font-size:13.5px;line-height:1.5;color:oklch(0.8 0.015 270);flex:1;">{{ p.blurb }}</p>
+            <a href="{{ p.url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-weight:700;font-size:13.5px;color:oklch(0.82 0.09 300);text-decoration:none;">Visit site<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ===== FOOTNOTE + CTA ===== -->
+  <section style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(20px,3vw,34px) clamp(16px,4vw,40px) clamp(30px,4vw,56px);">
+    <p style="margin:0 0 clamp(24px,3vw,36px);font-size:12.5px;line-height:1.6;color:oklch(0.62 0.015 275);max-width:70ch;">Our regular delivery radius is within about 100 miles of the Grants Pass area. Parks beyond that zone — our "Stay out!" picks — may include an additional delivery fee, which we'll confirm with your quote. Forest Service sites are dry camping (no hookups); ask us about fresh-water and battery setup.</p>
+    <div style="background:oklch(0.16 0.02 264 / 0.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;padding:clamp(24px,3.5vw,40px);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:0 18px 44px -18px oklch(0 0 0 / 0.6);">
+      <div>
+        <h2 style="margin:0;font-family:'Quicksand',sans-serif;font-weight:700;font-size:clamp(24px,3vw,34px);letter-spacing:-0.02em;color:#fff;">Found your spot?</h2>
+        <p style="margin:10px 0 0;font-size:15.5px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:46ch;">Book the campsite, then let us bring the trailer to you — delivered, set up, and stocked before you arrive.</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="Sweet Dreams RV.dc.html#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+        <a href="Sweet Dreams RV.dc.html#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">Meet the fleet</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <section id="contact" style="position:relative;background:oklch(0.24 0.05 285 / 0.38);border-top:1px solid oklch(1 0 0 / 0.1);color:#fff;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(34px,4vw,56px) clamp(16px,4vw,40px);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <img src="logo-white.png" alt="Sweet Dreams RV Rentals" style="height:64px;width:auto;display:block;">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.64 0.015 275);">Grants Pass &amp; Merlin, Oregon</div>
+        </div>
+        <div style="display:flex;gap:11px;flex-wrap:wrap;">
+          <a href="mailto:info@sweetdreamsrvrentals.com" style="display:inline-flex;align-items:center;gap:9px;padding:12px 17px;border-radius:9999px;background:#fff;color:oklch(0.12 0.02 264);font-weight:600;font-size:14px;text-decoration:none;">info@sweetdreamsrvrentals.com</a>
+          <a href="tel:15416304795" style="display:inline-flex;align-items:center;gap:9px;padding:12px 17px;border-radius:9999px;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">(541) 630-4795</a>
+        </div>
+      </div>
+      <div style="margin-top:32px;padding-top:20px;border-top:1px solid oklch(1 0 0 / 0.1);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.6 0.015 275);">
+        <span>© 2026 Sweet Dreams RV Rentals</span>
+        <span>Crater Lake Country · Rogue Valley</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { filter: 'all' };
+
+  typeMeta = {
+    state:   { label: 'State Park',     dot: 'background:oklch(0.75 0.15 152);' },
+    county:  { label: 'County Park',    dot: 'background:oklch(0.72 0.14 240);' },
+    private: { label: 'Private Park',   dot: 'background:oklch(0.74 0.16 300);' },
+    forest:  { label: 'Forest Service', dot: 'background:oklch(0.8 0.13 80);' },
+  };
+
+  parks = [
+    { id: 'valley-rogue', name: 'Valley of the Rogue State Park', type: 'state', zone: 'local', blurb: 'Riverside sites right off I-5, halfway between Grants Pass and Medford.', url: 'http://oregonstateparks.org/index.cfm?do=parkPage.dsp_parkPage&parkId=76' },
+    { id: 'joseph-stewart', name: 'Joseph H. Stewart Rec Area', type: 'state', zone: 'local', blurb: 'On Lost Creek Lake, on the road up toward Crater Lake.', url: 'http://oregonstateparks.org/index.cfm?do=parkPage.dsp_parkPage&parkId=23' },
+    { id: 'emigrant', name: 'Emigrant Lake', type: 'county', zone: 'local', blurb: 'Reservoir just east of Ashland — swimming, boating and disc golf.', url: 'http://jacksoncountyor.org/parks/Camping/Emigrant-Lake' },
+    { id: 'so-oregon-rv', name: 'Southern Oregon RV Park', type: 'county', zone: 'local', blurb: 'Simple full-hookup county park near Central Point.', url: 'http://jacksoncountyor.org/parks/Camping/So-Oregon-RV-Park' },
+    { id: 'willow', name: 'Willow Lake', type: 'county', zone: 'local', blurb: 'Quiet mountain reservoir below Mt. McLoughlin.', url: 'http://jacksoncountyor.org/parks/Camping/Willow-Lake' },
+    { id: 'rogue-elk', name: 'Rogue Elk', type: 'county', zone: 'local', blurb: 'Shady riverfront sites near Shady Cove.', url: 'http://jacksoncountyor.org/parks/Camping/Rogue-Elk-Park' },
+    { id: 'howard-prairie', name: 'Howard Prairie', type: 'county', zone: 'local', blurb: 'High-country reservoir resort east of Ashland.', url: 'http://jacksoncountyor.org/parks/Camping/Howard-Prairie-Resort' },
+    { id: 'indian-mary', name: 'Indian Mary', type: 'county', zone: 'local', blurb: 'The oldest county park in the U.S., on the Rogue near Merlin.', url: 'http://co.josephine.or.us/indianmary' },
+    { id: 'ashland-creekside', name: "Ashland's Creekside Campground & RV Park", type: 'private', zone: 'local', blurb: 'Walk-to-downtown creekside sites in Ashland.', url: 'https://ashlandcreeksiderv.com/' },
+    { id: 'holiday', name: 'Holiday RV Park', type: 'private', zone: 'local', blurb: 'Full-hookup park near the river in Rogue River.', url: 'http://holidayrvpark.net/' },
+    { id: 'rock-point', name: 'Rock Point RV', type: 'private', zone: 'local', blurb: 'Riverside full-hookups in Gold Hill.', url: 'https://www.rockpointrvpark.com/' },
+    { id: 'fish-lake', name: 'Fish Lake Resort', type: 'private', zone: 'local', blurb: 'Rustic alpine-lake resort near Mt. McLoughlin.', url: 'https://fishlakeresort.net/rv/' },
+    { id: 'lake-woods', name: 'Lake of the Woods Resort', type: 'private', zone: 'local', blurb: 'Forested alpine lake between Medford and Klamath Falls.', url: 'https://lakeofthewoodsresort.com/' },
+    { id: 'laughing-alpaca', name: 'Laughing Alpaca Campground & RV Park', type: 'private', zone: 'local', blurb: 'Small farm campground in Cave Junction — yes, real alpacas.', url: 'https://www.laughingalpacacampground.com/' },
+    { id: 'blue-heron', name: 'Blue Heron RV Park', type: 'private', zone: 'local', blurb: 'Riverside park just over the state line in Hornbrook, CA.', url: 'https://klamathranchresort.com/' },
+    { id: 'crater-lake-resort', name: 'Crater Lake Resort', type: 'private', zone: 'beyond', blurb: 'Fort Klamath base camp for Crater Lake National Park.', url: 'https://www.craterlakeresort.com/' },
+    { id: 'redwoods', name: 'Redwoods RV Park', type: 'private', zone: 'beyond', blurb: 'Among the giant redwoods in Crescent City, CA.', url: 'http://redwoodsrv.com/' },
+    { id: 'mill-creek', name: 'Mill Creek', type: 'forest', zone: 'beyond', blurb: 'First-come dry sites on the upper Rogue River.', url: 'https://www.forestcamping.com/dow/pacficnw/rogcmp.htm#mill_creek' },
+    { id: 'union-creek', name: 'Union Creek', type: 'forest', zone: 'beyond', blurb: 'Historic forest camp near Rogue Gorge and Crater Lake.', url: 'https://www.forestcamping.com/dow/pacficnw/rogcmp.htm#union_creek' },
+    { id: 'farewell-bend', name: 'Farewell Bend', type: 'forest', zone: 'beyond', blurb: 'Old-growth sites where the Rogue meets Union Creek.', url: 'https://www.forestcamping.com/dow/pacficnw/rogcmp.htm#farewell_bend' },
+    { id: 'natural-bridge', name: 'Natural Bridge', type: 'forest', zone: 'beyond', blurb: 'Camp where the Rogue vanishes into a lava tube.', url: 'https://www.forestcamping.com/dow/pacficnw/rogcmp.htm#natural_bridge' },
+  ];
+
+  decorate(p) {
+    const m = this.typeMeta[p.type];
+    return {
+      ...p,
+      badgeLabel: m.label,
+      dotStyle: m.dot,
+      slotId: 'cg-' + p.id,
+      placeholder: 'Photo of ' + p.name,
+    };
+  }
+
+  renderVals() {
+    const f = this.state.filter;
+    const match = (p) => f === 'all' || p.type === f;
+    const localParks = this.parks.filter((p) => p.zone === 'local' && match(p)).map((p) => this.decorate(p));
+    const beyondParks = this.parks.filter((p) => p.zone === 'beyond' && match(p)).map((p) => this.decorate(p));
+    const total = localParks.length + beyondParks.length;
+
+    const chipBase = "display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:9999px;font-family:'Nunito Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;color:#fff;transition:all .14s ease;";
+    const defs = [
+      { key: 'all', label: 'All', dot: 'background:oklch(0.8 0.02 280);' },
+      { key: 'state', label: 'State', dot: this.typeMeta.state.dot },
+      { key: 'county', label: 'County', dot: this.typeMeta.county.dot },
+      { key: 'private', label: 'Private', dot: this.typeMeta.private.dot },
+      { key: 'forest', label: 'Forest Service', dot: this.typeMeta.forest.dot },
+    ];
+    const chips = defs.map((d) => {
+      const on = f === d.key;
+      return {
+        label: d.label,
+        dotStyle: d.dot,
+        style: chipBase + (on
+          ? 'background:oklch(0.34 0.03 264 / 0.75);border:1.5px solid oklch(1 0 0 / 0.85);'
+          : 'background:oklch(0.2 0.022 264 / 0.5);border:1.5px solid oklch(1 0 0 / 0.14);'),
+        pick: () => this.setState({ filter: d.key }),
+      };
+    });
+
+    return {
+      chips,
+      localParks,
+      beyondParks,
+      hasLocal: localParks.length > 0,
+      hasBeyond: beyondParks.length > 0,
+      countLabel: total + (total === 1 ? ' place' : ' places'),
+    };
+  }
+}
+</script>
+</body>
+</html>

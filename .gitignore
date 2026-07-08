@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+.DS_Store
+
+# Playwright
+tests/test-results/
+tests/playwright-report/
+tests/blob-report/
+tests/.cache/
+
+# future backend
+dist/
+*.log

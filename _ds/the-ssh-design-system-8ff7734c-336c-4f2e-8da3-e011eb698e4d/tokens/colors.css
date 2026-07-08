@@ -1,0 +1,45 @@
+/* ============================================================
+   THE SSH — Color tokens
+   A restrained analog duotone: warm paper + near-black ink.
+   Orange is the single accent, used sparingly (live dots,
+   active marks, one highlight per view). Blue is a rare,
+   deliberate secondary borrowed from the driveway tent.
+   ============================================================ */
+:root {
+  /* --- Base palette --- */
+  --paper:      #ECE5D2;  /* primary surface — sun-bleached cream */
+  --paper-2:    #E3DAC2;  /* secondary surface — a shade deeper   */
+  --paper-3:    #F4EFE2;  /* raised surface — near-white card      */
+  --ink:        #17130D;  /* near-black, warm                      */
+  --ink-2:      #6B6253;  /* muted ink — captions, secondary text  */
+  --ink-3:      #9A9080;  /* faint ink — timestamps, disabled      */
+
+  --orange:     #EA961A;  /* the accent. one per view.             */
+  --orange-ink: #B9720C;  /* accessible orange for text on paper   */
+  --blue:       #1E2BE6;  /* rare secondary — the tent             */
+
+  /* --- Hairlines & rules --- */
+  --line:        rgba(23, 19, 13, 0.14);  /* default divider       */
+  --line-2:      rgba(23, 19, 13, 0.28);  /* emphasized divider    */
+  --line-strong: var(--ink);              /* structural frame      */
+  --line-invert: rgba(236, 229, 210, 0.20); /* hairline on ink     */
+
+  /* --- Semantic aliases --- */
+  --bg:             var(--paper);
+  --bg-alt:         var(--paper-2);
+  --surface:        var(--paper-3);
+  --surface-invert: var(--ink);
+
+  --text:        var(--ink);
+  --text-muted:  var(--ink-2);
+  --text-faint:  var(--ink-3);
+  --text-invert: var(--paper);
+  --text-invert-muted: rgba(236, 229, 210, 0.62);
+
+  --accent:        var(--orange);
+  --accent-text:   var(--orange-ink);
+  --on-accent:     var(--ink);
+
+  --selection-bg:  var(--orange);
+  --selection-fg:  var(--ink);
+}

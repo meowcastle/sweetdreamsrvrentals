@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&amp;family=Archivo+Black&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<script src="./sd-pricing.js"></script>
+<script>
+  (function(){
+    function jumpToHash(){
+      var h = location.hash;
+      if (!h || h.length < 2) return false;
+      var el;
+      try { el = document.querySelector(h); } catch (e) { return false; }
+      if (!el) return false;
+      var y = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop || 0) - 68;
+      window.scrollTo(0, y);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = y;
+      document.documentElement.scrollTop = y;
+      document.body.scrollTop = y;
+      return true;
+    }
+    if (location.hash && location.hash.length > 1) {
+      var tries = 0;
+      var iv = setInterval(function(){
+        if (jumpToHash() || ++tries > 80) clearInterval(iv);
+      }, 100);
+    }
+  })();
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: oklch(0.2 0.05 280); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  a:hover { opacity: 0.86; }
+  image-slot { display: block; }
+  .nav-burger { display:none; }
+  @media (max-width:760px){ .nav-burger { display:inline-flex !important; } .nav-links { display:none !important; position:absolute; top:100%; left:0; right:0; flex-direction:column; align-items:stretch; gap:4px; background:oklch(0.16 0.05 285 / 0.98); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); padding:10px 20px 16px; border-bottom:1px solid oklch(1 0 0 / 0.12); box-shadow:0 20px 40px -16px oklch(0 0 0 / 0.6); } .nav-toggle:checked ~ .nav-links { display:flex !important; } .nav-links > a { padding:11px 4px !important; } }
+  h1,h2,h3,h4,h5 { font-family:'Quicksand',sans-serif; }
+  .quote-cols { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr); gap:clamp(18px,2.5vw,28px); align-items:start; }
+  @media (max-width: 940px){ .quote-cols { grid-template-columns:1fr; } }
+  @media (max-width: 620px){ .step-arrow { display:none !important; } }
+  .stays-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  @media (min-width: 700px){ .stays-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  @media (min-width: 1000px){ .stays-grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
+</style>
+</helmet>
+
+<div data-screen-label="Sweet Dreams RV — Home" style="position:relative;z-index:0;font-family:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:oklch(0.86 0.012 270);min-height:100vh;overflow-x:hidden;">
+
+  <!-- fixed night-sky backdrop (viewport-sized = stays sharp) -->
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-2;background:url('hero-night-sky.jpg') center center / cover no-repeat;filter:brightness(1.32) saturate(1.12);"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg, oklch(0.32 0.07 275 / 0.14) 0%, oklch(0.26 0.07 285 / 0.24) 55%, oklch(0.2 0.06 290 / 0.4) 100%);"></div>
+
+  <!-- ===== NAV ===== -->
+  <header style="position:sticky;top:0;z-index:50;background:oklch(0.22 0.05 280 / 0.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid oklch(1 0 0 / 0.12);">
+    <div style="width:100%;margin:0;padding:13px clamp(20px,3vw,44px);display:flex;align-items:center;gap:18px;">
+      <a href="#top" style="display:flex;align-items:center;text-decoration:none;color:#fff;">
+        <img src="trailer-white.png" alt="Sweet Dreams RV Rentals" style="height:46px;width:auto;display:block;">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle menu" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;">
+      <label for="nav-toggle" class="nav-burger" aria-label="Menu" style="margin-left:auto;cursor:pointer;width:42px;height:42px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.08);align-items:center;justify-content:center;color:#fff;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></label>
+      <nav class="nav-links" style="margin-left:auto;display:flex;align-items:center;gap:clamp(8px,1.8vw,24px);flex-wrap:wrap;justify-content:flex-end;">
+        <a href="#how" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">How it works</a>
+        <a href="Our Trailers.dc.html" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">Meet the fleet</a>
+        <a href="#stays" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">Longer stays</a>
+        <a href="#faq" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">FAQs</a>
+        <a href="Campgrounds & RV Parks.dc.html" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">Campgrounds</a>
+        <a href="#quote" style="display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;text-decoration:none;box-shadow:0 6px 18px -6px oklch(0.5781 0.2303 264.8 / 0.6);">Get a quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section id="top" data-screen-label="Hero" style="position:relative;scroll-margin-top:80px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(36px,6vw,84px) clamp(16px,4vw,40px) clamp(44px,6vw,76px);">
+
+    <!-- Direction A: editorial split -->
+    <sc-if value="{{ heroSplit }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(24px,4vw,56px);align-items:center;">
+        <div>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-bottom:22px;">
+            <img src="sweetdreams-white.png" alt="Sweet Dreams" style="height:clamp(52px,7vw,80px);width:auto;display:block;filter:drop-shadow(0 3px 18px oklch(0.06 0.02 264 / 0.8));">
+            <img src="trailer-white.png" alt="RV trailer" style="height:clamp(88px,12vw,140px);width:auto;display:block;margin-left:clamp(8px,2vw,26px);filter:drop-shadow(0 3px 18px oklch(0.06 0.02 264 / 0.8));">
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.18);font-family:'Nunito Sans',sans-serif;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.86 0.015 270);">
+            <span style="width:6px;height:6px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>Grants Pass &amp; Merlin · Southern Oregon
+          </span>
+          <h1 style="margin:18px 0 0;font-weight:700;font-size:clamp(34px,5.4vw,56px);line-height:1.03;letter-spacing:-0.025em;color:#fff;text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">Southern Oregon's <span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">only fully-outfitted</span> RV trailer rental.</h1>
+          <p style="margin:18px 0 0;font-size:clamp(16px,1.5vw,18px);line-height:1.55;color:oklch(0.86 0.012 270);max-width:46ch;text-shadow:0 1px 16px oklch(0.06 0.02 264 / 0.8);">We deliver the trailer to your campsite and set it up, or you tow it yourself. Stocked, ready, waiting. <strong style="color:#fff;">When adventure calls… we deliver.</strong></p>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:22px;">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:500;font-size:13px;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Delivered &amp; set up</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:500;font-size:13px;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Fully outfitted</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:500;font-size:13px;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Or tow it yourself</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;">
+            <a href="#how" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">How it works</a>
+          </div>
+        </div>
+        <div style="position:relative;">
+          <div style="position:relative;width:100%;aspect-ratio:4/5;border-radius:24px;overflow:hidden;border:1px solid oklch(1 0 0 / 0.14);box-shadow:0 24px 48px -12px oklch(0 0 0 / 0.5);">
+            {{ carouselImgEls }}<button onClick="{{ carPrev }}" style="position:absolute;z-index:5;top:50%;left:12px;transform:translateY(-50%);width:38px;height:38px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(0.12 0.02 264 / 0.6);backdrop-filter:blur(8px);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button onClick="{{ carNext }}" style="position:absolute;z-index:5;top:50%;right:12px;transform:translateY(-50%);width:38px;height:38px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(0.12 0.02 264 / 0.6);backdrop-filter:blur(8px);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><div style="position:absolute;z-index:5;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;"><sc-for list="{{ carouselDots }}" as="cd" hint-placeholder-count="10"><button onClick="{{ cd.go }}" style="{{ cd.style }}"></button></sc-for></div>
+          </div>
+          <div style="position:absolute;left:-14px;bottom:26px;background:oklch(0.16 0.02 264 / 0.7);backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.14);border-radius:16px;padding:13px 16px;box-shadow:0 16px 32px -10px oklch(0 0 0 / 0.5);display:flex;align-items:center;gap:11px;animation:floaty 5s ease-in-out infinite;">
+            <span style="width:38px;height:38px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <div><div style="font-weight:700;font-size:14px;color:#fff;">8 named trailers</div><div style="font-size:12.5px;color:oklch(0.72 0.02 280);">{{ fleetFromLabel }}</div></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- Direction B: immersive overlay -->
+    <sc-if value="{{ heroImmersive }}" hint-placeholder-val="{{ false }}">
+      <div style="position:relative;border-radius:28px;overflow:hidden;box-shadow:0 24px 48px -12px oklch(0 0 0 / 0.5);min-height:clamp(440px,62vh,640px);display:flex;align-items:flex-end;border:1px solid oklch(1 0 0 / 0.12);">
+        <image-slot id="sdrv-hero-immersive" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a full-bleed campsite photo"></image-slot>
+        <div style="position:absolute;inset:0;background:linear-gradient(to top, oklch(0 0 0 / 0.62), oklch(0 0 0 / 0.08) 55%, oklch(0 0 0 / 0.18));pointer-events:none;"></div>
+        <div style="position:relative;margin:clamp(18px,3.5vw,44px);max-width:560px;background:oklch(0.14 0.02 264 / 0.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;padding:clamp(22px,3vw,34px);box-shadow:0 20px 40px -12px oklch(0 0 0 / 0.5);">
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.1);font-family:'Nunito Sans',sans-serif;font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.84 0.015 270);">Southern Oregon · we deliver</span>
+          <h1 style="margin:16px 0 0;font-weight:700;font-size:clamp(30px,4.4vw,48px);line-height:1.05;letter-spacing:-0.025em;color:#fff;">The trailer comes to <span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">you</span> — fully outfitted.</h1>
+          <p style="margin:15px 0 0;font-size:16px;line-height:1.55;color:oklch(0.84 0.012 270);">We deliver and set it up at your campsite, or you tow it yourself. Everything's stocked and ready. When adventure calls… we deliver.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;">
+            <a href="#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+            <a href="#how" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.12);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">How it works</a>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- Direction C: centered statement -->
+    <sc-if value="{{ heroStatement }}" hint-placeholder-val="{{ true }}">
+      <div style="text-align:center;max-width:860px;margin:0 auto;color:oklch(0.9 0.012 270);text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">
+        <img src="logo-white.png" alt="Sweet Dreams RV Rentals" style="height:clamp(120px,17vw,220px);width:auto;display:inline-block;filter:drop-shadow(0 3px 20px oklch(0.06 0.02 264 / 0.85));">
+        <p style="margin:20px auto 0;font-size:clamp(16px,1.6vw,19px);line-height:1.55;color:oklch(0.88 0.012 270);max-width:56ch;">Southern Oregon's only fully-outfitted RV trailer rental, delivered to your campsite and set up, or towed by you.</p>
+      </div>
+      <div onPointerDown="{{ deckDown }}" onPointerMove="{{ deckMove }}" onPointerUp="{{ deckUp }}" onPointerCancel="{{ deckUp }}" style="position:relative;width:100%;height:clamp(240px,28vw,360px);margin-top:clamp(34px,5vw,60px);touch-action:pan-y;cursor:grab;user-select:none;">
+        {{ deckImgEls }}
+      </div>
+      <h1 style="margin:clamp(30px,4vw,48px) auto 0;text-align:center;max-width:960px;font-weight:700;font-size:clamp(26px,4.4vw,48px);line-height:1.05;letter-spacing:-0.03em;color:#fff;text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">When adventure calls… <span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">we deliver!</span></h1>
+      <div style="display:flex;justify-content:center;margin-top:clamp(24px,3.5vw,38px);">
+        <a href="#quote" style="display:inline-flex;align-items:center;gap:9px;padding:15px 28px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15.5px;text-decoration:none;text-shadow:none;box-shadow:0 14px 34px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Get a quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+      </div>
+    </sc-if>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how" style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(34px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:80px;">
+    <div style="text-align:center;max-width:620px;margin:0 auto;">
+      <h2 style="margin:0;font-weight:700;font-size:clamp(26px,3.4vw,36px);letter-spacing:-0.02em;color:#fff;">How it works</h2>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:stretch;justify-content:center;gap:10px;margin-top:32px;">
+      <div style="flex:1;min-width:230px;display:flex;flex-direction:column;gap:9px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.1);border-radius:16px;padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;"><span style="width:28px;height:28px;flex:none;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;">1</span><span style="font-weight:700;font-size:15.5px;color:#fff;">Book your campsite</span></div>
+        <p style="margin:0;font-size:13.5px;line-height:1.5;color:oklch(0.76 0.015 270);">Your own site near Crater Lake or the Rogue. Need ideas? We curate favorites.</p>
+      </div>
+      <div class="step-arrow" aria-hidden="true" style="display:flex;align-items:center;color:oklch(0.6 0.03 286);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+      <div style="flex:1;min-width:230px;display:flex;flex-direction:column;gap:9px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.1);border-radius:16px;padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;"><span style="width:28px;height:28px;flex:none;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;">2</span><span style="font-weight:700;font-size:15.5px;color:#fff;">Pick your trailer</span></div>
+        <p style="margin:0;font-size:13.5px;line-height:1.5;color:oklch(0.76 0.015 270);">Eight trailers, from nimble Charlie for couples to roomy Nola for the whole gang.</p>
+      </div>
+      <div class="step-arrow" aria-hidden="true" style="display:flex;align-items:center;color:oklch(0.6 0.03 286);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+      <div style="flex:1;min-width:230px;display:flex;flex-direction:column;gap:9px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.1);border-radius:16px;padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;"><span style="width:28px;height:28px;flex:none;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;">3</span><span style="font-weight:700;font-size:15.5px;color:#fff;">Add the fun</span></div>
+        <p style="margin:0;font-size:13.5px;line-height:1.5;color:oklch(0.76 0.015 270);">Kayaks, paddleboards, the floating cabana, bikes, a grill and firewood.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== INSTANT QUOTE / RATES ===== -->
+  <section id="quote" data-screen-label="Instant quote" style="position:relative;border-top:1px solid oklch(1 0 0 / 0.08);border-bottom:1px solid oklch(1 0 0 / 0.08);background:oklch(0.4 0.05 285 / 0.16);scroll-margin-top:72px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,68px) clamp(16px,4vw,40px);">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div style="max-width:560px;">
+          <span style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Rates &amp; reserve</span>
+          <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.02em;color:#fff;">Build your instant quote</h2>
+          <p style="margin:12px 0 0;font-size:15.5px;line-height:1.55;color:oklch(0.8 0.015 270);">No waiting on an email. Configure your trip and see an estimate in real time, then reserve or send it over for the final word.</p>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:oklch(1 0 0 / 0.08);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);border-radius:9999px;padding:9px 15px;font-weight:500;font-size:13px;color:oklch(0.84 0.015 270);"><span style="width:7px;height:7px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>Summer nightly rates · $149–$169</div>
+      </div>
+
+      <div class="quote-cols" style="margin-top:30px;">
+
+        <!-- CONFIGURATOR -->
+        <div style="display:flex;flex-direction:column;gap:18px;">
+
+          <!-- 1 trailer -->
+          <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;">
+            <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">1 · Pick your trailer</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;margin-top:14px;">
+              <sc-for list="{{ trailers }}" as="t" hint-placeholder-count="8">
+                <button onClick="{{ t.pick }}" style="{{ t.cardStyle }}" style-hover="border-color:oklch(1 0 0 / 0.6);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:0.01em;color:#fff;">{{ t.name }}</span>
+                    <span style="width:16px;height:16px;border-radius:9999px;flex:none;{{ t.dotStyle }}"></span>
+                  </div>
+                  <span style="font-size:12px;color:oklch(0.74 0.02 280);line-height:1.35;">{{ t.tag }}</span>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:2px;">
+                    <span style="font-size:12px;color:oklch(0.64 0.015 275);">{{ t.sleeps }}</span>
+                    <span style="font-weight:600;font-size:13px;color:#fff;">{{ t.rateLabel }}</span>
+                  </div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- 2 nights -->
+          <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+            <div>
+              <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">2 · How many nights</div>
+              <div style="margin-top:6px;font-size:13px;color:oklch(0.72 0.02 280);">3-night minimum · up to 14 nights</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <button onClick="{{ decNights }}" style="width:44px;height:44px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+              <div style="min-width:64px;text-align:center;"><div style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:1;color:#fff;">{{ nights }}</div><div style="font-size:11.5px;color:oklch(0.64 0.015 275);margin-top:3px;">nights</div></div>
+              <button onClick="{{ incNights }}" style="width:44px;height:44px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+          </div>
+
+          <!-- 3 add-ons -->
+          <sc-if value="{{ showAddons }}" hint-placeholder-val="{{ true }}">
+            <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">3 · Add the fun</div>
+                <div style="font-size:12px;color:oklch(0.64 0.015 275);">Toys &amp; extras · est. pricing</div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:14px;">
+                <sc-for list="{{ addons }}" as="a" hint-placeholder-count="8">
+                  <sc-if value="{{ a.isSingle }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ a.toggle }}" style="{{ a.chipStyle }}">
+                      <span>{{ a.name }}</span>
+                      <span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ a.isQty }}" hint-placeholder-val="{{ false }}">
+                    <div style="{{ a.chipStyle }}">
+                      <span>{{ a.name }}</span>
+                      <span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span>
+                      <span style="display:inline-flex;align-items:center;gap:8px;margin-left:2px;padding-left:9px;border-left:1px solid oklch(1 0 0 / 0.16);">
+                        <button onClick="{{ a.dec }}" aria-label="Fewer" style="{{ a.stepStyle }}">−</button>
+                        <span style="min-width:14px;text-align:center;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;">{{ a.qtyLabel }}</span>
+                        <button onClick="{{ a.inc }}" aria-label="More" style="{{ a.stepStyle }}">+</button>
+                      </span>
+                    </div>
+                  </sc-if>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- SUMMARY -->
+        <div style="position:sticky;top:84px;background:oklch(0.16 0.02 264 / 0.66);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;padding:24px;box-shadow:0 24px 48px -16px oklch(0 0 0 / 0.6);">
+          <div style="position:relative;width:100%;aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:1px solid oklch(1 0 0 / 0.12);background:oklch(0.1 0.02 264 / 0.5);margin-bottom:18px;">
+            <sc-for list="{{ fleetPhotos }}" as="p" hint-placeholder-count="1">
+              <div style="{{ p.wrapStyle }}">
+                <image-slot id="{{ p.slotId }}" src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="{{ p.placeholder }}"></image-slot>
+              </div>
+            </sc-for>
+            <div style="position:absolute;left:0;right:0;bottom:0;z-index:3;padding:14px 15px 12px;background:linear-gradient(to top, oklch(0 0 0 / 0.72), transparent);pointer-events:none;display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:15px;letter-spacing:0.01em;color:#fff;">{{ activeName }}</span>
+              <span style="font-family:'Nunito Sans',sans-serif;font-size:12px;color:oklch(0.88 0.02 280);">{{ activeSleeps }}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-family:'Archivo Black',sans-serif;font-size:18px;letter-spacing:0.01em;color:#fff;">{{ selectedName }}</div><div style="font-size:13px;color:oklch(0.72 0.02 280);">{{ nightlyLabel }}</div></div>
+            <span style="width:40px;height:40px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><img src="trailer-white.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;"></span>
+          </div>
+          <p style="margin:12px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 275);">{{ selectedBlurb }}</p>
+          <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:18px 0;"></div>
+          <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;">
+            <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">{{ nightsLineLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Cleaning, prep &amp; stocking</span><span style="font-weight:600;color:#fff;">{{ prepLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Delivery</span><span style="font-weight:600;color:#fff;">{{ deliveryLabel }}</span></div>
+            <sc-if value="{{ showAddons }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div><sc-for list="{{ addonLines }}" as="al" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;padding-left:12px;"><span style="color:oklch(0.6 0.02 280);font-size:12.5px;">{{ al.label }}</span><span style="color:oklch(0.78 0.015 270);font-size:12.5px;">{{ al.amount }}</span></div></sc-for>
+            </sc-if>
+          </div>
+          <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:18px 0;"></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-weight:600;font-size:14px;color:oklch(0.78 0.015 270);">Estimated total</span>
+            <span style="font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-0.01em;background:linear-gradient(105deg, oklch(0.8 0.13 300), oklch(0.74 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">{{ totalLabel }}</span>
+          </div>
+          <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:oklch(0.64 0.015 275);">Plus a <strong style="color:oklch(0.82 0.015 270);">{{ depositLabel }} fully refundable</strong> security deposit. Insurance and delivery beyond {{ deliveryRadiusLabel }} mi are quoted separately.</p>
+          <button onClick="{{ openReserve }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Check availability &amp; reserve</button>
+          <button onClick="{{ openEmail }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;">Email me this quote</button>
+          <div style="display:flex;align-items:center;gap:7px;justify-content:center;margin-top:13px;font-size:12px;color:oklch(0.64 0.015 275);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Self-serve estimate — no waiting on email</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHY / FLEET (feature + photo) ===== -->
+  <section style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(34px,5vw,64px) clamp(16px,4vw,40px);">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(24px,4vw,52px);align-items:center;">
+
+      <!-- left: value list -->
+      <div>
+        <span style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Why Sweet Dreams</span>
+        <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.02em;color:#fff;line-height:1.08;">The only fully-outfitted rental in Southern Oregon.</h2>
+        <div style="margin-top:26px;display:flex;flex-direction:column;">
+          <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid oklch(1 0 0 / 0.1);">
+            <span style="flex:none;width:46px;height:46px;border-radius:13px;background:oklch(0.55 0.12 244 / 0.35);display:grid;place-items:center;"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" stroke="oklch(0.82 0.1 250)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <div><h3 style="margin:0;font-weight:700;font-size:17px;color:#fff;">We deliver &amp; set it up</h3><p style="margin:5px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Pick your campground and we'll tow the trailer there, level it, and have it ready before you arrive. No hitch, no backing in.</p></div>
+          </div>
+          <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid oklch(1 0 0 / 0.1);">
+            <span style="flex:none;width:46px;height:46px;border-radius:13px;background:oklch(0.55 0.12 160 / 0.32);display:grid;place-items:center;"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 9h16M6 9V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3m-1 0v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9M10 13h4" stroke="oklch(0.82 0.13 158)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <div><h3 style="margin:0;font-weight:700;font-size:17px;color:#fff;">Fully outfitted</h3><p style="margin:5px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Kitchen, bedding, towels, the works, stocked and ready. Add kayaks, paddleboards, bikes, a grill and more to make it a real trip.</p></div>
+          </div>
+          <div style="display:flex;gap:16px;padding:18px 0;border-top:1px solid oklch(1 0 0 / 0.1);border-bottom:1px solid oklch(1 0 0 / 0.1);">
+            <span style="flex:none;width:46px;height:46px;border-radius:13px;background:oklch(0.6 0.14 320 / 0.32);display:grid;place-items:center;"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M14 17h3l3-4-2-5h-4M14 17H4V6h10v11Zm0 0V8m-7 9a2 2 0 1 0 0 .01M17 17a2 2 0 1 0 0 .01" stroke="oklch(0.82 0.13 322)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <div><h3 style="margin:0;font-weight:700;font-size:17px;color:#fff;">Or tow it yourself</h3><p style="margin:5px 0 0;font-size:14.5px;line-height:1.5;color:oklch(0.78 0.015 270);">Prefer to haul your own? Charlie weighs under 4,533 lbs, light enough for a mid-size SUV. We'll walk you through it.</p></div>
+          </div>
+        </div>
+        <a href="Our Trailers.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:13px 20px;border-radius:9999px;background:oklch(1 0 0 / 0.08);backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:14.5px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">Meet the fleet<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+      </div>
+
+      <!-- right: photo -->
+      <div style="position:relative;">
+        <div style="position:relative;width:100%;aspect-ratio:3/2;border-radius:24px;overflow:hidden;border:1px solid oklch(1 0 0 / 0.14);box-shadow:0 24px 48px -14px oklch(0 0 0 / 0.6);">
+          <image-slot id="sdrv-why-photo" src="why-fleet.png" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a fleet photo"></image-slot>
+        </div>
+        <div style="position:absolute;left:-14px;bottom:-14px;background:oklch(0.14 0.02 264 / 0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.14);border-radius:16px;padding:14px 17px;box-shadow:0 16px 32px -10px oklch(0 0 0 / 0.55);animation:floaty 5s ease-in-out infinite;">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#fff;line-height:1;">{{ deliveryRadiusLabel }} mi</div>
+          <div style="font-size:12.5px;color:oklch(0.74 0.02 280);margin-top:4px;">Free delivery radius</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TEMPORARY HOUSING ===== -->
+  <section id="stays" data-screen-label="Temporary housing" style="position:relative;border-top:1px solid oklch(1 0 0 / 0.08);border-bottom:1px solid oklch(1 0 0 / 0.08);background:oklch(0.4 0.05 285 / 0.14);scroll-margin-top:80px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,68px) clamp(16px,4vw,40px);">
+      <div style="max-width:620px;">
+        <span style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.74 0.04 286);">More than vacations</span>
+        <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.02em;color:#fff;line-height:1.08;">Need a place to stay for a while?</h2>
+        <p style="margin:14px 0 0;font-size:15.5px;line-height:1.6;color:oklch(0.82 0.015 270);">A fully-furnished trailer, delivered to your driveway, property, or venue and set up ready to use. From longer stays to special events, we can help when you need comfortable space in a hurry, with weekly and monthly rates for extended bookings.</p>
+      </div>
+
+      <div class="stays-grid" style="margin-top:32px;">
+
+        <div style="display:flex;flex-direction:column;gap:12px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:22px;">
+          <span style="width:44px;height:44px;flex:none;border-radius:13px;background:oklch(0.6 0.14 60 / 0.3);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14.5 5.5l4 4M3 21l1-4L15 6l3 3L7 20l-4 1ZM17 3l4 4-2 2-4-4 2-2Z" stroke="oklch(0.85 0.13 70)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div><h3 style="margin:0;font-weight:700;font-size:16.5px;color:#fff;">Home remodels</h3><p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:oklch(0.76 0.015 270);">Live comfortably on your own property while the kitchen, bath, or whole house is under construction.</p></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:22px;">
+          <span style="width:44px;height:44px;flex:none;border-radius:13px;background:oklch(0.55 0.12 244 / 0.32);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6l7-3Z" stroke="oklch(0.82 0.1 250)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 12l2 2 4-4" stroke="oklch(0.82 0.1 250)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div><h3 style="margin:0;font-weight:700;font-size:16.5px;color:#fff;">Insurance &amp; rebuild</h3><p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:oklch(0.76 0.015 270);">Displaced by fire, flood, or storm damage? A ready-to-live-in home right where you're rebuilding. We work with insurance stays.</p></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:22px;">
+          <span style="width:44px;height:44px;flex:none;border-radius:13px;background:oklch(0.55 0.12 160 / 0.3);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="oklch(0.82 0.13 158)" stroke-width="1.7"></circle><path d="M3 20a6 6 0 0 1 12 0M16 6.5a3 3 0 0 1 0 5.5M21 20a6 6 0 0 0-4-5.7" stroke="oklch(0.82 0.13 158)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div><h3 style="margin:0;font-weight:700;font-size:16.5px;color:#fff;">Extra guest space</h3><p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:oklch(0.76 0.015 270);">Family in town or a full house for the holidays? Give guests their own private, comfortable space in the driveway.</p></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:22px;">
+          <span style="width:44px;height:44px;flex:none;border-radius:13px;background:oklch(0.6 0.14 320 / 0.3);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="2" stroke="oklch(0.82 0.13 322)" stroke-width="1.7"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="oklch(0.82 0.13 322)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div><h3 style="margin:0;font-weight:700;font-size:16.5px;color:#fff;">Worksite &amp; crew</h3><p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:oklch(0.76 0.015 270);">On-site housing for traveling workers or seasonal crews, delivered and set up wherever the job is.</p></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;background:oklch(0.2 0.022 264 / 0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:22px;">
+          <span style="width:44px;height:44px;flex:none;border-radius:13px;background:oklch(0.6 0.13 200 / 0.32);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.9 4.3L18.5 8l-3.5 3 1 4.7L12 13.9 8 15.7l1-4.7L5.5 8l4.6-.7L12 3Z" stroke="oklch(0.82 0.11 200)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div><h3 style="margin:0;font-weight:700;font-size:16.5px;color:#fff;">Special events</h3><p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:oklch(0.76 0.015 270);">Weddings, reunions, and gatherings. A comfortable place for guests to stay, or a home base right at the venue.</p></div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:30px;border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;background:oklch(0.2 0.022 264 / 0.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:22px clamp(18px,3vw,26px);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;">
+        <div style="max-width:44ch;">
+          <h3 style="margin:0;font-weight:700;font-size:17px;color:#fff;">For longer stays and events, give us a call or email.</h3>
+          <p style="margin:6px 0 0;font-size:14px;line-height:1.55;color:oklch(0.74 0.02 280);">These bookings are custom, so they're handled directly, not through the instant quote. Tell us your dates and location and we'll put together pricing for you.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:11px;">
+          <a href="tel:15416304795" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.6);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>(541) 630-4795</a>
+          <a href="mailto:info@sweetdreamsrvrentals.com?subject=Longer%20stay%20%2F%20event%20inquiry" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Email us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq" data-screen-label="FAQs" style="position:relative;max-width:820px;margin:0 auto;padding:clamp(36px,5vw,68px) clamp(16px,4vw,40px);scroll-margin-top:80px;">
+    <div style="text-align:center;">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Good to know</span>
+      <h2 style="margin:10px 0 0;font-weight:700;font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.02em;color:#fff;">Frequently asked questions</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:30px;">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+        <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:16px;overflow:hidden;">
+          <button onClick="{{ f.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:transparent;border:none;cursor:pointer;text-align:left;">
+            <span style="font-weight:600;font-size:15.5px;color:#fff;">{{ f.q }}</span>
+            <span style="flex:none;transition:transform .2s ease;{{ f.chevStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="oklch(0.72 0.02 280)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          </button>
+          <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;padding:0 20px 19px;font-size:14.5px;line-height:1.6;color:oklch(0.78 0.015 270);">{{ f.a }}</p>
+            <sc-if value="{{ f.showCancelBtn }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px 20px;"><button onClick="{{ openCancel }}" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 10px 24px -8px oklch(0.5781 0.2303 264.8 / 0.6);">Request a cancellation<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+            </sc-if>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT / FOOTER ===== -->
+  <section id="contact" data-screen-label="Contact" style="position:relative;background:oklch(0.24 0.05 285 / 0.38);border-top:1px solid oklch(1 0 0 / 0.1);color:#fff;scroll-margin-top:80px;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(40px,5vw,72px) clamp(16px,4vw,40px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(24px,4vw,48px);align-items:center;">
+        <div>
+          <h2 style="margin:0;font-weight:700;font-size:clamp(28px,3.6vw,40px);letter-spacing:-0.02em;color:#fff;">Ready when you are.</h2>
+          <p style="margin:14px 0 0;font-size:15.5px;line-height:1.6;color:oklch(0.82 0.015 270);max-width:42ch;">Reserve through the instant quote, or reach out and we'll handle the details. We typically reply within 24–48 hours. Plan your trip around Crater Lake, the Rogue River, Ashland &amp; Medford.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:11px;margin-top:24px;">
+            <a href="mailto:info@sweetdreamsrvrentals.com" style="display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:9999px;background:#fff;color:oklch(0.12 0.02 264);font-weight:600;font-size:14.5px;text-decoration:none;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>info@sweetdreamsrvrentals.com</a>
+            <a href="tel:15416304795" style="display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:9999px;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>(541) 630-4795</a>
+          </div>
+        </div>
+        <div style="background:oklch(0.18 0.02 264 / 0.6);backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:28px;">
+          <div style="display:flex;align-items:center;gap:11px;">
+            <img src="logo-white.png" alt="Sweet Dreams RV Rentals" style="height:70px;width:auto;display:block;">
+            <div><div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.64 0.015 275);">Grants Pass &amp; Merlin, Oregon</div></div>
+          </div>
+          <p style="margin:18px 0 0;font-size:14px;line-height:1.6;color:oklch(0.82 0.015 270);"><em>When adventure calls… we deliver.</em> Southern Oregon's only fully-outfitted RV trailer rental, delivered and set up, or towed by you.</p>
+          <div style="display:flex;gap:10px;margin-top:20px;">
+            <a href="https://www.facebook.com/sweetdreamsrvrentals" target="_blank" rel="noopener" aria-label="Facebook" style="width:42px;height:42px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);display:grid;place-items:center;color:#fff;text-decoration:none;" style-hover="background:oklch(1 0 0 / 0.14);border-color:oklch(1 0 0 / 0.4);"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5V6.8c0-.8.2-1.2 1.4-1.2H17V2.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v1.9H8v3h2.6V22H14v-8.5h2.5l.4-3H14z"></path></svg></a>
+            <a href="https://instagram.com/sweetdreamsrvr" target="_blank" rel="noopener" aria-label="Instagram" style="width:42px;height:42px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);display:grid;place-items:center;color:#fff;text-decoration:none;" style-hover="background:oklch(1 0 0 / 0.14);border-color:oklch(1 0 0 / 0.4);"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8"></rect><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"></circle><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"></circle></svg></a>
+            <a href="https://www.pinterest.com/sweetdreamsrvrentals" target="_blank" rel="noopener" aria-label="Pinterest" style="width:42px;height:42px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);display:grid;place-items:center;color:#fff;text-decoration:none;" style-hover="background:oklch(1 0 0 / 0.14);border-color:oklch(1 0 0 / 0.4);"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 3 5.6 3 9.9c0 2 1.1 4.4 2.9 5.2.3.1.4 0 .5-.3l.2-.9c.1-.2 0-.3-.1-.5-.5-.6-.9-1.6-.9-2.6 0-2.6 1.9-5 5-5 2.7 0 4.2 1.7 4.2 3.9 0 2.9-1.3 5.4-3.2 5.4-1 0-1.8-.9-1.6-1.9.3-1.3.9-2.6.9-3.5 0-.8-.4-1.5-1.3-1.5-1.1 0-1.9 1.1-1.9 2.6 0 .9.3 1.6.3 1.6l-1.3 5.4c-.4 1.6-.1 3.6 0 3.8 0 .1.2.2.3.1.1-.1 1.6-2 2.1-3.8l.8-3.1c.4.8 1.5 1.4 2.7 1.4 3.6 0 6-3.3 6-7.6C18.6 4.9 15.7 2 12 2z"></path></svg></a>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:40px;padding-top:22px;border-top:1px solid oklch(1 0 0 / 0.1);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.6 0.015 275);">
+        <span>© 2026 Sweet Dreams RV Rentals</span>
+        <span>Photo: John · Crater Lake Country · Rogue Valley</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESERVE MODAL ===== -->
+  <sc-if value="{{ reserveOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vh,48px) clamp(8px,3vw,16px);overflow-y:auto;">
+      <div onClick="{{ closeReserve }}" style="position:fixed;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
+
+      <div style="position:relative;width:100%;max-width:640px;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:oklch(0.13 0.02 264 / 0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid oklch(1 0 0 / 0.14);border-radius:26px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);">
+
+        <!-- header -->
+        <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid oklch(1 0 0 / 0.1);background:oklch(0.13 0.02 264 / 0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
+          <span style="width:40px;height:40px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><img src="trailer-white.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;"></span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.15;">{{ reserveHeading }}</div>
+            <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">{{ selectedName }} · {{ nights }} nights</div>
+          </div>
+          <button onClick="{{ closeReserve }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+        </div>
+
+        <!-- step rail -->
+        <div style="display:flex;gap:6px;padding:14px 22px 0;">
+          <div style="flex:1;height:4px;border-radius:9999px;{{ railStep1 }}"></div>
+          <div style="flex:1;height:4px;border-radius:9999px;{{ railStep2 }}"></div>
+          <div style="flex:1;height:4px;border-radius:9999px;{{ railStep3 }}"></div>
+        </div>
+
+        <!-- STEP 1: DETAILS + AVAILABILITY -->
+        <sc-if value="{{ stepDetails }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:20px 22px 24px;">
+            <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">Step 1 · Trip details</div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Trip dates <span style="color:oklch(0.72 0.16 20);">*</span></span>
+                <button type="button" onClick="{{ toggleCal }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);cursor:pointer;font-family:'Nunito Sans',sans-serif;">
+                  <span style="{{ arrivalBtnStyle }}">{{ arrivalBtnLabel }}</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;"><rect x="3" y="5" width="18" height="16" rx="2" stroke="oklch(0.7 0.02 280)" stroke-width="1.7"></rect><path d="M3 9h18M8 3v4M16 3v4" stroke="oklch(0.7 0.02 280)" stroke-width="1.7" stroke-linecap="round"></path></svg>
+                </button>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Departure</span>
+                <div style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);color:oklch(0.78 0.015 270);font-size:14px;">{{ departureBoxLabel }}</div>
+              </label>
+            </div>
+
+            <sc-if value="{{ calOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;border-radius:18px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(0.13 0.018 264 / 0.96);padding:18px 18px 14px;box-shadow:0 20px 50px -22px oklch(0 0 0 / 0.8);">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;">
+                  <button type="button" onClick="{{ prevCalMonth }}" style="{{ prevCalStyle }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                  <div style="flex:1;text-align:center;font-family:'Nunito Sans',sans-serif;font-weight:700;font-size:12px;color:oklch(0.8 0.08 288);text-transform:uppercase;letter-spacing:0.06em;">{{ calHint }}</div>
+                  <button type="button" onClick="{{ nextCalMonth }}" style="width:34px;height:34px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);cursor:pointer;display:grid;place-items:center;" style-hover="background:oklch(1 0 0 / 0.1);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                </div>
+                <div style="display:flex;gap:22px;flex-wrap:wrap;">
+                  <sc-for list="{{ calMonths }}" as="m" hint-placeholder-count="2">
+                    <div style="flex:1 1 236px;min-width:236px;">
+                      <div style="text-align:center;font-family:'Quicksand',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:10px;">{{ m.label }}</div>
+                      <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+                        <sc-for list="{{ calWeekdays }}" as="w" hint-placeholder-count="7">
+                          <div style="text-align:center;font-size:11px;font-weight:600;color:oklch(0.52 0.02 280);padding:2px 0 8px;">{{ w }}</div>
+                        </sc-for>
+                      </div>
+                      <div style="display:grid;grid-template-columns:repeat(7,1fr);" onMouseLeave="{{ clearHover }}">
+                        <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="42">
+                          <div style="{{ c.wrapStyle }}" onMouseEnter="{{ c.onEnter }}">
+                            <div onClick="{{ c.onClick }}" style="{{ c.innerStyle }}">{{ c.num }}</div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid oklch(1 0 0 / 0.08);">
+                  <div style="display:flex;align-items:center;gap:16px;font-size:11.5px;color:oklch(0.68 0.02 280);">
+                    <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:14px;height:14px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.6281 0.2103 285), oklch(0.7262 0.1806 326.19));"></span>Your trip</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;"><span style="font-size:13px;color:oklch(0.6 0.1 25);text-decoration:line-through;">14</span>Fully booked</span>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-family:'Archivo Black',sans-serif;font-size:19px;color:#fff;line-height:1.05;">{{ calPriceMain }}</div>
+                    <div style="font-size:11.5px;color:oklch(0.62 0.02 280);margin-top:2px;">{{ calPriceSub }}</div>
+                  </div>
+                </div>
+                <sc-if value="{{ selectedHasBookings }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:12px;display:flex;align-items:flex-start;gap:9px;padding:11px 13px;border-radius:12px;background:oklch(0.62 0.19 290 / 0.1);border:1px solid oklch(0.62 0.19 290 / 0.28);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="9" stroke="oklch(0.8 0.12 290)" stroke-width="2"></circle><path d="M12 11v5m0-8h.01" stroke="oklch(0.8 0.12 290)" stroke-width="2" stroke-linecap="round"></path></svg>
+                    <div style="font-size:12.5px;line-height:1.5;color:oklch(0.84 0.03 285);">Pick any open date. If <strong style="color:#fff;">{{ selectedName }}</strong> is already taken for your dates, we'll suggest another of our {{ fleetCount }} trailers that's free. Crossed-out dates are booked across the whole fleet.</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Delivery campground / RV park <span style="color:oklch(0.72 0.16 20);">*</span></span>
+              <select value="{{ fSiteSel }}" onChange="{{ onSiteSelect }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.18 0.02 264);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+                <option value="">Select a campground…</option>
+                <sc-for list="{{ campgroundOptions }}" as="cg" hint-placeholder-count="12">
+                  <option value="{{ cg }}">{{ cg }}</option>
+                </sc-for>
+                <option value="__other">Other</option>
+              </select>
+              <input type="text" value="{{ fSiteOther }}" onChange="{{ onSiteOther }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+
+            <sc-if value="{{ siteWithin }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(0.5 0.13 152 / 0.12);border:1px solid oklch(0.6 0.14 152 / 0.32);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M5 13l4 4L19 7" stroke="oklch(0.82 0.15 152)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.86 0.03 152);"><strong style="color:#fff;">≈ {{ siteMilesLabel }} mi</strong> from our Merlin base. Within the free delivery radius, so delivery is <strong style="color:#fff;">included</strong>.</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ siteBeyond }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(0.72 0.15 60 / 0.12);border:1px solid oklch(0.72 0.15 60 / 0.34);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M12 9v4m0 4h.01M10.3 3.9 2.4 18a1.5 1.5 0 0 0 1.3 2.3h16.6a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0Z" stroke="oklch(0.82 0.16 66)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.88 0.05 66);"><strong style="color:#fff;">≈ {{ siteMilesLabel }} mi</strong> from our Merlin base, beyond the free {{ deliveryRadiusLabel }} mi radius. A <strong style="color:#fff;">{{ deliveryFeeLabel }}</strong> delivery fee has been added.</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ siteUnknownDist }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.14);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><circle cx="12" cy="12" r="9" stroke="oklch(0.7 0.02 280)" stroke-width="1.8"></circle><path d="M12 11v5m0-8h.01" stroke="oklch(0.7 0.02 280)" stroke-width="1.9" stroke-linecap="round"></path></svg>
+                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.74 0.02 280);">We'll confirm the delivery distance and any fee for this location with your quote.</span>
+              </div>
+            </sc-if>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Your name <span style="color:oklch(0.72 0.16 20);">*</span></span>
+                <input type="text" value="{{ fName }}" onChange="{{ onName }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Phone <span style="color:oklch(0.72 0.16 20);">*</span></span>
+                <input type="tel" value="{{ fPhone }}" onChange="{{ onPhone }}" placeholder="(541) 000-0000" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              </label>
+            </div>
+
+            <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email <span style="color:oklch(0.72 0.16 20);">*</span></span>
+              <input type="email" value="{{ fEmail }}" onChange="{{ onEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+
+            <!-- availability result -->
+            <sc-if value="{{ availOk }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:oklch(0.5 0.13 152 / 0.16);border:1px solid oklch(0.6 0.14 152 / 0.4);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <div style="font-size:13.5px;color:oklch(0.86 0.05 152);"><strong style="color:#fff;">{{ selectedName }} is available</strong> for your dates. Reserve it before someone else does.</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ availChecking }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.12);">
+                <span style="width:16px;height:16px;border-radius:9999px;border:2px solid oklch(1 0 0 / 0.25);border-top-color:#fff;animation:spin 0.7s linear infinite;display:block;"></span>
+                <div style="font-size:13.5px;color:oklch(0.82 0.015 270);">Checking the calendar…</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ availTaken }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;border-radius:14px;background:oklch(0.5 0.17 25 / 0.12);border:1px solid oklch(0.62 0.17 25 / 0.45);padding:14px;">
+                <div style="display:flex;align-items:flex-start;gap:10px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.15 30)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <div style="font-size:13.5px;color:oklch(0.86 0.08 32);"><strong style="color:#fff;">{{ selectedName }} is booked</strong> for {{ altDatesLabel }}.</div>
+                </div>
+                <sc-if value="{{ hasAlts }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-top:12px;">
+                    <div style="font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:oklch(0.72 0.03 282);margin-bottom:8px;">Available for {{ altDatesLabel }}</div>
+                    <div style="display:flex;flex-direction:column;gap:7px;">
+                      <sc-for list="{{ altTrailers }}" as="a" hint-placeholder-count="3">
+                        <button type="button" onClick="{{ a.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:11px 13px;border-radius:11px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);cursor:pointer;font-family:'Nunito Sans',sans-serif;" style-hover="background:oklch(1 0 0 / 0.1);border-color:oklch(0.7 0.16 300 / 0.6);">
+                          <div style="min-width:0;"><div style="font-weight:700;font-size:14px;color:#fff;">{{ a.name }}</div><div style="font-size:12px;color:oklch(0.68 0.02 280);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.sub }}</div></div>
+                          <div style="display:flex;align-items:center;gap:9px;flex:none;"><span style="font-size:12.5px;font-weight:600;color:oklch(0.84 0.06 152);">{{ a.priceLabel }}</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="oklch(0.8 0.08 288)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ altNone }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:10px;font-size:12.5px;color:oklch(0.82 0.06 40);">No trailers are open for those exact nights. Try shifting your dates.</div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ availNoDates }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:14px;background:oklch(0.72 0.14 70 / 0.13);border:1px solid oklch(0.72 0.14 70 / 0.5);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><rect x="3" y="5" width="18" height="16" rx="2" stroke="oklch(0.82 0.13 75)" stroke-width="1.7"></rect><path d="M3 9h18M8 3v4M16 3v4" stroke="oklch(0.82 0.13 75)" stroke-width="1.7" stroke-linecap="round"></path></svg>
+                <div style="font-size:13.5px;color:oklch(0.87 0.09 78);"><strong style="color:#fff;">Pick your arrival and departure</strong> first. Tap an arrival day, then a departure day (3–14 nights).</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ availNeedInfo }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:14px;background:oklch(0.72 0.14 70 / 0.13);border:1px solid oklch(0.72 0.14 70 / 0.5);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><path d="M12 8v5M12 16h.01M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.13 75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <div style="font-size:13.5px;color:oklch(0.87 0.09 78);"><strong style="color:#fff;">A few details needed.</strong> Please add your {{ reserveMissingLabel }} to continue.</div>
+              </div>
+            </sc-if>
+
+            <!-- action -->
+            <div style="position:sticky;bottom:0;z-index:4;margin:8px -22px -24px;padding:14px 22px 20px;background:linear-gradient(to top, oklch(0.13 0.02 264) 64%, transparent);">
+              <sc-if value="{{ availOk }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ goToPayment }}" style="width:100%;padding:15px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Continue to reserve →</button>
+              </sc-if>
+              <sc-if value="{{ availNotOk }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ checkAvail }}" style="width:100%;padding:15px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">{{ checkAvailLabel }}</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STEP 2: STRIPE-STYLE CHECKOUT -->
+        <sc-if value="{{ stepPayment }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:20px 22px 24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+              <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">Step 2 · Secure your dates</div>
+              <button onClick="{{ backToDetails }}" style="background:none;border:none;cursor:pointer;font-size:12.5px;color:oklch(0.7 0.02 280);font-family:'Nunito Sans',sans-serif;">← Back</button>
+            </div>
+
+            <!-- order summary -->
+            <div style="margin-top:16px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.04);padding:16px;">
+              <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">{{ selectedName }} · {{ tripDatesLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Cleaning, prep &amp; stocking</span><span style="font-weight:600;color:#fff;">{{ prepLabel }}</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Delivery</span><span style="font-weight:600;color:#fff;">{{ deliveryLabel }}</span></div>
+                <sc-if value="{{ hasAddons }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div><sc-for list="{{ addonLines }}" as="al" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;padding-left:12px;"><span style="color:oklch(0.6 0.02 280);font-size:12.5px;">{{ al.label }}</span><span style="color:oklch(0.78 0.015 270);font-size:12.5px;">{{ al.amount }}</span></div></sc-for>
+                </sc-if>
+                <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:3px 0;"></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Trip total</span><span style="font-weight:700;color:#fff;">{{ totalLabel }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="color:oklch(0.78 0.015 270);">Refundable security deposit <span style="color:oklch(0.68 0.16 155);font-weight:600;">· returned after your trip</span></span><span style="font-weight:600;color:#fff;">{{ depositLabel }}</span></div>
+                <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:3px 0;"></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:#fff;font-weight:700;">Charged today</span><span style="font-weight:800;color:#fff;">{{ grandTotalLabel }}</span></div>
+              </div>
+            </div>
+
+            <!-- payment plan selector — only when booking 2+ weeks out -->
+            <sc-if value="{{ farOut }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;">
+                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);margin-bottom:10px;">Choose how to pay</div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <button onClick="{{ setPlanFirstNight }}" style="width:100%;text-align:left;border-radius:14px;padding:14px 15px;cursor:pointer;font-family:'Nunito Sans',sans-serif;{{ planFnStyle }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                      <div style="font-weight:700;font-size:14.5px;color:#fff;">Reserve with first night</div>
+                      <span style="font-weight:800;font-size:15px;color:#fff;white-space:nowrap;">{{ firstNightLabel }}</span>
+                    </div>
+                    <div style="margin-top:4px;font-size:12.5px;line-height:1.5;color:oklch(0.74 0.015 270);">Pay one night now to hold your dates. The remaining {{ balanceLaterLabel }} (trip balance + refundable deposit) is charged to your card on file on <strong style="color:#fff;">{{ balanceChargeLabel }}</strong>, two weeks before delivery.</div>
+                  </button>
+                  <button onClick="{{ setPlanFull }}" style="width:100%;text-align:left;border-radius:14px;padding:14px 15px;cursor:pointer;font-family:'Nunito Sans',sans-serif;{{ planFullStyle }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                      <div style="font-weight:700;font-size:14.5px;color:#fff;">Pay in full today</div>
+                      <span style="font-weight:800;font-size:15px;color:#fff;white-space:nowrap;">{{ grandTotalLabel }}</span>
+                    </div>
+                    <div style="margin-top:4px;font-size:12.5px;line-height:1.5;color:oklch(0.74 0.015 270);">Pay the whole trip plus the deposit now. Nothing else to remember. Your {{ depositLabel }} deposit is refunded after the trailer is returned.</div>
+                  </button>
+                </div>
+              </div>
+            </sc-if>
+            <!-- due today callout -->
+            <div style="margin-top:14px;padding:14px 16px;border-radius:14px;background:oklch(0.5781 0.2303 264.8 / 0.14);border:1px solid oklch(0.5781 0.2303 264.8 / 0.4);">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div><div style="font-weight:700;font-size:14px;color:#fff;">Due today</div><div style="font-size:12px;color:oklch(0.74 0.02 280);">{{ dueTodaySubLabel }}</div></div>
+                <span style="font-family:'Archivo Black',sans-serif;font-size:24px;background:linear-gradient(105deg, oklch(0.8 0.13 300), oklch(0.74 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">{{ dueTodayLabel }}</span>
+              </div>
+              <sc-if value="{{ showDepositSplit }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid oklch(1 0 0 / 0.12);display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Your trip</span><span style="font-weight:700;color:#fff;">{{ totalLabel }}</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="color:oklch(0.78 0.015 270);">Security deposit <span style="color:oklch(0.68 0.16 155);font-weight:600;">· refunded after return</span></span><span style="font-weight:700;color:#fff;">{{ depositLabel }}</span></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ planFirstNight }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:14px;background:oklch(0.72 0.14 70 / 0.12);border:1px solid oklch(0.72 0.14 70 / 0.4);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><rect x="3" y="5" width="18" height="16" rx="2" stroke="oklch(0.84 0.13 75)" stroke-width="1.7"></rect><path d="M3 9h18M8 3v4M16 3v4" stroke="oklch(0.84 0.13 75)" stroke-width="1.7" stroke-linecap="round"></path></svg>
+                <div style="font-size:12.5px;line-height:1.5;color:oklch(0.88 0.06 78);">Heads up: your card on file will be automatically charged <strong style="color:#fff;">{{ balanceLaterLabel }}</strong> on <strong style="color:#fff;">{{ balanceChargeLabel }}</strong> (two weeks before delivery). We'll email you a reminder a few days before.</div>
+              </div>
+            </sc-if>
+
+            <!-- Stripe Checkout handoff -->
+            <div style="margin-top:18px;display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.04);">
+              <div style="font-size:13px;line-height:1.5;color:oklch(0.8 0.015 270);">You'll finish payment on Stripe's secure checkout, then come right back. Pay with Apple&nbsp;Pay, Google&nbsp;Pay, Klarna, or any major card.</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;">
+                <span style="display:inline-flex;align-items:center;padding:5px 10px;border-radius:8px;background:oklch(1 0 0 / 0.08);border:1px solid oklch(1 0 0 / 0.12);font-size:11.5px;font-weight:600;color:oklch(0.86 0.012 270);"> Pay</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 10px;border-radius:8px;background:oklch(1 0 0 / 0.08);border:1px solid oklch(1 0 0 / 0.12);font-size:11.5px;font-weight:600;color:oklch(0.86 0.012 270);">G Pay</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 10px;border-radius:8px;background:oklch(1 0 0 / 0.08);border:1px solid oklch(1 0 0 / 0.12);font-size:11.5px;font-weight:600;color:oklch(0.86 0.012 270);">Klarna</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 10px;border-radius:8px;background:oklch(1 0 0 / 0.08);border:1px solid oklch(1 0 0 / 0.12);font-size:11.5px;font-weight:600;color:oklch(0.86 0.012 270);">Visa · MC · Amex</span>
+              </div>
+            </div>
+
+            <sc-if value="{{ checkoutError }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;display:flex;align-items:center;gap:9px;padding:12px 14px;border-radius:14px;background:oklch(0.62 0.16 25 / 0.14);border:1px solid oklch(0.66 0.16 25 / 0.4);font-size:13px;color:oklch(0.86 0.09 30);">Something went wrong reaching checkout. Please try again, or call us at (541) 630-4795.</div>
+            </sc-if>
+
+            <button onClick="{{ startCheckout }}" style="width:100%;margin-top:16px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);display:flex;align-items:center;justify-content:center;gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="#fff" stroke-width="1.8"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"></path></svg>{{ checkoutButtonLabel }}</button>
+
+            <sc-if value="{{ planFirstNight }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:12px 0 0;font-size:11.5px;line-height:1.5;color:oklch(0.6 0.015 275);text-align:center;">By reserving, you authorize Sweet Dreams RV to securely save your card and automatically charge the remaining balance of <strong style="color:oklch(0.8 0.015 270);">{{ balanceLaterLabel }}</strong> on {{ balanceChargeLabel }}, two weeks before delivery. The {{ depositLabel }} security deposit is refunded after the trailer is returned. See our cancellation policy for details.</p>
+            </sc-if>
+            <sc-if value="{{ planFull }}" hint-placeholder-val="{{ true }}">
+              <p style="margin:12px 0 0;font-size:11.5px;line-height:1.5;color:oklch(0.6 0.015 275);text-align:center;">You're paying the full amount of <strong style="color:oklch(0.8 0.015 270);">{{ grandTotalLabel }}</strong> today, which includes the {{ depositLabel }} security deposit. The deposit is refunded after the trailer is returned. See our cancellation policy for details.</p>
+            </sc-if>
+
+            <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:13px;font-size:12px;color:oklch(0.62 0.015 275);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="oklch(0.62 0.015 275)" stroke-width="1.8"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="oklch(0.62 0.015 275)" stroke-width="1.8" stroke-linecap="round"></path></svg>
+              Secured by <strong style="color:oklch(0.78 0.02 280);">Stripe</strong> · we never see your card details
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STEP 3: CONFIRMATION -->
+        <sc-if value="{{ stepConfirmed }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:32px 22px 28px;text-align:center;">
+            <span style="width:64px;height:64px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <h3 style="margin:18px 0 0;font-weight:700;font-size:22px;color:#fff;">You're booked!</h3>
+            <p style="margin:10px auto 0;font-size:14.5px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:38ch;">{{ selectedName }} is reserved for <strong style="color:#fff;">{{ tripDatesLabel }}</strong>. We'll deliver and set up at {{ siteLabel }}.</p>
+            <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.04);padding:16px;text-align:left;display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Paid today</span><span style="font-weight:600;color:#fff;">{{ dueTodayLabel }}</span></div>
+              <sc-if value="{{ planFirstNight }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Balance auto-charged {{ balanceChargeLabel }}</span><span style="font-weight:600;color:#fff;">{{ balanceLaterLabel }}</span></div>
+              </sc-if>
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Refundable deposit (of above)</span><span style="font-weight:600;color:#fff;">{{ depositLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Confirmation sent to</span><span style="font-weight:600;color:#fff;">{{ emailLabel }}</span></div>
+            </div>
+            <sc-if value="{{ planFirstNight }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:42ch;">Your card on file will be charged the {{ balanceLaterLabel }} balance on <strong style="color:oklch(0.82 0.015 270);">{{ balanceChargeLabel }}</strong>. We'll email a reminder first, and the {{ depositLabel }} deposit is returned after the trailer comes back.</p>
+            </sc-if>
+            <p style="margin:12px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:40ch;">A confirmation email is on its way, and we've added your trip to the fleet calendar. Questions? Reply to that email or call (541) 630-4795.</p>
+            <button onClick="{{ closeReserve }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:15px;">Done</button>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== EMAIL QUOTE MODAL ===== -->
+  <sc-if value="{{ emailOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:clamp(12px,4vh,48px) 16px;overflow-y:auto;">
+      <div onClick="{{ closeEmail }}" style="position:fixed;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
+
+      <div style="position:relative;width:100%;max-width:420px;background:oklch(0.13 0.02 264 / 0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);overflow:hidden;">
+
+        <div style="display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid oklch(1 0 0 / 0.1);">
+          <span style="width:40px;height:40px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.15;">Email me this quote</div>
+            <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">{{ selectedName }} · {{ nights }} nights · {{ totalLabel }}</div>
+          </div>
+          <button onClick="{{ closeEmail }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+        </div>
+
+        <!-- FORM -->
+        <sc-if value="{{ emailForm }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:20px 22px 24px;">
+            <p style="margin:0 0 16px;font-size:13.5px;line-height:1.55;color:oklch(0.8 0.015 270);">We'll send this exact configuration to your inbox, plus a copy to our team so we can hold it for you. No obligation.</p>
+            <label style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Your email</span>
+              <input type="email" value="{{ fEmail }}" onChange="{{ onEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Name <span style="color:oklch(0.6 0.02 280);font-weight:400;">(optional)</span></span>
+              <input type="text" value="{{ fName }}" onChange="{{ onName }}" placeholder="First name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+
+            <!-- mini summary -->
+            <div style="margin-top:16px;border-radius:14px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:14px;display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">{{ nightsLineLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Prep &amp; delivery</span><span style="font-weight:600;color:#fff;">{{ prepPlusDeliveryLabel }}</span></div>
+              <sc-if value="{{ hasAddons }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div><sc-for list="{{ addonLines }}" as="al" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;padding-left:12px;"><span style="color:oklch(0.6 0.02 280);font-size:12.5px;">{{ al.label }}</span><span style="color:oklch(0.74 0.02 280);font-size:12.5px;">{{ al.amount }}</span></div></sc-for>
+              </sc-if>
+              <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:2px 0;"></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Estimated total</span><span style="font-family:'Archivo Black',sans-serif;font-size:15px;color:#fff;">{{ totalLabel }}</span></div>
+            </div>
+
+            <button onClick="{{ sendQuote }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Send me the quote</button>
+          </div>
+        </sc-if>
+
+        <!-- SENT -->
+        <sc-if value="{{ emailSent }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:32px 22px 28px;text-align:center;">
+            <span style="width:60px;height:60px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Quote on its way!</h3>
+            <p style="margin:10px auto 0;font-size:14px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:34ch;">We've emailed your {{ selectedName }} quote to <strong style="color:#fff;">{{ emailLabel }}</strong>. Check your inbox in a minute or two.</p>
+            <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:36ch;">Our team got a copy too. We'll reach out if you'd like help locking in dates. Or reserve now to guarantee your trailer.</p>
+            <button onClick="{{ emailToReserve }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Check availability &amp; reserve</button>
+            <button onClick="{{ closeEmail }}" style="width:100%;margin-top:10px;padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;">Done</button>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== CANCELLATION REQUEST MODAL ===== -->
+  <sc-if value="{{ cancelOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:clamp(12px,4vh,48px) 16px;overflow-y:auto;">
+      <div onClick="{{ closeCancel }}" style="position:fixed;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
+
+      <div style="position:relative;width:100%;max-width:460px;background:oklch(0.13 0.02 264 / 0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid oklch(1 0 0 / 0.14);border-radius:24px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);overflow:hidden;">
+
+        <div style="display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid oklch(1 0 0 / 0.1);">
+          <span style="width:40px;height:40px;border-radius:9999px;background:oklch(0.62 0.16 25 / 0.24);border:1px solid oklch(0.68 0.16 25 / 0.4);display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m3 0-.8 12a2 2 0 0 1-2 1.8H7.8a2 2 0 0 1-2-1.8L5 7" stroke="oklch(0.82 0.13 28)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.15;">Request a cancellation</div>
+            <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">We'll confirm by email within 24–48 hours</div>
+          </div>
+          <button onClick="{{ closeCancel }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+        </div>
+
+        <!-- FORM -->
+        <sc-if value="{{ cancelForm }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:20px 22px 24px;">
+            <p style="margin:0 0 14px;font-size:13.5px;line-height:1.55;color:oklch(0.8 0.015 270);">Fill this out to request a cancellation. Refunds follow the policy below, based on how far out your arrival date is. We'll review and confirm the details with you.</p>
+
+            <div style="border:1px solid oklch(1 0 0 / 0.12);border-radius:16px;overflow:hidden;margin-bottom:18px;">
+              <div style="display:flex;align-items:flex-start;gap:11px;padding:13px 15px;background:oklch(0.5 0.13 152 / 0.09);border-bottom:1px solid oklch(1 0 0 / 0.08);">
+                <span style="flex:none;margin-top:2px;width:8px;height:8px;border-radius:9999px;background:oklch(0.72 0.15 152);"></span>
+                <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:#fff;">14+ days before arrival</div><div style="margin-top:2px;font-size:12px;line-height:1.5;color:oklch(0.74 0.015 270);">Refunded in full, less a 3% cancellation fee (minimum $10) that covers non-refundable processing and admin costs.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:11px;padding:13px 15px;background:oklch(0.72 0.15 60 / 0.08);border-bottom:1px solid oklch(1 0 0 / 0.08);">
+                <span style="flex:none;margin-top:2px;width:8px;height:8px;border-radius:9999px;background:oklch(0.78 0.15 66);"></span>
+                <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:#fff;">Less than 14 days before arrival</div><div style="margin-top:2px;font-size:12px;line-height:1.5;color:oklch(0.74 0.015 270);">50% of the total is non-refundable. This also applies to any booking made within 14 days of arrival.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:11px;padding:13px 15px;background:oklch(0.62 0.16 25 / 0.08);">
+                <span style="flex:none;margin-top:2px;width:8px;height:8px;border-radius:9999px;background:oklch(0.72 0.16 28);"></span>
+                <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:#fff;">7 days or less before arrival</div><div style="margin-top:2px;font-size:12px;line-height:1.5;color:oklch(0.74 0.015 270);">Non-refundable.</div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:14px;background:oklch(1 0 0 / 0.04);border:1px solid oklch(1 0 0 / 0.1);margin-bottom:12px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><path d="M3 12a9 9 0 1 1 3 6.7M3 12V7m0 5h5" stroke="oklch(0.78 0.02 280)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <div style="font-size:12px;line-height:1.5;color:oklch(0.78 0.015 270);"><strong style="color:#fff;">Rather reschedule?</strong> Within 14 days of arrival you can move your dates for a $50 fee. Funds already paid carry over to a future stay, subject to availability.</div>
+            </div>
+            <p style="margin:0 0 4px;font-size:11.5px;line-height:1.5;color:oklch(0.6 0.015 275);">During the off-season, approved refunds may take extra time to process. We'll keep you posted throughout.</p>
+
+            <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:16px 0;"></div>
+
+            <label style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Name on reservation</span>
+              <input type="text" value="{{ cName }}" onChange="{{ onCName }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email</span>
+              <input type="email" value="{{ cEmail }}" onChange="{{ onCEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Confirmation # or reservation details</span>
+              <input type="text" value="{{ cDetails }}" onChange="{{ onCDetails }}" placeholder="Trailer &amp; trip dates, or confirmation number" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Reason <span style="color:oklch(0.6 0.02 280);font-weight:400;">(optional)</span></span>
+              <textarea value="{{ cReason }}" onChange="{{ onCReason }}" rows="3" placeholder="Anything we should know?" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;resize:vertical;"></textarea>
+            </label>
+
+            <button onClick="{{ submitCancel }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Submit cancellation request</button>
+            <p style="margin:12px 0 0;font-size:12px;line-height:1.5;color:oklch(0.62 0.015 275);text-align:center;">Prefer to talk it through? Call us at <a href="tel:15416304795" style="color:oklch(0.78 0.02 280);">(541) 630-4795</a>.</p>
+          </div>
+        </sc-if>
+
+        <!-- SENT -->
+        <sc-if value="{{ cancelSent }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:32px 22px 28px;text-align:center;">
+            <span style="width:60px;height:60px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+            <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Request received</h3>
+            <p style="margin:10px auto 0;font-size:14px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:36ch;">Thanks. We've logged your cancellation request and sent a copy to <strong style="color:#fff;">{{ cancelEmailLabel }}</strong>. Our team will review it against your booking and confirm within 24–48 hours.</p>
+            <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:38ch;">Any refund is processed per our cancellation policy based on how far out your arrival date is. We'll walk you through it.</p>
+            <button onClick="{{ closeCancel }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:15px;">Done</button>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;heroVariant&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;split&quot;, &quot;immersive&quot;, &quot;statement&quot;],
+    &quot;default&quot;: &quot;statement&quot;,
+    &quot;tsType&quot;: &quot;'split' | 'immersive' | 'statement'&quot;
+  },
+  &quot;showAddons&quot;: {
+    &quot;editor&quot;: &quot;boolean&quot;,
+    &quot;default&quot;: true,
+    &quot;tsType&quot;: &quot;boolean&quot;
+  }
+}">
+class Component extends DCLogic {
+  pricing = (window.SDPricing ? window.SDPricing.load() : null);
+  state = { nights: 4, trailerId: 'charlie', delivery: 'included', addons: {}, openFaq: 0,
+    reserveOpen: false, step: 'details', avail: 'idle', calOpen: false, calMonth: null, calStart: null, calMode: 'arrival', calHover: null,
+    emailOpen: false, emailStep: 'form',
+    fName: '', fEmail: '', fPhone: '', fArrival: '', fSite: '', fSiteSel: '', fSiteOther: '',
+    cancelOpen: false, cancelStep: 'form',
+    cName: '', cEmail: '', cDetails: '', cReason: '',
+    checkoutBusy: false, checkoutError: false, payPlan: 'firstnight',
+    carIdx: 0, dragging: false, dragPos: 0 };
+
+  carouselList = ['fan-1.png', 'fan-2.png', 'fan-3.png', 'fan-4.png', 'fan-5.png', 'fan-6.png'];
+
+  // ─────────────────────────────────────────────────────────────
+  // TEAM NOTIFICATIONS  (booking / quote / cancellation → info@sweetdreamsrvrentals.com)
+  //
+  // Posts each submission to an endpoint on YOUR server, which sends the email
+  // (and can log to a DB, push to a calendar, etc.). Point NOTIFY_ENDPOINT at
+  // your route, e.g. '/api/notify'. Payload is JSON:
+  //   { subject, type, ...fields }
+  // Until the endpoint is set, forms still work — they just skip the POST.
+  // ─────────────────────────────────────────────────────────────
+  NOTIFY_ENDPOINT = ''; // e.g. '/api/notify'  (leave '' to disable)
+
+  // ─────────────────────────────────────────────────────────────
+  // STRIPE CHECKOUT  (deposit payment — Apple Pay / Google Pay / Klarna / cards)
+  //
+  // Your server route creates a Stripe Checkout Session and returns { url }.
+  // The browser redirects there; on success Stripe returns to
+  //   <site>?booking=success   (show confirmation)   / cancel returns to the page.
+  // Enable the wallets + Klarna in your Stripe Dashboard — no front-end change needed.
+  // Your secret key stays on the server; it never touches this file.
+  // Point CHECKOUT_ENDPOINT at your route, e.g. '/api/create-checkout-session'.
+  // While unset, the button runs a demo confirmation so the page is still clickable.
+  // ─────────────────────────────────────────────────────────────
+  CHECKOUT_ENDPOINT = ''; // e.g. '/api/create-checkout-session'  (leave '' for demo mode)
+
+  notifyTeam(subject, fields) {
+    const url = this.NOTIFY_ENDPOINT;
+    if (!url) return; // not configured yet — skip silently
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({ subject: subject, to: 'info@sweetdreamsrvrentals.com' }, fields)),
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // AUTOMATED CUSTOMER EMAILS
+  //
+  // Every booking generates a small schedule of transactional emails to the
+  // guest. Some send immediately (confirmation); the rest are future-dated and
+  // sent by your mailer on their sendAt date. Point MAILER_ENDPOINT at a route
+  // that accepts { messages: [{ to, sendAt, subject, body, kind }] } and either
+  // sends now (sendAt <= today) or schedules for later (e.g. via a queue / cron
+  // / provider's scheduled-send). While unset, the schedule is still written to
+  // localStorage ('sd_email_queue') so the admin console can preview it.
+  // ─────────────────────────────────────────────────────────────
+  MAILER_ENDPOINT = ''; // e.g. '/api/send-guest-email'  (leave '' for demo/preview mode)
+
+  // Build the ordered list of customer emails for a booking record.
+  buildGuestEmails(rec, trailerName, datesLabel) {
+    const money = (n) => this.fmt(n);
+    const dateLong = (iso) => {
+      if (!iso) return '';
+      const d = new Date(iso + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    };
+    const MS = 86400000;
+    const arrIso = rec.arrival;
+    const depIso = arrIso ? this.isoLocal(new Date(new Date(arrIso + 'T00:00:00').getTime() + rec.nights * MS)) : null;
+    const minus = (iso, days) => iso ? this.isoLocal(new Date(new Date(iso + 'T00:00:00').getTime() - days * MS)) : null;
+    const plus = (iso, days) => iso ? this.isoLocal(new Date(new Date(iso + 'T00:00:00').getTime() + days * MS)) : null;
+    const todayIso = this.isoLocal(new Date());
+    const name = rec.guest || 'there';
+    const first = (name.split(' ')[0]) || 'there';
+    const site = rec.site || 'your campsite';
+    const firstNightPlan = rec.paymentPlan === 'firstnight';
+    const msgs = [];
+
+    // 1 — Booking confirmation (sends immediately)
+    if (firstNightPlan) {
+      msgs.push({
+        kind: 'confirmation', to: rec.email, sendAt: todayIso,
+        subject: 'You\u2019re reserved! ' + trailerName + ' for ' + datesLabel,
+        body:
+`Hi ${first},
+
+Your Sweet Dreams RV reservation is confirmed.
+
+  Trailer:   ${trailerName}
+  Dates:     ${datesLabel}
+  Delivery:  ${site}
+
+You reserved with your first night (${money(rec.dueToday)}), paid today.
+
+IMPORTANT: automatic balance charge
+The remaining balance of ${money(rec.balanceLater)} (trip balance plus the ${money(rec.deposit)} refundable security deposit) will be charged automatically to the card on file on ${dateLong(rec.balanceChargeDate)} — two weeks before delivery. No action needed on your end. We'll send a reminder a few days beforehand.
+
+Your ${money(rec.deposit)} deposit is refunded after the trailer is returned in good shape.
+
+Questions? Just reply to this email or call (541) 630-4795.
+
+See you out there,
+Sweet Dreams RV Rentals`,
+      });
+      // 2 — Balance reminder (3 days before the charge)
+      msgs.push({
+        kind: 'balance-reminder', to: rec.email, sendAt: minus(rec.balanceChargeDate, 3),
+        subject: 'Reminder: your ' + trailerName + ' balance is charged ' + dateLong(rec.balanceChargeDate),
+        body:
+`Hi ${first},
+
+A quick heads up: the remaining balance for your ${trailerName} trip (${datesLabel}) will be charged automatically on ${dateLong(rec.balanceChargeDate)}.
+
+  Amount:  ${money(rec.balanceLater)}
+  Card:    the card you used to reserve
+
+If anything needs to change, please reply or call (541) 630-4795 before that date.
+
+Sweet Dreams RV Rentals`,
+      });
+      // 3 — Balance charged receipt (on the charge date)
+      msgs.push({
+        kind: 'balance-charged', to: rec.email, sendAt: rec.balanceChargeDate,
+        subject: 'Payment received. You\u2019re all set for ' + datesLabel,
+        body:
+`Hi ${first},
+
+We've charged the remaining balance of ${money(rec.balanceLater)} to your card. Your ${trailerName} trip is fully paid.
+
+  Dates:     ${datesLabel}
+  Delivery:  ${site}
+
+The ${money(rec.deposit)} security deposit included here is refunded after the trailer is returned.
+
+We can't wait to get you set up.
+
+Sweet Dreams RV Rentals`,
+      });
+    } else {
+      msgs.push({
+        kind: 'confirmation', to: rec.email, sendAt: todayIso,
+        subject: 'You\u2019re booked! ' + trailerName + ' for ' + datesLabel,
+        body:
+`Hi ${first},
+
+Your Sweet Dreams RV reservation is confirmed and paid in full.
+
+  Trailer:   ${trailerName}
+  Dates:     ${datesLabel}
+  Delivery:  ${site}
+  Paid today: ${money(rec.dueToday)} (includes the ${money(rec.deposit)} refundable security deposit)
+
+Your ${money(rec.deposit)} deposit is refunded after the trailer is returned in good shape.
+
+Questions? Just reply to this email or call (541) 630-4795.
+
+See you out there,
+Sweet Dreams RV Rentals`,
+      });
+    }
+
+    // 4 — Delivery reminder (2 days before arrival) — every booking
+    msgs.push({
+      kind: 'delivery-reminder', to: rec.email, sendAt: minus(arrIso, 2),
+      subject: 'We\u2019re on our way soon. ' + trailerName + ' delivery ' + dateLong(arrIso),
+      body:
+`Hi ${first},
+
+Your trip is almost here! We'll deliver and set up your ${trailerName} on ${dateLong(arrIso)} at ${site}.
+
+  Check-in:  after 3 PM on arrival day
+  Check-out: 11 AM–12 PM on ${dateLong(depIso)}
+
+We'll walk you through everything on site. If your plans or site details changed, reply or call (541) 630-4795.
+
+Sweet Dreams RV Rentals`,
+    });
+
+    // 5 — Deposit refund (day after departure) — every booking
+    msgs.push({
+      kind: 'deposit-refund', to: rec.email, sendAt: plus(depIso, 1),
+      subject: 'Your ' + money(rec.deposit) + ' deposit is on its way back',
+      body:
+`Hi ${first},
+
+Thanks for camping with us! Now that your ${trailerName} is back and checked over, we've released your ${money(rec.deposit)} refundable security deposit. It should appear on your statement within a few business days.
+
+We'd love to host you again.
+
+Sweet Dreams RV Rentals`,
+    });
+
+    return msgs.filter((m) => m.to && m.sendAt);
+  }
+
+  // Send the immediate emails and hand the scheduled ones to the mailer.
+  queueGuestEmails(rec, trailerName, datesLabel) {
+    const messages = this.buildGuestEmails(rec, trailerName, datesLabel);
+    // Always keep a local copy so the admin console can preview the schedule.
+    try {
+      const key = 'sd_email_queue';
+      const arr = JSON.parse(localStorage.getItem(key) || '[]');
+      arr.push({ bookingId: rec.id, guest: rec.guest, email: rec.email, trailer: trailerName, dates: datesLabel, queuedAt: new Date().toISOString(), messages: messages });
+      localStorage.setItem(key, JSON.stringify(arr));
+    } catch (e) {}
+    const url = this.MAILER_ENDPOINT;
+    if (!url) return; // demo/preview mode
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId: rec.id, messages: messages }),
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+
+  // Live pricing config (owner admin → public site). Re-read on any change.
+  pcfg() {
+    if (window.SDPricing) { if (!this.pricing) this.pricing = window.SDPricing.load(); return this.pricing; }
+    return this.pricing || null;
+  }
+  componentDidMount() {
+    // If the pricing script finished loading after construction, pick it up now.
+    if (!this.pricing && window.SDPricing) { this.pricing = window.SDPricing.load(); this.forceUpdate(); }
+    this._onPricing = () => { if (window.SDPricing) { this.pricing = window.SDPricing.load(); this.forceUpdate(); } };
+    window.addEventListener('sd-pricing-changed', this._onPricing);
+    window.addEventListener('storage', (e) => { if (!e || e.key === (window.SDPricing && window.SDPricing.KEY) || e.key === 'sd_pricing') this._onPricing(); });
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('trailer');
+      if (id && this.trailers.some((t) => t.id === id)) {
+        this.setState({ trailerId: id });
+      }
+      // Returning from a successful Stripe Checkout → show the confirmation.
+      if (params.get('booking') === 'success') {
+        this.setState({ reserveOpen: true, step: 'confirmed' });
+      }
+    } catch (e) {}
+    // Pre-fill contact details for a returning guest (saved on their last booking).
+    try {
+      const g = JSON.parse(localStorage.getItem('sd_guest') || 'null');
+      if (g && (g.name || g.email || g.phone)) {
+        this.setState((s) => ({
+          fName: s.fName || g.name || '',
+          fEmail: s.fEmail || g.email || '',
+          fPhone: s.fPhone || g.phone || '',
+        }));
+      }
+    } catch (e) {}
+  }
+
+  componentWillUnmount() {
+    if (this._carTimer) clearInterval(this._carTimer);
+    if (this._onPricing) window.removeEventListener('sd-pricing-changed', this._onPricing);
+  }
+
+  fmtDate(d) {
+    if (!d || isNaN(d)) return '—';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  photoMap = { charlie: 'charlie-exterior.png', ella: 'photo-ella.jpg', jerry: 'jerry-main.png', virginia: 'virginia-exterior.png', patricia: 'patricia-exterior.png', nola: 'photo-nola.jpg', marylou: 'marylou-exterior.png', billybob: 'billybob-bath.png' };
+
+  trailers = [
+    { id: 'charlie',  name: 'Charlie',   rate: 139, tag: 'Mid-size SUV tow · under 4,533 lbs', sleeps: 'Sleeps 4–6', blurb: 'Our lightest trailer, tows under 4,533 lbs behind a mid-size SUV. The easy escape for a couple or a small crew.' },
+    { id: 'ella',     name: 'Ella',      rate: 149, tag: "Couples' getaway",                   sleeps: 'Sleeps 2–4', blurb: 'A cozy retreat for two, with just enough room to bring a couple of friends along.' },
+    { id: 'virginia', name: 'Virginia',  rate: 149, tag: 'Easy weekender',                     sleeps: 'Sleeps 4', blurb: 'A no-fuss weekender that comfortably sleeps a family of four.' },
+    { id: 'marylou',  name: 'Mary Lou',  rate: 144, tag: 'Family-friendly',                    sleeps: 'Sleeps 6–7', blurb: 'A family-friendly layout that flexes up to seven, great for growing crews.' },
+    { id: 'jerry',    name: 'Jerry',     rate: 159, tag: 'Bring the gang',                     sleeps: 'Sleeps 6–8', blurb: 'Built for the whole gang, with room to sleep up to eight.' },
+    { id: 'patricia', name: 'Patricia',  rate: 159, tag: 'Two slide-outs · fireplace',                  sleeps: 'Sleeps 6–8', blurb: 'Two slide-outs open up the living space, plus an electric fireplace. Roomy comfort for up to eight.' },
+    { id: 'nola',     name: 'Nola',      rate: 159, tag: 'Roomiest · bunk room',               sleeps: 'Sleeps 8', blurb: 'One of our roomiest, with a dedicated bunk room that sleeps eight.' },
+    { id: 'billybob', name: 'Billy Bob', rate: 159, tag: 'Multiple slide-outs',                sleeps: 'Sleeps 8', blurb: 'Multiple slide-outs make this the most spacious trailer in the fleet, sleeping eight.' },
+  ];
+
+  addonsList = [
+    { id: 'kayak',  name: 'Kayak',                 price: 45 },
+    { id: 'sup',    name: 'Paddleboard',           price: 45 },
+    { id: 'pedal',  name: 'Pedal boat',            price: 65 },
+    { id: 'cabana', name: 'Floating island cabana', price: 120 },
+    { id: 'bikes',  name: 'Bikes (pair)',          price: 60 },
+    { id: 'grill',  name: 'Propane grill',         price: 25 },
+    { id: 'wood',   name: 'Firewood bundle',       price: 20 },
+    { id: 'chairs', name: 'Camp chairs (set)',     price: 15 },
+  ];
+
+  campgroundOptions = [
+    'Valley of the Rogue State Park', 'Joseph H. Stewart Rec Area', 'Emigrant Lake', 'Southern Oregon RV Park',
+    'Willow Lake', 'Rogue Elk', 'Howard Prairie', 'Indian Mary',
+    "Ashland's Creekside Campground & RV Park", 'Holiday RV Park', 'Rock Point RV', 'Fish Lake Resort',
+    'Lake of the Woods Resort', 'Laughing Alpaca Campground & RV Park', 'Blue Heron RV Park',
+    'Crater Lake Resort', 'Redwoods RV Park', 'Mill Creek', 'Union Creek', 'Farewell Bend', 'Natural Bridge',
+  ];
+
+  // Approx. driving distance (mi) from the Merlin / Grants Pass base for each
+  // campground. Used to auto-detect whether a delivery falls inside the free
+  // radius or triggers the beyond-radius fee — so the customer never has to
+  // guess. Anything not listed (e.g. "Other") is treated as unknown.
+  campgroundMiles = {
+    'Valley of the Rogue State Park': 18, 'Joseph H. Stewart Rec Area': 48,
+    'Emigrant Lake': 45, 'Southern Oregon RV Park': 28, 'Willow Lake': 58,
+    'Rogue Elk': 42, 'Howard Prairie': 60, 'Indian Mary': 16,
+    "Ashland's Creekside Campground & RV Park": 42, 'Holiday RV Park': 30,
+    'Rock Point RV': 22, 'Fish Lake Resort': 70, 'Lake of the Woods Resort': 78,
+    'Laughing Alpaca Campground & RV Park': 35, 'Blue Heron RV Park': 52,
+    'Crater Lake Resort': 105, 'Redwoods RV Park': 92, 'Mill Creek': 118,
+    'Union Creek': 96, 'Farewell Bend': 112, 'Natural Bridge': 106,
+  };
+
+  faqs = [
+    { q: 'How does it actually work?', a: 'You book your own campsite at a campground or RV park, then we deliver the trailer there and set it up before you arrive. You show up to a ready-to-go home base. No towing, no leveling, no fuss.' },
+    { q: 'Where do you deliver?', a: 'Our base delivery fee covers roughly 100 miles around Merlin and Grants Pass. Anywhere farther out is still very doable. We just add a delivery charge based on distance, which we confirm with your quote.' },
+    { q: 'How long can I book?', a: 'Stays run from a 3-night minimum up to 14 nights. Planning something longer or a special occasion? Just ask.' },
+    { q: 'What fees should I expect?', a: 'A $95 cleaning, prep & stocking fee and a $1,000 fully refundable security deposit. Delivery beyond 100 miles and insurance are quoted separately. Summer nightly rates run $149–$169 and are seasonal.' },
+    { q: 'When is check-in and check-out?', a: 'Check-in is after 3 PM and check-out is between 11 AM and 12 PM, so we have time to deliver, set up, and turn the trailer over fresh for the next guests.' },
+    { q: 'Can I bring my dog?', a: 'Yes, a house-mannered dog is welcome with a $45 pet fee. We just ask that pets are clean and well-behaved inside the trailer.' },
+    { q: 'What if I need to cancel?', a: 'Cancel 14 or more days before arrival and you\u2019re refunded in full, less a small 3% fee (minimum $10). Within 14 days, 50% is non-refundable; within 7 days, the reservation is non-refundable. You can also reschedule within 14 days for a $50 fee and carry your funds to a future stay. Send us a request and we\u2019ll confirm the details.', action: 'cancel' },
+    { q: 'Any house rules?', a: 'Strictly no smoking or vaping inside the trailers. And no Burning Man, sorry. Other festivals may be approved with applicable fees.' },
+    { q: 'Can I tow it myself?', a: "Absolutely. Several trailers tow easily. Charlie comes in under 4,533 lbs, light enough for a mid-size SUV. We'll walk you through hitching and towing before you head out." },
+  ];
+
+  fmt(n) { return '$' + Number(n).toLocaleString('en-US'); }
+
+  // Combine the campground choice with the optional site number / address.
+  siteValue(sel, detail) {
+    const d = (detail || '').trim();
+    if (sel === '__other') return d || 'Other';
+    if (!sel) return '';
+    return d ? (sel + ' · ' + d) : sel;
+  }
+
+  // Parse an inline-style string into a React style object (so <img> elements built
+  // in renderVals never carry a literal "{{ hole }}" src during streaming).
+  styleObj(str) {
+    const o = {};
+    (str || '').split(';').forEach((part) => {
+      const i = part.indexOf(':'); if (i < 0) return;
+      const k = part.slice(0, i).trim(); if (!k) return;
+      o[k.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = part.slice(i + 1).trim();
+    });
+    return o;
+  }
+
+  // True if the given trailer already has an online booking whose nights overlap
+  // [arrival, arrival+nights). Same-day turnaround (one checks out as another
+  // checks in) is allowed. Reads the shared store the admin also watches.
+  isoLocal(d) { const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
+  // Every night already occupied for a trailer (checkout day is free again), as a
+  // Set of 'YYYY-MM-DD' strings — reads the same shared stores hasConflict does.
+  occupiedNights(trailerId) {
+    const set = new Set();
+    let arr = [];
+    try {
+      const web = JSON.parse(localStorage.getItem('sd_web_bookings') || '[]');
+      const occ = JSON.parse(localStorage.getItem('sd_occupancy') || '[]');
+      arr = (Array.isArray(web) ? web : []).concat(Array.isArray(occ) ? occ : []);
+    } catch (e) { return set; }
+    arr.forEach((b) => {
+      if (!b || b.trailer !== trailerId || !b.arrival) return;
+      const s = new Date(b.arrival + 'T00:00:00');
+      if (isNaN(s)) return;
+      const n = Number(b.nights) || 0;
+      for (let k = 0; k < n; k++) set.add(this.isoLocal(new Date(s.getTime() + k * 86400000)));
+    });
+    return set;
+  }
+  // Nights where EVERY trailer is occupied — the only dates the calendar blocks.
+  // A date free for even one trailer stays selectable; the per-trailer conflict
+  // is then surfaced as an alternate-trailer suggestion after the dates commit.
+  fleetBookedNights() {
+    const perNight = {};
+    let arr = [];
+    try {
+      const web = JSON.parse(localStorage.getItem('sd_web_bookings') || '[]');
+      const occ = JSON.parse(localStorage.getItem('sd_occupancy') || '[]');
+      arr = (Array.isArray(web) ? web : []).concat(Array.isArray(occ) ? occ : []);
+    } catch (e) { return new Set(); }
+    arr.forEach((b) => {
+      if (!b || !b.trailer || !b.arrival) return;
+      const s = new Date(b.arrival + 'T00:00:00');
+      if (isNaN(s)) return;
+      const n = Number(b.nights) || 0;
+      for (let k = 0; k < n; k++) {
+        const iso = this.isoLocal(new Date(s.getTime() + k * 86400000));
+        (perNight[iso] || (perNight[iso] = new Set())).add(b.trailer);
+      }
+    });
+    const total = this.trailers.length;
+    const set = new Set();
+    Object.keys(perNight).forEach((iso) => { if (perNight[iso].size >= total) set.add(iso); });
+    return set;
+  }
+  hasConflict(trailerId, arrivalStr, nights) {
+    if (!arrivalStr) return false;
+    const start = new Date(arrivalStr + 'T00:00:00');
+    if (isNaN(start)) return false;
+    const s0 = start.getTime();
+    const e0 = s0 + nights * 86400000;
+    let arr = [];
+    try {
+      const web = JSON.parse(localStorage.getItem('sd_web_bookings') || '[]');
+      const occ = JSON.parse(localStorage.getItem('sd_occupancy') || '[]');
+      arr = (Array.isArray(web) ? web : []).concat(Array.isArray(occ) ? occ : []);
+    } catch (e) { return false; }
+    return arr.some((b) => {
+      if (!b || b.trailer !== trailerId || !b.arrival) return false;
+      const bs = new Date(b.arrival + 'T00:00:00').getTime();
+      if (isNaN(bs)) return false;
+      const be = bs + (Number(b.nights) || 0) * 86400000;
+      return s0 < be && bs < e0;
+    });
+  }
+
+  // Two-tap range selection inside the availability calendar: first tap sets the
+  // arrival, second sets the departure (deriving nights). Guards against past days,
+  // booked nights inside the range, and the 3–14 night policy.
+  calPick(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    if (d < today) return;
+    const occ = this.fleetBookedNights();
+    const MIN = 3, MAX = 14;
+    const mode = this.state.calMode || 'arrival';
+    const setArrival = () => {
+      if (occ.has(iso)) return; // arrival can't land on an occupied night
+      for (let k = 0; k < MIN; k++) if (occ.has(this.isoLocal(new Date(d.getTime() + k * 86400000)))) return; // need 3 free nights
+      this.setState({ calStart: iso, fArrival: '', calMode: 'departure', avail: 'idle' });
+    };
+    if (mode === 'arrival') { setArrival(); return; }
+    // departure mode: anchor is the pending arrival, or the committed arrival
+    const anchorIso = this.state.calStart || this.state.fArrival;
+    if (!anchorIso) { setArrival(); return; }
+    const anchor = new Date(anchorIso + 'T00:00:00');
+    if (d.getTime() <= anchor.getTime()) return; // tapping the arrival or earlier does nothing; use the Trip dates button to change arrival
+    const n = Math.round((d.getTime() - anchor.getTime()) / 86400000);
+    if (n < MIN || n > MAX) return;
+    for (let k = 0; k < n; k++) if (occ.has(this.isoLocal(new Date(anchor.getTime() + k * 86400000)))) return;
+    this.setState({ fArrival: anchorIso, nights: n, calStart: null, avail: 'idle' });
+  }
+
+  renderVals() {
+    const P = window.SDPricing;
+    const cfg = this.pcfg() || (P ? P.DEFAULTS : null);
+    // Effective fleet + add-ons driven by the owner's live pricing config.
+    const baseTrailers = this.trailers.map((x) => ({ ...x, rate: (cfg && cfg.trailers[x.id] != null) ? cfg.trailers[x.id] : x.rate }));
+    const addonsList = (cfg && Array.isArray(cfg.addons)) ? cfg.addons.filter((a) => a.active !== false) : this.addonsList;
+    const t = baseTrailers.find((x) => x.id === this.state.trailerId) || baseTrailers[0];
+    const nights = this.state.nights;
+    const fleetMinRate = Math.min.apply(null, baseTrailers.map((x) => x.rate));
+    // reserve modal date values (computed up-front so weekend/summer rates can apply)
+    const arrivalDate = this.state.fArrival ? new Date(this.state.fArrival + 'T00:00:00') : null;
+    const departureDate = arrivalDate ? new Date(arrivalDate.getTime() + nights * 86400000) : null;
+    const tripDatesLabel = arrivalDate ? this.fmtDate(arrivalDate) + ' – ' + this.fmtDate(departureDate) : 'your dates';
+    const rental = P ? P.stayRental(t.rate, arrivalDate, nights, cfg) : t.rate * nights;
+    const prep = cfg ? cfg.fees.prep : 95;
+    const deliveryFee = cfg ? cfg.delivery.beyondFee : 120;
+    const delivery = this.state.delivery === 'extended' ? deliveryFee : 0;
+    const addonsTotal = addonsList.reduce((s, a) => s + a.price * (this.state.addons[a.id] || 0), 0);
+    const selectedAddonNames = addonsList
+      .filter((a) => (this.state.addons[a.id] || 0) > 0)
+      .map((a) => { const q = this.state.addons[a.id] || 0; return a.name + (q > 1 ? ' ×' + q : ''); });
+    const addonLines = addonsList
+      .filter((a) => (this.state.addons[a.id] || 0) > 0)
+      .map((a) => { const q = this.state.addons[a.id] || 0; return { label: a.name + (q > 1 ? ' ×' + q : ''), amount: this.fmt(a.price * q) }; });
+    const total = rental + prep + delivery + addonsTotal;
+    const hv = this.props.heroVariant || 'split';
+
+    // reserve modal derived values
+    const deposit = cfg ? cfg.fees.deposit : 1000;
+
+    // ----- deposit / payment-plan model -----
+    // grandTotal = trip cost + the refundable security deposit (everything the
+    // guest is ultimately charged; the deposit is returned after the trailer is back).
+    const grandTotal = total + deposit;
+    const MS_DAY = 86400000;
+    const nowMid = new Date(); nowMid.setHours(0, 0, 0, 0);
+    const daysUntilArrival = arrivalDate ? Math.round((arrivalDate.getTime() - nowMid.getTime()) / MS_DAY) : null;
+    // "2 weeks out or more" → guest may reserve with just the first night.
+    const farOut = daysUntilArrival != null && daysUntilArrival >= 14;
+    const firstNight = P ? P.stayRental(t.rate, arrivalDate, 1, cfg) : t.rate;
+    // Balance auto-charge fires 14 days (two weeks) before the delivery/arrival date.
+    const balanceChargeDate = arrivalDate ? new Date(arrivalDate.getTime() - 14 * MS_DAY) : null;
+    const balanceChargeLabel = balanceChargeDate ? this.fmtDate(balanceChargeDate) : 'two weeks before delivery';
+    // Near-term bookings (inside 14 days) always pay in full now; only far-out
+    // bookings get to choose the first-night reserve option.
+    const payPlan = farOut ? (this.state.payPlan || 'firstnight') : 'full';
+    const dueToday = payPlan === 'firstnight' ? firstNight : grandTotal;
+    const balanceLater = grandTotal - dueToday;
+
+    const canCheck = !!(arrivalDate && this.state.fName && this.state.fEmail);
+    // All reserve fields are required. Validate before availability / booking.
+    const emailOk = /.+@.+\..+/.test((this.state.fEmail || '').trim());
+    const reserveMissing = [];
+    if (!(this.state.fName || '').trim()) reserveMissing.push('name');
+    if (!emailOk) reserveMissing.push('a valid email');
+    if (!(this.state.fPhone || '').trim()) reserveMissing.push('phone');
+    if (!(this.state.fSiteSel || '').trim()) reserveMissing.push('campground');
+    if (this.state.fSiteSel === '__other' && !(this.state.fSiteOther || '').trim()) reserveMissing.push('a site number or address');
+    const reserveReady = reserveMissing.length === 0;
+    const activeStep = this.state.step;
+
+    // ---- Airbnb-style availability calendar (2-up months, range band, hover preview) ----
+    const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+    const occNights = this.fleetBookedNights();
+    const calBase = this.state.calMonth ? new Date(this.state.calMonth + 'T00:00:00') : new Date(today0.getFullYear(), today0.getMonth(), 1);
+    const monthFirst = new Date(calBase.getFullYear(), calBase.getMonth(), 1);
+    const gradient = 'linear-gradient(135deg, oklch(0.6281 0.2103 285), oklch(0.7262 0.1806 326.19))';
+    const bandTint = 'oklch(0.62 0.19 290 / 0.18)';
+    const MIN_N = cfg ? cfg.stay.min : 3, MAX_N = cfg ? cfg.stay.max : 14;
+    // Two explicit modes. 'arrival' = next tap sets the arrival (and enters departure
+    // mode). 'departure' = next tap only moves the departure, anchored to the arrival.
+    const calMode = this.state.calMode || 'arrival';
+    const startIso = this.state.calStart;                 // pending arrival (mid-selection)
+    const committedIso = this.state.fArrival;             // committed arrival
+    const anchorIso = startIso || (calMode === 'departure' ? committedIso : null);
+    const anchorDate = anchorIso ? new Date(anchorIso + 'T00:00:00') : null;
+    const isCommitted = !startIso && !!committedIso;
+    const commArr = committedIso ? new Date(committedIso + 'T00:00:00') : null;
+    const commDep = commArr ? new Date(commArr.getTime() + nights * 86400000) : null;
+    const minStayFits = (d) => {
+      if (d < today0) return false;
+      for (let k = 0; k < MIN_N; k++) if (occNights.has(this.isoLocal(new Date(d.getTime() + k * 86400000)))) return false;
+      return true;
+    };
+    const validEndFrom = (anchor, d) => {
+      if (!anchor || d.getTime() <= anchor.getTime()) return false;
+      const n = Math.round((d.getTime() - anchor.getTime()) / 86400000);
+      if (n < MIN_N || n > MAX_N) return false;
+      for (let k = 0; k < n; k++) if (occNights.has(this.isoLocal(new Date(anchor.getTime() + k * 86400000)))) return false;
+      return true;
+    };
+    // The range band to paint: committed range, or a live hover preview while picking a departure.
+    let bandA = null, bandB = null;
+    if (calMode === 'departure' && anchorDate) {
+      bandA = anchorDate;
+      const hv = this.state.calHover ? new Date(this.state.calHover + 'T00:00:00') : null;
+      if (hv && validEndFrom(anchorDate, hv)) bandB = hv;
+      else if (isCommitted && commDep) bandB = commDep;
+    } else if (isCommitted && commArr && commDep) {
+      bandA = commArr; bandB = commDep;
+    }
+    const dayCell = (d) => {
+      const iso = this.isoLocal(d);
+      const t0 = d.getTime();
+      const past = d < today0;
+      const booked = occNights.has(iso);
+      const selectable = (calMode === 'departure' && anchorDate) ? validEndFrom(anchorDate, d) : minStayFits(d);
+      const isStart = !!bandA && t0 === bandA.getTime();
+      const isEnd = !!bandB && t0 === bandB.getTime();
+      const inBand = !!bandA && !!bandB && t0 >= bandA.getTime() && t0 <= bandB.getTime();
+      const interior = inBand && !isStart && !isEnd;
+      // wrapper paints the continuous band (half-cell at the endpoints so it links up)
+      let wrap = 'position:relative;height:44px;display:flex;align-items:center;justify-content:center;';
+      if (interior) wrap += 'background:' + bandTint + ';';
+      else if (isStart && isEnd) wrap += '';
+      else if (isStart && bandB) wrap += 'background:linear-gradient(to right, transparent 50%, ' + bandTint + ' 50%);';
+      else if (isEnd && bandA) wrap += 'background:linear-gradient(to right, ' + bandTint + ' 50%, transparent 50%);';
+      // inner circle holds the number
+      let inner = 'position:relative;width:40px;height:40px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:14.5px;transition:background .12s ease;';
+      let hover = '';
+      if (isStart || isEnd) inner += 'background:' + gradient + ';color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 12px -4px oklch(0.6281 0.2103 285 / 0.7);';
+      else if (interior) inner += 'color:#fff;font-weight:600;cursor:pointer;';
+      else if (booked) inner += 'color:oklch(0.6 0.1 25);cursor:not-allowed;text-decoration:line-through;';
+      else if (selectable) { inner += 'color:oklch(0.94 0.01 270);cursor:pointer;'; hover = 'background:oklch(1 0 0 / 0.1);'; }
+      else inner += 'color:oklch(0.4 0.02 280);cursor:not-allowed;';
+      return { num: d.getDate(), iso, wrapStyle: wrap, innerStyle: inner, innerHover: hover,
+        onClick: () => this.calPick(iso),
+        onEnter: () => { if (selectable && this.state.calHover !== iso) this.setState({ calHover: iso }); } };
+    };
+    const buildMonth = (mDate) => {
+      const first = new Date(mDate.getFullYear(), mDate.getMonth(), 1);
+      const gs = new Date(first); gs.setDate(1 - first.getDay());
+      const cells = Array.from({ length: 42 }, (_, i) => {
+        const d = new Date(gs.getTime() + i * 86400000);
+        if (d.getMonth() !== first.getMonth()) return { blank: true, num: '', wrapStyle: 'height:44px;', innerStyle: '', innerHover: '', onClick: () => {}, onEnter: () => {} };
+        return dayCell(d);
+      });
+      return { label: first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), cells };
+    };
+    const calMonths = [buildMonth(monthFirst), buildMonth(new Date(monthFirst.getFullYear(), monthFirst.getMonth() + 1, 1))];
+    const prevAllowed = monthFirst > new Date(today0.getFullYear(), today0.getMonth(), 1);
+    const fmtShort = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const arrivalBtnLabel = (startIso && !committedIso)
+      ? fmtShort(new Date(startIso + 'T00:00:00')) + ' → pick departure'
+      : (committedIso ? fmtShort(commArr) + ' → ' + fmtShort(commDep) : 'Add your dates');
+    const departureBoxLabel = committedIso ? fmtShort(commDep) : (startIso ? 'Pick departure' : 'Select arrival');
+    const calHint = (calMode === 'departure' && anchorDate) ? 'Choose your checkout date' : 'Choose your arrival date';
+    // Live pricing that follows the committed range or the hover-preview range.
+    const calSelNights = (bandA && bandB) ? Math.round((bandB.getTime() - bandA.getTime()) / 86400000) : 0;
+    const calDeliveryFee = this.state.delivery === 'extended' ? deliveryFee : 0;
+    const hasCalPrice = calSelNights > 0;
+    const calRental = P ? P.stayRental(t.rate, bandA, calSelNights, cfg) : t.rate * calSelNights;
+    const calTripTotal = hasCalPrice ? calRental + prep + calDeliveryFee + addonsTotal : 0;
+    const calPriceMain = hasCalPrice ? this.fmt(calTripTotal) : this.fmt(t.rate);
+    const calPriceSub = hasCalPrice
+      ? (calSelNights + ' nights · incl. cleaning' + (calDeliveryFee ? ' & delivery' : '') + (addonsTotal ? ' & add-ons' : ''))
+      : 'per night · 3-night minimum';
+    // When the chosen trailer can't do the committed dates, offer the ones that can.
+    const altTrailers = [];
+    if (this.state.fArrival && !this.state.calStart) {
+      this.trailers.forEach((tr) => {
+        if (tr.id === this.state.trailerId) return;
+        if (!this.hasConflict(tr.id, this.state.fArrival, nights)) {
+          altTrailers.push({
+            id: tr.id, name: tr.name, sub: tr.sleeps || tr.tag || '',
+            priceLabel: this.fmt((P ? P.stayRental((cfg && cfg.trailers[tr.id] != null) ? cfg.trailers[tr.id] : tr.rate, this.state.fArrival ? new Date(this.state.fArrival + 'T00:00:00') : null, nights, cfg) : tr.rate * nights) + prep + calDeliveryFee + addonsTotal) + ' total',
+            pick: () => this.setState({ trailerId: tr.id, avail: 'ok', calStart: null, calMode: 'arrival', calHover: null }),
+          });
+        }
+      });
+    }
+    const altDatesLabel = (commArr && commDep) ? (fmtShort(commArr) + ' – ' + fmtShort(commDep)) : 'your dates';
+
+    const railOn = 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));';
+    const railOff = 'background:oklch(1 0 0 / 0.12);';
+    const stepIdx = activeStep === 'details' ? 0 : activeStep === 'payment' ? 1 : 2;
+
+    const cardBase = 'display:flex;flex-direction:column;gap:5px;border-radius:14px;padding:13px 14px;cursor:pointer;text-align:left;transition:transform .12s ease, box-shadow .12s ease;background:oklch(0.24 0.025 264 / 0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
+    const chipBase = 'display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:9999px;font-weight:500;font-size:13.5px;cursor:pointer;color:#fff;background:oklch(0.24 0.025 264 / 0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all .12s ease;';
+
+    const completeBooking = () => {
+      // Never write a booking without a committed arrival, or one that overlaps.
+      if (!this.state.fArrival || this.state.calStart) { this.setState({ step: 'details', avail: 'nodates', calOpen: true }); return; }
+      if (!reserveReady) { this.setState({ step: 'details', avail: 'needinfo' }); return; }
+      if (this.hasConflict(this.state.trailerId, this.state.fArrival, nights)) {
+        this.setState({ step: 'details', avail: 'taken', checkoutBusy: false });
+        return;
+      }
+      // Hand the completed booking off to the admin via shared browser storage.
+      try {
+        const rec = {
+          id: 'web' + Date.now(),
+          trailer: this.state.trailerId,
+          arrival: this.state.fArrival,
+          nights: nights,
+          guest: this.state.fName || 'Online guest',
+          email: this.state.fEmail || '',
+          phone: this.state.fPhone || '',
+          site: this.state.fSite || 'To be confirmed',
+          addons: selectedAddonNames,
+          total: total,
+          deposit: deposit,
+          grandTotal: grandTotal,
+          paymentPlan: payPlan,
+          dueToday: dueToday,
+          balanceLater: balanceLater,
+          balanceChargeDate: balanceChargeDate ? this.isoLocal(balanceChargeDate) : null,
+          createdAt: new Date().toISOString(),
+          source: 'web',
+        };
+        const key = 'sd_web_bookings';
+        const arr = JSON.parse(localStorage.getItem(key) || '[]');
+        arr.push(rec);
+        localStorage.setItem(key, JSON.stringify(arr));
+        // Remember this guest's contact details for next time.
+        localStorage.setItem('sd_guest', JSON.stringify({ name: this.state.fName || '', email: this.state.fEmail || '', phone: this.state.fPhone || '' }));
+        // Queue the customer's automated emails (confirmation now + the
+        // scheduled balance/reminder/refund messages) for the mailer to send.
+        try { this.queueGuestEmails(rec, t.name, tripDatesLabel); } catch (e) {}
+      } catch (e) {}
+      this.notifyTeam('New booking — ' + t.name + ' — ' + (this.state.fName || 'Online guest'), {
+        type: payPlan === 'firstnight' ? 'Booking (first-night reserve)' : 'Booking (paid in full)',
+        trailer: t.name,
+        guest: this.state.fName || 'Online guest',
+        email: this.state.fEmail || '',
+        phone: this.state.fPhone || '',
+        dates: tripDatesLabel,
+        nights: nights,
+        delivery_site: this.state.fSite || 'To be confirmed',
+        add_ons: selectedAddonNames.join(', ') || 'None',
+        trip_total: this.fmt(total),
+        deposit: this.fmt(deposit),
+        payment_plan: payPlan === 'firstnight' ? 'First night now, balance auto-charged' : 'Paid in full',
+        paid_today: this.fmt(dueToday),
+        balance_due: payPlan === 'firstnight' ? this.fmt(balanceLater) : '$0',
+        balance_charge_date: payPlan === 'firstnight' ? balanceChargeLabel : 'N/A',
+      });
+      this.setState({ step: 'confirmed', checkoutBusy: false });
+    };
+
+    return {
+      deckImgEls: (() => {
+        const n = this.carouselList.length;
+        const dragging = this.state.dragging;
+        const pos = dragging ? this.state.dragPos : this.state.carIdx;
+        const TAU = Math.PI * 2;
+        return this.carouselList.map((src, i) => {
+          // signed shortest offset of this photo from the front position (fractional while dragging)
+          let d = ((((i - pos) % n) + n) % n);
+          if (d > n / 2) d -= n;
+          const phi = d * (TAU / n);              // angle around the ring
+          const depth = (1 - Math.cos(phi)) / 2;  // 0 at front, 1 at back
+          const tx = Math.round(Math.sin(phi) * 82);
+          const ty = Math.round(depth * -28);
+          const scale = (1 - depth * 0.22).toFixed(3);
+          const op = Math.max(0, 1 - depth * 0.9).toFixed(3);
+          const z = Math.round(100 + Math.cos(phi) * 50);
+          const trans = dragging ? 'transition:none;' : 'transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease;';
+          const style = 'position:absolute;top:50%;left:50%;width:clamp(180px,24vw,320px);aspect-ratio:4/3;object-fit:cover;border-radius:14px;box-shadow:0 22px 50px -14px oklch(0 0 0 / 0.7);pointer-events:none;transform:translate(-50%,-50%) translateX(' + tx + '%) translateY(' + ty + '%) scale(' + scale + ');z-index:' + z + ';opacity:' + op + ';' + trans;
+          return React.createElement('img', { key: i, src, alt: 'Sweet Dreams RV trip photo', draggable: false, style: this.styleObj(style) });
+        });
+      })(),
+      carouselImgEls: this.carouselList.map((src, i) => React.createElement('img', {
+        key: i, src, alt: 'Sweet Dreams RV trip photo',
+        style: this.styleObj('position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s ease;' + (i === this.state.carIdx ? 'opacity:1;z-index:2;' : 'opacity:0;z-index:1;')),
+      })),
+      carouselDots: this.carouselList.map((src, i) => ({
+        style: 'width:' + (i === this.state.carIdx ? '22px' : '8px') + ';height:8px;border-radius:9999px;border:none;cursor:pointer;padding:0;transition:all .2s ease;background:' + (i === this.state.carIdx ? '#fff' : 'oklch(1 0 0 / 0.45)') + ';',
+        go: () => this.setState({ carIdx: i }),
+      })),
+      carPrev: () => this.setState((s) => ({ carIdx: (s.carIdx - 1 + this.carouselList.length) % this.carouselList.length })),
+      carNext: () => this.setState((s) => ({ carIdx: (s.carIdx + 1) % this.carouselList.length })),
+
+      deckDown: (e) => {
+        this._dragStart = e.clientX;
+        this._dragBase = this.state.carIdx;
+        this._dragMoved = false;
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      },
+      deckMove: (e) => {
+        if (this._dragStart == null) return;
+        const dx = e.clientX - this._dragStart;
+        if (!this._dragMoved && Math.abs(dx) < 4) return; // ignore micro-jitter so taps stay taps
+        this._dragMoved = true;
+        const STEP = 130; // px of drag per photo
+        // drag left (dx<0) rotates forward, drag right (dx>0) rotates back — continuous, tracks the finger
+        const pos = this._dragBase - dx / STEP;
+        this.setState({ dragging: true, dragPos: pos });
+      },
+      deckUp: (e) => {
+        if (this._dragStart == null) return;
+        const n = this.carouselList.length;
+        if (this._dragMoved) {
+          // release: pop to whichever image is closest to the front
+          const snapped = ((Math.round(this.state.dragPos) % n) + n) % n;
+          this.setState({ carIdx: snapped, dragging: false });
+        } else {
+          // pure tap (unchanged): advance one based on which half was clicked
+          const r = e.currentTarget.getBoundingClientRect();
+          if (e.clientX < r.left + r.width / 2) this.setState((s) => ({ carIdx: (s.carIdx - 1 + n) % n }));
+          else this.setState((s) => ({ carIdx: (s.carIdx + 1) % n }));
+        }
+        this._dragStart = null;
+      },
+
+      heroSplit: hv === 'split',
+      heroImmersive: hv === 'immersive',
+      heroStatement: hv === 'statement',
+      showAddons: this.props.showAddons !== false,
+
+      // ----- reserve modal -----
+      reserveOpen: this.state.reserveOpen,
+      reserveHeading: activeStep === 'details' ? 'Check availability & reserve'
+        : activeStep === 'payment' ? 'Reserve your trip' : 'Reservation confirmed',
+      stepDetails: activeStep === 'details',
+      stepPayment: activeStep === 'payment',
+      stepConfirmed: activeStep === 'confirmed',
+      railStep1: railOn,
+      railStep2: stepIdx >= 1 ? railOn : railOff,
+      railStep3: stepIdx >= 2 ? railOn : railOff,
+
+      fName: this.state.fName,
+      fEmail: this.state.fEmail,
+      fPhone: this.state.fPhone,
+      fArrival: this.state.fArrival,
+      fSite: this.state.fSite,
+      fSiteSel: this.state.fSiteSel,
+      fSiteOther: this.state.fSiteOther,
+      siteIsOther: this.state.fSiteSel === '__other',
+      campgroundOptions: this.campgroundOptions,
+      onName: (e) => this.setState({ fName: e.target.value, avail: 'idle' }),
+      onEmail: (e) => this.setState({ fEmail: e.target.value, avail: 'idle' }),
+      onPhone: (e) => this.setState({ fPhone: e.target.value, avail: 'idle' }),
+      onArrival: (e) => this.setState({ fArrival: e.target.value, avail: 'idle' }),
+      onSiteSelect: (e) => {
+        const v = e.target.value;
+        const patch = { fSiteSel: v, fSite: this.siteValue(v, this.state.fSiteOther), avail: 'idle' };
+        // Auto-detect delivery zone from the campground's distance so the fee is
+        // set for the customer rather than left to them to guess.
+        const miles = this.campgroundMiles[v];
+        const radius = cfg ? cfg.delivery.freeRadius : 100;
+        if (typeof miles === 'number') patch.delivery = miles > radius ? 'extended' : 'included';
+        this.setState(patch);
+      },
+      onSiteOther: (e) => { const d = e.target.value; this.setState({ fSiteOther: d, fSite: this.siteValue(this.state.fSiteSel, d), avail: 'idle' }); },
+
+      // ----- custom availability calendar -----
+      calOpen: this.state.calOpen,
+      calMonths,
+      calHint,
+      departureBoxLabel,
+      hasCalPrice,
+      calPriceMain,
+      calPriceSub,
+      altTrailers,
+      selectedHasBookings: this.occupiedNights(this.state.trailerId).size > 0,
+      fleetCount: this.trailers.length,
+      hasAlts: altTrailers.length > 0,
+      altNone: altTrailers.length === 0,
+      altDatesLabel,
+      clearHover: () => { if (this.state.calHover) this.setState({ calHover: null }); },
+      calWeekdays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      arrivalBtnLabel,
+      arrivalBtnStyle: 'font-size:16px;' + (arrivalDate ? 'color:#fff;' : 'color:oklch(0.6 0.02 280);'),
+      toggleCal: () => this.setState((s) => {
+        const cm = s.calMonth || this.isoLocal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+        if (!s.calOpen) return { calOpen: true, calMode: 'arrival', calStart: null, calMonth: cm };
+        // Already open: if we're idle in arrival mode, collapse; otherwise re-initiate an arrival change.
+        if (s.calMode === 'arrival' && !s.calStart) return { calOpen: false };
+        return { calMode: 'arrival', calStart: null, calMonth: cm };
+      }),
+      prevCalMonth: () => this.setState((s) => { const b = s.calMonth ? new Date(s.calMonth + 'T00:00:00') : new Date(); const t = new Date(); if (new Date(b.getFullYear(), b.getMonth(), 1) <= new Date(t.getFullYear(), t.getMonth(), 1)) return {}; return { calMonth: this.isoLocal(new Date(b.getFullYear(), b.getMonth() - 1, 1)) }; }),
+      nextCalMonth: () => this.setState((s) => { const b = s.calMonth ? new Date(s.calMonth + 'T00:00:00') : new Date(); return { calMonth: this.isoLocal(new Date(b.getFullYear(), b.getMonth() + 1, 1)) }; }),
+      prevCalStyle: 'width:32px;height:32px;border-radius:9px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);cursor:' + (prevAllowed ? 'pointer' : 'not-allowed') + ';display:grid;place-items:center;' + (prevAllowed ? '' : 'opacity:0.35;'),
+
+      departureLabel: departureDate ? this.fmtDate(departureDate) : 'Select arrival',
+      tripDatesLabel,
+      siteLabel: this.state.fSite || 'your campsite',
+      emailLabel: this.state.fEmail || 'your email',
+      dueTodayLabel: this.fmt(dueToday),
+      grandTotalLabel: this.fmt(grandTotal),
+      firstNightLabel: this.fmt(firstNight),
+      balanceLaterLabel: this.fmt(balanceLater),
+      balanceChargeLabel,
+      farOut,
+      planFirstNight: payPlan === 'firstnight',
+      planFull: payPlan === 'full',
+      dueTodaySubLabel: payPlan === 'firstnight'
+        ? ('First night · balance ' + balanceChargeLabel)
+        : (this.fmt(total) + ' trip + ' + this.fmt(deposit) + ' refundable deposit'),
+      showDepositSplit: payPlan !== 'firstnight' && deposit > 0,
+      daysUntilLabel: daysUntilArrival != null ? String(daysUntilArrival) : '',
+      setPlanFirstNight: () => this.setState({ payPlan: 'firstnight' }),
+      setPlanFull: () => this.setState({ payPlan: 'full' }),
+      planFnStyle: (payPlan === 'firstnight') ? 'border:2px solid oklch(0.72 0.18 300);background:oklch(0.5781 0.2303 264.8 / 0.12);' : 'border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.04);',
+      planFullStyle: (payPlan === 'full') ? 'border:2px solid oklch(0.72 0.18 300);background:oklch(0.5781 0.2303 264.8 / 0.12);' : 'border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.04);',
+      hasAddons: addonsTotal > 0,
+
+      availChecking: this.state.avail === 'checking',
+      availOk: this.state.avail === 'ok',
+      availTaken: this.state.avail === 'taken',
+      availNoDates: this.state.avail === 'nodates',
+      availNeedInfo: this.state.avail === 'needinfo',
+      reserveMissingLabel: reserveMissing.join(', '),
+      // "Check availability" is only meaningful once a full arrival→departure range is committed.
+      availNotOk: this.state.avail !== 'ok',
+      datesReady: !!this.state.fArrival && !this.state.calStart,
+      checkAvailLabel: (!this.state.fArrival || this.state.calStart) ? 'Pick your dates first' : (!reserveReady ? 'Fill in your details' : 'Check availability'),
+
+      openReserve: () => this.setState({ reserveOpen: true, step: 'details', avail: 'idle', calOpen: false, calStart: null, calMode: 'arrival' }),
+      closeReserve: () => this.setState({ reserveOpen: false }),
+      checkAvail: () => {
+        // Require a complete, committed date range, then all reserve fields.
+        if (!this.state.fArrival || this.state.calStart) { this.setState({ avail: 'nodates', calOpen: true }); return; }
+        if (!reserveReady) { this.setState({ avail: 'needinfo' }); return; }
+        this.setState({ avail: 'checking' });
+        const tid = this.state.trailerId, arrival = this.state.fArrival, nn = this.state.nights;
+        setTimeout(() => {
+          const conflict = this.hasConflict(tid, arrival, nn);
+          this.setState({ avail: conflict ? 'taken' : 'ok' });
+        }, 950);
+      },
+      goToPayment: () => this.setState({ step: 'payment', checkoutError: false }),
+      backToDetails: () => this.setState({ step: 'details' }),
+      checkoutError: this.state.checkoutError,
+      checkoutButtonLabel: this.state.checkoutBusy ? 'Redirecting to secure checkout…' : ('Pay ' + this.fmt(dueToday) + (payPlan === 'firstnight' ? ' to reserve' : ' now')),
+      startCheckout: async () => {
+        const url = this.CHECKOUT_ENDPOINT;
+        // Demo mode (no server endpoint set yet): simulate a successful reservation.
+        if (!url) { completeBooking(); return; }
+        if (this.state.checkoutBusy) return;
+        this.setState({ checkoutBusy: true, checkoutError: false });
+        try {
+          const base = window.location.origin + window.location.pathname;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              trailer: t.name,
+              trailerId: this.state.trailerId,
+              arrival: this.state.fArrival,
+              nights: nights,
+              dates: tripDatesLabel,
+              guest: this.state.fName || '',
+              email: this.state.fEmail || '',
+              phone: this.state.fPhone || '',
+              deliverySite: this.state.fSite || '',
+              addons: selectedAddonNames,
+              // ----- payment plan -----
+              // 'firstnight' → charge dueToday now, save card, auto-charge the
+              //   balance off-session on balanceChargeDate (14 days before arrival).
+              // 'full' → charge the whole grandTotal (trip + deposit) now.
+              paymentPlan: payPlan,
+              depositAmountCents: deposit * 100,
+              tripTotalCents: total * 100,
+              grandTotalCents: grandTotal * 100,
+              dueTodayCents: dueToday * 100,
+              balanceAmountCents: balanceLater * 100,
+              balanceChargeDate: balanceChargeDate ? this.isoLocal(balanceChargeDate) : null,
+              // Save the card so the balance can be auto-charged off-session on
+              // balanceChargeDate. Server: set the Checkout Session's
+              // payment_intent_data.setup_future_usage = 'off_session'.
+              savePaymentMethod: payPlan === 'firstnight',
+              currency: 'usd',
+              successUrl: base + '?booking=success',
+              cancelUrl: window.location.href,
+            }),
+          });
+          const data = await res.json();
+          if (data && data.url) { window.location.assign(data.url); return; }
+          throw new Error('no checkout url');
+        } catch (e) {
+          this.setState({ checkoutBusy: false, checkoutError: true });
+        }
+      },
+      pay: () => completeBooking(),
+
+      // ----- email quote modal -----
+      emailOpen: this.state.emailOpen,
+      emailForm: this.state.emailStep === 'form',
+      emailSent: this.state.emailStep === 'sent',
+      prepPlusDeliveryLabel: this.fmt(prep + delivery),
+      openEmail: () => this.setState({ emailOpen: true, emailStep: 'form' }),
+      closeEmail: () => this.setState({ emailOpen: false }),
+      sendQuote: () => {
+        this.notifyTeam('Instant quote request — ' + t.name, {
+          type: 'Instant quote',
+          trailer: t.name,
+          name: this.state.fName || 'Not provided',
+          email: this.state.fEmail || '',
+          nights: nights,
+          add_ons: selectedAddonNames.join(', ') || 'None',
+          estimated_total: this.fmt(total),
+        });
+        this.setState({ emailStep: 'sent' });
+        // Remember this guest so their details prefill next time (quote or booking).
+        try { localStorage.setItem('sd_guest', JSON.stringify({ name: this.state.fName || '', email: this.state.fEmail || '', phone: this.state.fPhone || '' })); } catch (e) {}
+      },
+      emailToReserve: () => this.setState({ emailOpen: false, reserveOpen: true, step: 'details', avail: 'idle' }),
+
+      // ----- cancellation request modal -----
+      cancelOpen: this.state.cancelOpen,
+      cancelForm: this.state.cancelStep === 'form',
+      cancelSent: this.state.cancelStep === 'sent',
+      openCancel: () => this.setState({ cancelOpen: true, cancelStep: 'form' }),
+      closeCancel: () => this.setState({ cancelOpen: false }),
+      submitCancel: () => {
+        this.notifyTeam('Cancellation request — ' + (this.state.cName || 'guest'), {
+          type: 'Cancellation request',
+          name: this.state.cName || 'Not provided',
+          email: this.state.cEmail || '',
+          reservation_details: this.state.cDetails || 'Not provided',
+          reason: this.state.cReason || 'Not given',
+        });
+        this.setState({ cancelStep: 'sent' });
+      },
+      cName: this.state.cName,
+      cEmail: this.state.cEmail,
+      cDetails: this.state.cDetails,
+      cReason: this.state.cReason,
+      onCName: (e) => this.setState({ cName: e.target.value }),
+      onCEmail: (e) => this.setState({ cEmail: e.target.value }),
+      onCDetails: (e) => this.setState({ cDetails: e.target.value }),
+      onCReason: (e) => this.setState({ cReason: e.target.value }),
+      cancelEmailLabel: this.state.cEmail || 'your email',
+
+      trailers: baseTrailers.map((x) => {
+        const on = x.id === this.state.trailerId;
+        return {
+          ...x,
+          rateLabel: 'from $' + x.rate,
+          cardStyle: cardBase + (on
+            ? 'border:2px solid oklch(1 0 0 / 0.92);box-shadow:0 10px 26px -10px oklch(0.5781 0.2303 264.8 / 0.7);'
+            : 'border:1px solid oklch(1 0 0 / 0.12);'),
+          dotStyle: on
+            ? 'background:#fff;'
+            : 'background:transparent;border:1.5px solid oklch(1 0 0 / 0.4);',
+          pick: () => this.setState({ trailerId: x.id, avail: 'idle', calStart: null, calMode: 'arrival' }),
+        };
+      }),
+
+      nights,
+      nightsLineLabel: nights + ' nights × $' + t.rate,
+      fleetFromLabel: 'From $' + fleetMinRate + ' / night',
+      deliveryFeeLabel: '+' + this.fmt(deliveryFee),
+      deliveryRadiusLabel: String(cfg ? cfg.delivery.freeRadius : 100),
+      siteMilesLabel: String(this.campgroundMiles[this.state.fSiteSel] || ''),
+      siteWithin: typeof this.campgroundMiles[this.state.fSiteSel] === 'number' && this.campgroundMiles[this.state.fSiteSel] <= (cfg ? cfg.delivery.freeRadius : 100),
+      siteBeyond: typeof this.campgroundMiles[this.state.fSiteSel] === 'number' && this.campgroundMiles[this.state.fSiteSel] > (cfg ? cfg.delivery.freeRadius : 100),
+      siteUnknownDist: this.state.fSiteSel === '__other',
+      depositLabel: this.fmt(deposit),
+      decNights: () => this.setState((s) => ({ nights: Math.max(MIN_N, s.nights - 1), avail: 'idle' })),
+      incNights: () => this.setState((s) => ({ nights: Math.min(MAX_N, s.nights + 1), avail: 'idle' })),
+
+      selectedName: t.name,
+      selectedBlurb: t.blurb,
+      nightlyLabel: '$' + t.rate + ' / night',
+      fleetPhotos: this.trailers.map((x) => ({
+        slotId: 'sdrv-fleet-' + x.id,
+        photo: this.photoMap[x.id] || '',
+        placeholder: 'Drop a photo of ' + x.name,
+        wrapStyle: 'position:absolute;inset:0;transition:opacity .4s ease;' + (x.id === this.state.trailerId
+          ? 'opacity:1;z-index:2;'
+          : 'opacity:0;z-index:1;pointer-events:none;'),
+      })),
+      activeName: t.name,
+      activeSleeps: t.sleeps,
+      rentalLabel: this.fmt(rental),
+      prepLabel: this.fmt(prep),
+      deliveryLabel: delivery ? '+' + this.fmt(delivery) : 'Included',
+      addonsTotalLabel: addonsTotal ? '+' + this.fmt(addonsTotal) : '$0',
+      addonLines,
+      totalLabel: this.fmt(total),
+
+      delIncStyle: this.state.delivery === 'included' ? 'border:2px solid oklch(1 0 0 / 0.9);' : 'border:1px solid oklch(1 0 0 / 0.14);',
+      delExtStyle: this.state.delivery === 'extended' ? 'border:2px solid oklch(1 0 0 / 0.9);' : 'border:1px solid oklch(1 0 0 / 0.14);',
+      setIncluded: () => this.setState({ delivery: 'included' }),
+      setExtended: () => this.setState({ delivery: 'extended' }),
+
+      addons: addonsList.map((a) => {
+        const q = this.state.addons[a.id] || 0;
+        const on = q > 0;
+        const max = a.qty ? Math.max(1, a.maxQty || 1) : 1;
+        const activeStyle = on
+          ? 'border:1.5px solid oklch(1 0 0 / 0.85);background:oklch(0.34 0.03 264 / 0.6);'
+          : 'border:1.5px solid oklch(1 0 0 / 0.14);';
+        return {
+          ...a,
+          isSingle: !a.qty,
+          isQty: !!a.qty,
+          priceLabel: '$' + a.price,
+          qtyLabel: String(q),
+          chipStyle: chipBase + activeStyle + (a.qty ? 'cursor:default;' : ''),
+          stepStyle: "width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.22);background:oklch(1 0 0 / 0.06);color:#fff;font-size:16px;line-height:1;cursor:pointer;font-family:'Nunito Sans',sans-serif;",
+          toggle: () => this.setState((s) => ({ addons: { ...s.addons, [a.id]: (s.addons[a.id] ? 0 : 1) } })),
+          inc: () => this.setState((s) => ({ addons: { ...s.addons, [a.id]: Math.min(max, (s.addons[a.id] || 0) + 1) } })),
+          dec: () => this.setState((s) => ({ addons: { ...s.addons, [a.id]: Math.max(0, (s.addons[a.id] || 0) - 1) } })),
+        };
+      }),
+
+      faqs: this.faqs.map((f, i) => {
+        const open = this.state.openFaq === i;
+        return {
+          ...f,
+          open,
+          showCancelBtn: f.action === 'cancel',
+          chevStyle: open ? 'transform:rotate(180deg);' : 'transform:rotate(0deg);',
+          toggle: () => this.setState((s) => ({ openFaq: s.openFaq === i ? -1 : i })),
+        };
+      }),
+    };
+  }
+}
+</script>
+</body>
+</html>

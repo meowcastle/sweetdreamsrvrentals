@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&amp;family=Archivo+Black&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: oklch(0.2 0.05 280); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  a:hover { opacity: 0.86; }
+  image-slot { display: block; }
+  .nav-burger { display:none; }
+  @media (max-width:760px){ .nav-burger { display:inline-flex !important; } .nav-links { display:none !important; position:absolute; top:100%; left:0; right:0; flex-direction:column; align-items:stretch; gap:4px; background:oklch(0.16 0.05 285 / 0.98); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); padding:10px 20px 16px; border-bottom:1px solid oklch(1 0 0 / 0.12); box-shadow:0 20px 40px -16px oklch(0 0 0 / 0.6); } .nav-toggle:checked ~ .nav-links { display:flex !important; } .nav-links > a { padding:11px 4px !important; } }
+  h1,h2,h3,h4,h5 { font-family:'Quicksand',sans-serif; }
+  .fleet-cols { display:grid; grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr); gap:clamp(20px,3vw,40px); align-items:start; }
+  @media (max-width: 900px) { .fleet-cols { grid-template-columns:1fr; } }
+</style>
+</helmet>
+
+<div data-screen-label="Our Trailers — Meet the Fleet" style="position:relative;z-index:0;font-family:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:oklch(0.86 0.012 270);min-height:100vh;overflow-x:hidden;">
+
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-2;background:url('hero-night-sky.jpg') center center / cover no-repeat;filter:brightness(1.32) saturate(1.12);"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg, oklch(0.32 0.07 275 / 0.14) 0%, oklch(0.26 0.07 285 / 0.24) 55%, oklch(0.2 0.06 290 / 0.42) 100%);"></div>
+
+  <!-- ===== NAV ===== -->
+  <header style="position:sticky;top:0;z-index:50;background:oklch(0.22 0.05 280 / 0.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid oklch(1 0 0 / 0.12);">
+    <div style="width:100%;margin:0;padding:13px clamp(20px,3vw,44px);display:flex;align-items:center;gap:18px;">
+      <a href="Sweet Dreams RV.dc.html" style="display:flex;align-items:center;text-decoration:none;color:#fff;">
+        <img src="trailer-white.png" alt="Sweet Dreams RV Rentals" style="height:46px;width:auto;display:block;">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle menu" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;">
+      <label for="nav-toggle" class="nav-burger" aria-label="Menu" style="margin-left:auto;cursor:pointer;width:42px;height:42px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.08);align-items:center;justify-content:center;color:#fff;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></label>
+      <nav class="nav-links" style="margin-left:auto;display:flex;align-items:center;gap:clamp(8px,1.8vw,24px);flex-wrap:wrap;justify-content:flex-end;">
+        <a href="Sweet Dreams RV.dc.html#how" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">How it works</a>
+        <a href="Our Trailers.dc.html" style="text-decoration:none;color:#fff;font-weight:700;font-size:14px;">Meet the fleet</a>
+        <a href="Sweet Dreams RV.dc.html#faq" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">FAQs</a>
+        <a href="Campgrounds &amp; RV Parks.dc.html" style="text-decoration:none;color:oklch(0.82 0.015 270);font-weight:500;font-size:14px;">Campgrounds</a>
+        <a href="Sweet Dreams RV.dc.html#quote" style="display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;text-decoration:none;box-shadow:0 6px 18px -6px oklch(0.5781 0.2303 264.8 / 0.6);">Get a quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section data-screen-label="Fleet hero" style="position:relative;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(34px,5.5vw,72px) clamp(16px,4vw,40px) clamp(20px,3vw,34px);text-align:center;">
+      <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.18);font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.86 0.015 270);">
+        <span style="width:6px;height:6px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>8 named trailers · Southern Oregon
+      </span>
+      <h1 style="margin:18px 0 0;font-weight:700;font-size:clamp(34px,5.4vw,58px);line-height:1.02;letter-spacing:-0.028em;color:#fff;text-shadow:0 2px 24px oklch(0.06 0.02 264 / 0.7);">Meet the <span style="background:linear-gradient(105deg, oklch(0.78 0.13 300), oklch(0.72 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">fleet</span></h1>
+      <p style="margin:16px auto 0;font-size:clamp(16px,1.5vw,18px);line-height:1.55;color:oklch(0.86 0.012 270);max-width:60ch;text-shadow:0 1px 16px oklch(0.06 0.02 264 / 0.8);">From a couples' getaway to "bring the whole gang," there's a floorplan for every trip. Every trailer arrives fully outfitted, right down to the French press. Grab your gear and grub, and let us get you out so you can stay out.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:24px;">
+        <a href="Sweet Dreams RV.dc.html#quote" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+        <a href="Campgrounds &amp; RV Parks.dc.html" style="display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:9999px;background:oklch(1 0 0 / 0.1);backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:15px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);">Find a campground</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FILTER BAR ===== -->
+  
+
+  <!-- ===== FLEET GRID + FULLY OUTFITTED ===== -->
+  <section data-screen-label="Fleet grid" style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(22px,3vw,34px) clamp(16px,4vw,40px) clamp(40px,5vw,64px);">
+    <div class="fleet-cols">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:clamp(16px,2vw,22px);">
+      <sc-for list="{{ fleet }}" as="t" hint-placeholder-count="8">
+        <div style="{{ t.cardStyle }}" style-hover="transform:translateY(-4px);box-shadow:0 22px 44px -16px oklch(0 0 0 / 0.65);">
+          <button onClick="{{ t.open }}" style="position:relative;display:block;width:100%;padding:0;border:none;background:transparent;cursor:pointer;text-align:left;">
+            <div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:oklch(0.1 0.02 264 / 0.5);">
+              <image-slot id="{{ t.slotId }}" src="{{ t.photo }}" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="{{ t.placeholder }}"></image-slot>
+              <div style="position:absolute;left:0;right:0;top:0;bottom:0;background:linear-gradient(to top, oklch(0 0 0 / 0.55), transparent 42%);pointer-events:none;"></div>
+              <span style="position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9999px;background:oklch(0.12 0.02 264 / 0.72);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-weight:600;font-size:12px;color:#fff;">{{ t.sleeps }}</span>
+              <sc-if value="{{ t.towable }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.28);backdrop-filter:blur(8px);border:1px solid oklch(0.6 0.14 152 / 0.5);font-weight:600;font-size:11.5px;color:oklch(0.88 0.09 152);">Tow-friendly</span>
+              </sc-if>
+              <div style="position:absolute;left:0;right:0;bottom:0;padding:14px 16px 13px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;">
+                <span style="font-family:'Archivo Black',sans-serif;font-size:22px;letter-spacing:0.01em;color:#fff;text-shadow:0 2px 12px oklch(0 0 0 / 0.6);">{{ t.name }}</span>
+                <span style="font-family:'Nunito Sans',sans-serif;font-weight:700;font-size:13px;color:#fff;text-shadow:0 2px 12px oklch(0 0 0 / 0.6);">{{ t.rateLabel }}</span>
+              </div>
+            </div>
+          </button>
+          <div style="padding:16px 17px 18px;display:flex;flex-direction:column;gap:13px;flex:1;">
+            <p style="margin:0;font-size:14px;line-height:1.55;color:oklch(0.8 0.015 270);">{{ t.short }}</p>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;">
+              <sc-for list="{{ t.features }}" as="ft" hint-placeholder-count="3">
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:9999px;background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.12);font-size:12px;color:oklch(0.82 0.015 270);">{{ ft }}</span>
+              </sc-for>
+            </div>
+            <div style="margin-top:auto;display:flex;align-items:center;gap:9px;padding-top:3px;">
+              <button onClick="{{ t.open }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:13.5px;font-family:'Nunito Sans',sans-serif;">Meet {{ t.name }}</button>
+              
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <aside style="position:sticky;top:84px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(0.22 0.04 285 / 0.36);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:22px;padding:clamp(20px,2vw,26px);">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.74 0.04 286);">Every trailer, ready to go</span>
+      <h2 style="margin:8px 0 0;font-weight:700;font-size:clamp(21px,2vw,26px);letter-spacing:-0.02em;color:#fff;">Fully outfitted means fully outfitted</h2>
+      <p style="margin:10px 0 0;font-size:14px;line-height:1.55;color:oklch(0.8 0.015 270);">Whatever you pick, it shows up stocked and set up. All you bring is your gear and your grub.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
+        <sc-for list="{{ included }}" as="inc" hint-placeholder-count="4">
+          <div style="background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:18px;padding:20px;">
+            <span style="width:40px;height:40px;border-radius:11px;background:oklch(0.55 0.12 285 / 0.3);display:grid;place-items:center;color:oklch(0.85 0.1 290);">{{ inc.icon }}</span>
+            <h3 style="margin:14px 0 0;font-weight:700;font-size:16px;color:#fff;">{{ inc.title }}</h3>
+            <p style="margin:6px 0 0;font-size:13.5px;line-height:1.5;color:oklch(0.78 0.015 270);">{{ inc.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+    </div>
+  </section>
+
+  <!-- ===== CTA / FOOTER ===== -->
+  <section data-screen-label="Footer" style="position:relative;background:oklch(0.24 0.05 285 / 0.38);border-top:1px solid oklch(1 0 0 / 0.1);color:#fff;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(40px,5vw,72px) clamp(16px,4vw,40px);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(24px,4vw,48px);align-items:center;">
+        <div>
+          <h2 style="margin:0;font-weight:700;font-size:clamp(28px,3.6vw,40px);letter-spacing:-0.02em;color:#fff;">Found your rig?</h2>
+          <p style="margin:14px 0 0;font-size:15.5px;line-height:1.6;color:oklch(0.82 0.015 270);max-width:42ch;">Build an instant quote in under a minute, or reach out and we'll help you pick the right trailer for your crew.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:11px;margin-top:24px;">
+            <a href="Sweet Dreams RV.dc.html#quote" style="display:inline-flex;align-items:center;gap:9px;padding:13px 20px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14.5px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Build your instant quote</a>
+            <a href="tel:15416304795" style="display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:9999px;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;text-decoration:none;border:1px solid oklch(1 0 0 / 0.25);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>(541) 630-4795</a>
+          </div>
+        </div>
+        <div style="background:oklch(0.18 0.02 264 / 0.6);backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:28px;">
+          <div style="display:flex;align-items:center;gap:11px;">
+            <img src="logo-white.png" alt="Sweet Dreams RV Rentals" style="height:70px;width:auto;display:block;">
+            <div><div style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.64 0.015 275);">Grants Pass &amp; Merlin, Oregon</div></div>
+          </div>
+          <p style="margin:18px 0 0;font-size:14px;line-height:1.6;color:oklch(0.82 0.015 270);"><em>When adventure calls… we deliver.</em> Southern Oregon's only fully-outfitted RV trailer rental, delivered and set up, or towed by you.</p>
+        </div>
+      </div>
+      <div style="margin-top:40px;padding-top:22px;border-top:1px solid oklch(1 0 0 / 0.1);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.6 0.015 275);">
+        <span>© 2026 Sweet Dreams RV Rentals</span>
+        <span>Meet the fleet · Crater Lake Country</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DETAIL MODAL ===== -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:clamp(12px,4vh,48px) 16px;overflow-y:auto;">
+      <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
+      <div style="position:relative;width:100%;max-width:560px;background:oklch(0.13 0.02 264 / 0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid oklch(1 0 0 / 0.14);border-radius:26px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);overflow:hidden;">
+        <div style="position:relative;width:100%;aspect-ratio:16/10;background:oklch(0.1 0.02 264 / 0.5);">
+          <sc-for list="{{ activeGallery }}" as="g" hint-placeholder-count="1">
+            <div style="{{ g.wrapStyle }}">
+              <image-slot id="{{ g.slotId }}" src="{{ g.photo }}" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="{{ g.placeholder }}"></image-slot>
+            </div>
+          </sc-for>
+          <div style="position:absolute;inset:0;z-index:3;background:linear-gradient(to top, oklch(0.1 0.02 264 / 0.85), transparent 55%);pointer-events:none;"></div>
+          <button onClick="{{ closeModal }}" style="position:absolute;z-index:5;top:14px;right:14px;width:36px;height:36px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(0.12 0.02 264 / 0.7);backdrop-filter:blur(8px);cursor:pointer;display:grid;place-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+          <sc-if value="{{ galleryHasMany }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ prevPhoto }}" style="position:absolute;z-index:5;top:50%;left:12px;transform:translateY(-50%);width:38px;height:38px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(0.12 0.02 264 / 0.6);backdrop-filter:blur(8px);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+            <button onClick="{{ nextPhoto }}" style="position:absolute;z-index:5;top:50%;right:12px;transform:translateY(-50%);width:38px;height:38px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(0.12 0.02 264 / 0.6);backdrop-filter:blur(8px);cursor:pointer;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+            <span style="position:absolute;z-index:5;top:14px;left:14px;padding:5px 11px;border-radius:9999px;background:oklch(0.12 0.02 264 / 0.7);backdrop-filter:blur(8px);border:1px solid oklch(1 0 0 / 0.16);font-size:12px;font-weight:600;color:#fff;">{{ galleryCounter }}</span>
+            <div style="position:absolute;z-index:5;left:0;right:0;bottom:62px;display:flex;justify-content:center;gap:6px;">
+              <sc-for list="{{ galleryDots }}" as="d" hint-placeholder-count="4">
+                <button onClick="{{ d.go }}" style="{{ d.style }}"></button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div style="position:absolute;z-index:4;left:0;right:0;bottom:0;padding:18px 22px 15px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;">
+            <div>
+              <div style="font-family:'Archivo Black',sans-serif;font-size:28px;letter-spacing:0.01em;color:#fff;">{{ activeName }}</div>
+              <div style="font-size:13px;color:oklch(0.86 0.02 280);margin-top:2px;">{{ activeSleeps }} · {{ activeTag }}</div>
+            </div>
+            <span style="font-family:'Nunito Sans',sans-serif;font-weight:700;font-size:16px;color:#fff;background:oklch(0.12 0.02 264 / 0.6);padding:7px 13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);">{{ activeRate }}</span>
+          </div>
+        </div>
+        <div style="padding:22px;">
+          <p style="margin:0;font-size:15px;line-height:1.6;color:oklch(0.84 0.015 270);">{{ activeLong }}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;">
+            <sc-for list="{{ activeFeatures }}" as="af" hint-placeholder-count="4">
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.12);font-size:12.5px;color:oklch(0.84 0.015 270);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.78 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ af }}</span>
+            </sc-for>
+          </div>
+          <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.03);overflow:hidden;">
+            <div style="padding:12px 16px;border-bottom:1px solid oklch(1 0 0 / 0.1);font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.74 0.03 286);">Full specs</div>
+            <sc-for list="{{ activeSpecs }}" as="sp" hint-placeholder-count="6">
+              <div style="display:flex;align-items:flex-start;gap:14px;padding:11px 16px;border-bottom:1px solid oklch(1 0 0 / 0.06);">
+                <span style="flex:none;width:96px;font-size:12.5px;font-weight:600;color:oklch(0.68 0.02 280);">{{ sp.label }}</span>
+                <span style="flex:1;font-size:13.5px;line-height:1.45;color:#fff;">{{ sp.value }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:11px;margin-top:22px;">
+            <a href="{{ quoteHref }}" style="flex:1;min-width:160px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Get a quote for {{ activeName }}</a>
+            <button onClick="{{ closeModal }}" style="min-width:110px;padding:14px 20px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;">Back to fleet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { filter: 'all', activeId: null, activePhoto: 0 };
+
+  galleryViews = [
+    'Exterior',
+    'Living area',
+    'Kitchen / dinette',
+    'Bedroom / bunks',
+    'Bathroom',
+  ];
+
+  fleet = [
+    { id: 'charlie', name: 'Charlie', rate: 139, sleeps: 'Sleeps 4–6', tag: 'Tow it yourself', towable: true, size: 'small',
+      photo: 'charlie-exterior.png',
+      gallery: [
+        { src: 'charlie-exterior.png', view: 'Exterior' },
+        { src: 'charlie-living.png', view: 'Living & dinette' },
+        { src: 'charlie-kitchen.png', view: 'Kitchen' },
+        { src: 'charlie-interior.png', view: 'Interior & fridge' },
+        { src: 'charlie-bunks.png', view: 'Bunks' },
+        { src: 'charlie-bath.png', view: 'Bathroom' },
+      ],
+      short: 'Weighs under 4,533 lbs, so you can tow him behind a mid-size SUV. A surprisingly spacious layout with an extra-roomy bath.',
+      long: 'Charlie is our lightest trailer, tipping the scales at under 4,533 lbs, which means you can tow him yourself behind a mid-size SUV. Don\u2019t let the size fool you: his layout is surprisingly spacious and sleeps four to six, with an extra-roomy bathroom for a rig this light. The easy escape for a couple or a small crew who want to do the driving.',
+      features: ['Tow with a mid-size SUV', 'Extra-roomy bath', 'Under 4,533 lbs'],
+      specs: [['Sleeps', '4–6'], ['Sleeping', 'Spacious convertible layout'], ['Slide-outs', 'None (compact build)'], ['Bath', 'Extra-roomy full bath'], ['Kitchen', 'Indoor galley'], ['Towing', 'Under 4,533 lbs · mid-size SUV'], ['Nightly rate', 'From $149']] },
+    { id: 'ella', name: 'Ella', rate: 149, sleeps: 'Sleeps 2–4', tag: "Couples' getaway", towable: false, size: 'small',
+      photo: 'photo-ella.jpg',
+      gallery: [
+        { src: 'photo-ella.jpg', view: 'Exterior' },
+        { src: 'ella-interior.png', view: 'Entertainment center & bed' },
+        { src: 'ella-dinette.png', view: 'Dinette' },
+        { src: 'ella-kitchen.png', view: 'Kitchen' },
+        { src: 'ella-bunks.png', view: 'Bunks & bath' },
+      ],
+      short: 'A slide-out opens up a convertible dinette, plus an outdoor kitchen so you can cook to the view. Front queen and double bunks.',
+      long: 'Ella features a slide-out with a spacious convertible dinette and an outdoor kitchen, so you can whip up dinner while soaking in the view. A front queen bed plus double bunks means you can bring the kids along without giving up comfort.',
+      features: ['Slide-out', 'Outdoor kitchen', 'Front queen + bunks'],
+      specs: [['Sleeps', '2–4'], ['Sleeping', 'Front queen + double bunks'], ['Slide-outs', 'One'], ['Dinette', 'Spacious convertible dinette'], ['Kitchen', 'Indoor galley + outdoor kitchen'], ['Best for', "Couples' getaway, small families"], ['Nightly rate', 'From $159']] },
+    { id: 'virginia', name: 'Virginia', rate: 149, sleeps: 'Sleeps 4', tag: 'Easy weekender', towable: false, size: 'small',
+      photo: 'virginia-exterior.png',
+      gallery: [
+        { src: 'virginia-exterior.png', view: 'Exterior · awning out' },
+        { src: 'virginia-slideout.png', view: 'Exterior · slide-out' },
+        { src: 'virginia-floorplan.png', view: 'Floorplan' },
+      ],
+      short: 'A slide-out with a convertible dinette and a convertible couch. Front queen and double bunks mean the kids are covered.',
+      long: 'Virginia keeps things simple and comfortable: a slide-out opens up a spacious convertible dinette and a convertible couch, and a front queen with double bunks means there\u2019s room for the whole family. A no-fuss weekender for four.',
+      features: ['Slide-out', 'Convertible dinette + couch', 'Front queen + bunks'],
+      specs: [['Sleeps', '4'], ['Sleeping', 'Front queen + double bunks'], ['Slide-outs', 'One'], ['Living', 'Convertible dinette + convertible couch'], ['Kitchen', 'Indoor galley'], ['Best for', 'Easy family weekender'], ['Nightly rate', 'From $159']] },
+    { id: 'marylou', name: 'Mary Lou', rate: 144, sleeps: 'Sleeps 6–7', tag: 'Family-friendly', towable: false, size: 'medium',
+      photo: 'marylou-exterior.png',
+      gallery: [
+        { src: 'marylou-exterior.png', view: 'Exterior · awning out' },
+        { src: 'marylou-living.png', view: 'Living area & bed' },
+        { src: 'marylou-bedroom.png', view: 'Queen bedroom' },
+        { src: 'marylou-kitchen.png', view: 'Kitchen' },
+        { src: 'marylou-kitchen-lounge.png', view: 'Kitchen & lounge' },
+        { src: 'marylou-dinette.png', view: 'Dinette' },
+        { src: 'marylou-dinette2.png', view: 'Dinette · table set' },
+      ],
+      short: 'A queen bed, a full-size bunk, a single bunk, a couch and a convertible dinette. Comfortably sleeps six to seven.',
+      long: 'Mary Lou is built for growing crews. She sports a queen bed, a full-size bunk, a single-size bunk, a couch and a convertible dinette, sleeping six to seven comfortably. A flexible, family-friendly layout for trips where everyone comes along.',
+      features: ['Queen bed', 'Full + single bunks', 'Convertible dinette'],
+      specs: [['Sleeps', '6–7'], ['Sleeping', 'Queen + full-size bunk + single bunk + couch'], ['Living', 'Couch + convertible dinette'], ['Kitchen', 'Indoor galley'], ['Best for', 'Growing families'], ['Nightly rate', 'From $159']] },
+    { id: 'patricia', name: 'Patricia', rate: 159, sleeps: 'Sleeps 6–8', tag: 'Two slide-outs · fireplace', towable: false, size: 'large',
+      photo: 'patricia-exterior.png',
+      gallery: [
+        { src: 'patricia-exterior.png', view: 'Exterior · evening' },
+        { src: 'patricia-living.png', view: 'Living & dinette' },
+        { src: 'patricia-fireplace.png', view: 'Fireplace & entertainment' },
+        { src: 'patricia-dinette.png', view: 'Dinette' },
+        { src: 'patricia-kitchen.png', view: 'Kitchen' },
+        { src: 'patricia-bedroom.png', view: 'Queen bedroom' },
+        { src: 'patricia-bunks.png', view: 'Bunk room' },
+        { src: 'patricia-bed-storage.png', view: 'Bunk · storage' },
+        { src: 'patricia-hallway.png', view: 'Hallway' },
+      ],
+      short: 'A beauty with two slide-outs, a front queen, an electric fireplace, and a separate bunk room. Bring the whole family.',
+      long: 'Patricia is a beauty. A large slide-out opens up a spacious dinette and couch that both convert into double beds, warmed by an electric fireplace for a little extra ambiance. Up front, a queen bed; and a second slide-out holds a separate room with twin bunks and a couch that converts to a double. Plenty of room for the whole family.',
+      features: ['Two slide-outs', 'Electric fireplace', 'Front queen', 'Separate bunk room'],
+      specs: [['Sleeps', '6–8'], ['Sleeping', 'Front queen + twin bunks + convertible beds'], ['Slide-outs', 'Two'], ['Living', 'Dinette + couch convert to double beds'], ['Heating', 'Electric fireplace'], ['Bunk room', 'Separate room · twin bunks + convertible couch'], ['Nightly rate', 'From $169']] },
+    { id: 'jerry', name: 'Jerry', rate: 159, sleeps: 'Sleeps 6–8', tag: 'Super-slideout · fireplace', towable: false, size: 'large',
+      photo: 'jerry-main.png',
+      gallery: [
+        { src: 'jerry-main.png', view: 'Exterior' },
+        { src: 'jerry-kitchen.png', view: 'Exterior · campsite' },
+        { src: 'jerry-bedroom.png', view: 'Living & dinette' },
+        { src: 'jerry-exterior.png', view: 'Kitchen' },
+        { src: 'jerry-living.png', view: 'Bedroom' },
+      ],
+      short: 'One of our roomiest rigs, with a super-slideout, a bunk room with three twin bunks, and a fireplace for cozy nights.',
+      long: 'Jerry is one of our roomiest rigs. A super-slideout holds a sofa and dinette that both convert to full beds, and a bunk room adds three twin bunks plus a couch that converts to a double. A fireplace keeps things cozy on fall and winter nights. He\u2019s ready for your next great adventure.',
+      features: ['Super-slideout', 'Bunk room · 3 twins', 'Fireplace', 'Convertible beds'],
+      specs: [['Sleeps', '6–8'], ['Sleeping', 'Convertible sofa + dinette + 3 twin bunks + convertible couch'], ['Slide-outs', 'Super-slideout'], ['Living', 'Sofa + dinette convert to full beds'], ['Heating', 'Fireplace'], ['Bunk room', '3 twin bunks + convertible couch'], ['Nightly rate', 'From $169']] },
+    { id: 'nola', name: 'Nola', rate: 159, sleeps: 'Sleeps 8', tag: 'Two slide-outs · outdoor kitchen', towable: false, size: 'large',
+      photo: 'photo-nola.jpg',
+      gallery: [
+        { src: 'photo-nola.jpg', view: 'Exterior' },
+        { src: 'nola-bedroom.png', view: 'Queen bedroom' },
+        { src: 'nola-bunks.png', view: 'Bunk room' },
+        { src: 'nola-dinette.png', view: 'Dinette & lounge' },
+        { src: 'nola-kitchen.png', view: 'Kitchen' },
+        { src: 'nola-hallway.png', view: 'Hallway' },
+        { src: 'nola-bath.png', view: 'Bathroom' },
+        { src: 'nola-bath-sink.png', view: 'Bathroom · vanity' },
+      ],
+      short: 'One of our roomiest. A super-slideout, a second bunk-room slide-out with twin bunks, and an outdoor kitchen.',
+      long: 'Nola is one of our roomiest rigs. Her super-slideout holds a sofa and dinette that both convert to full beds, while a second slide-out opens a bunk room with two twin bunks and a couch that converts to a double. Add in an outdoor kitchen and she\u2019s ready to take you on your next great adventure.',
+      features: ['Two slide-outs', 'Outdoor kitchen', 'Bunk room', 'Convertible beds'],
+      specs: [['Sleeps', '8'], ['Sleeping', 'Convertible sofa + dinette + 2 twin bunks + convertible couch'], ['Slide-outs', 'Two (super-slideout + bunk room)'], ['Living', 'Sofa + dinette convert to full beds'], ['Kitchen', 'Indoor galley + outdoor kitchen'], ['Bunk room', '2 twin bunks + convertible couch'], ['Nightly rate', 'From $169']] },
+    { id: 'billybob', name: 'Billy Bob', rate: 159, sleeps: 'Sleeps 8', tag: 'Roomiest · private master', towable: false, size: 'large',
+      photo: 'billybob-bath.png',
+      gallery: [
+        { src: 'billybob-bath.png', view: 'Exterior' },
+        { src: 'billybob-kitchen.png', view: 'Grey Wolf front' },
+        { src: 'billybob-living.png', view: 'Living & dinette' },
+        { src: 'billybob-detail.png', view: 'Kitchen' },
+        { src: 'billybob-exterior.png', view: 'Bathroom' },
+      ],
+      short: 'The roomiest of the fleet. A super-slideout, a private master bedroom with its own exterior door, and a four-bunk room.',
+      long: 'Billy Bob is one of our roomiest rigs. A super-slideout holds a sofa and dinette that both convert to full beds, while a second slide-out opens a private master bedroom with its own exterior door. A separate bunkroom adds four twin bunks, a couch, and a dinette that converts to a double. He\u2019s ready to take the whole gang on your next great adventure.',
+      features: ['Super-slideout', 'Private master + exterior door', 'Bunk room · 4 twins', 'Convertible beds'],
+      specs: [['Sleeps', '8'], ['Sleeping', 'Private master + 4 twin bunks + convertible beds'], ['Slide-outs', 'Two (super-slideout + master)'], ['Master', 'Private bedroom with exterior door'], ['Living', 'Sofa + dinette convert to full beds'], ['Bunk room', 'Separate · 4 twin bunks + couch + convertible dinette'], ['Nightly rate', 'From $169']] },
+  ];
+
+  filterDefs = [
+    { id: 'all', label: 'All trailers' },
+    { id: 'towable', label: 'Tow it yourself' },
+    { id: 'small', label: 'Couples & small crews' },
+    { id: 'large', label: 'Bring the gang' },
+  ];
+
+  included = [
+    { title: 'Stocked kitchen', body: 'Cookware, dishes, utensils and yes, a French press. Just bring the grub.',
+      icon: React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none' }, React.createElement('path', { d: 'M6 3v6a3 3 0 0 0 6 0V3M9 9v12M15 3v18M15 12h3a2 2 0 0 0 2-2V6a3 3 0 0 0-5-2', stroke: 'currentColor', 'stroke-width': 1.7, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })) },
+    { title: 'Beds made up', body: 'Sheets, pillows, blankets and towels, all ready the moment you arrive.',
+      icon: React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none' }, React.createElement('path', { d: 'M3 17v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5M3 17h18M3 17v3m18-3v3M7 10V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2', stroke: 'currentColor', 'stroke-width': 1.7, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })) },
+    { title: 'Delivered & set up', body: 'We tow it to your campsite, level it, and have it ready before you get there.',
+      icon: React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none' }, React.createElement('path', { d: 'M3 13l1.5-4.5A2 2 0 0 1 6.4 7h7.2a2 2 0 0 1 1.9 1.5L17 13M3 13h14m-14 0v3h2m12-3v3h-2M6 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm9 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z', stroke: 'currentColor', 'stroke-width': 1.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })) },
+    { title: 'Add the fun', body: 'Kayaks, paddleboards, bikes, a grill and more to round out the trip.',
+      icon: React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none' }, React.createElement('path', { d: 'M4 16a2 2 0 1 0 4 0 2 2 0 0 0-4 0Zm12 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0ZM6 16h8l-2-8H8m6 8l3-6h3', stroke: 'currentColor', 'stroke-width': 1.7, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })) },
+  ];
+
+  renderVals() {
+    const cardBase = 'display:flex;flex-direction:column;background:oklch(0.2 0.022 264 / 0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:22px;overflow:hidden;box-shadow:0 8px 28px -12px oklch(0 0 0 / 0.5);transition:transform .16s ease, box-shadow .16s ease;';
+
+    const f = this.state.filter;
+    const visible = this.fleet.filter((t) => {
+      if (f === 'all') return true;
+      if (f === 'towable') return t.towable;
+      if (f === 'small') return t.size === 'small';
+      if (f === 'large') return t.size === 'large' || t.size === 'medium';
+      return true;
+    });
+
+    const active = this.fleet.find((t) => t.id === this.state.activeId) || null;
+
+    // Real photos when we have them; otherwise drop-in slots for each view.
+    const galleryDefs = !active ? []
+      : (active.gallery && active.gallery.length)
+        ? active.gallery
+        : this.galleryViews.map((view, i) => ({ src: i === 0 ? active.photo : '', view }));
+
+    const filterOn = 'padding:9px 16px;border-radius:9999px;cursor:pointer;font-weight:600;font-size:13.5px;font-family:\'Nunito Sans\',sans-serif;color:#fff;background:oklch(0.28 0.03 264 / 0.7);border:1px solid oklch(1 0 0 / 0.5);transition:all .12s ease;';
+    const filterOff = 'padding:9px 16px;border-radius:9999px;cursor:pointer;font-weight:500;font-size:13.5px;font-family:\'Nunito Sans\',sans-serif;color:oklch(0.82 0.015 270);background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.14);transition:all .12s ease;';
+
+    return {
+      filters: this.filterDefs.map((d) => ({
+        label: d.label,
+        style: this.state.filter === d.id ? filterOn : filterOff,
+        pick: () => this.setState({ filter: d.id }),
+      })),
+
+      fleet: visible.map((t) => ({
+        name: t.name,
+        slotId: 'sdrv-fleet-card-' + t.id,
+        photo: t.photo,
+        placeholder: 'Drop a photo of ' + t.name,
+        sleeps: t.sleeps,
+        towable: t.towable,
+        rateLabel: 'from $' + t.rate + '/night',
+        short: t.short,
+        features: t.features,
+        cardStyle: cardBase,
+        open: () => this.setState({ activeId: t.id, activePhoto: 0 }),
+      })),
+
+      included: this.included,
+
+      modalOpen: !!active,
+      closeModal: () => this.setState({ activeId: null }),
+      activeName: active ? active.name : '',
+      quoteHref: 'Sweet Dreams RV.dc.html?trailer=' + (active ? active.id : '') + '#quote',
+      activeGallery: galleryDefs.map((g, i) => ({
+        slotId: 'sdrv-gallery-' + (active ? active.id : 'x') + '-' + i,
+        photo: g.src,
+        placeholder: 'Drop a ' + (active ? active.name : '') + ' photo — ' + g.view,
+        wrapStyle: 'position:absolute;inset:0;transition:opacity .3s ease;' + (i === this.state.activePhoto
+          ? 'opacity:1;z-index:2;'
+          : 'opacity:0;z-index:1;pointer-events:none;'),
+      })),
+      galleryHasMany: galleryDefs.length > 1,
+      galleryCounter: active ? (this.state.activePhoto + 1) + ' / ' + galleryDefs.length : '',
+      galleryDots: galleryDefs.map((g, i) => ({
+        style: 'width:' + (i === this.state.activePhoto ? '20px' : '7px') + ';height:7px;border-radius:9999px;border:none;cursor:pointer;padding:0;transition:all .2s ease;background:' + (i === this.state.activePhoto ? '#fff' : 'oklch(1 0 0 / 0.4)') + ';',
+        go: () => this.setState({ activePhoto: i }),
+      })),
+      prevPhoto: () => this.setState((s) => ({ activePhoto: (s.activePhoto - 1 + galleryDefs.length) % galleryDefs.length })),
+      nextPhoto: () => this.setState((s) => ({ activePhoto: (s.activePhoto + 1) % galleryDefs.length })),
+      activeSleeps: active ? active.sleeps : '',
+      activeTag: active ? active.tag : '',
+      activeRate: active ? 'from $' + active.rate + '/night' : '',
+      activeLong: active ? active.long : '',
+      activeFeatures: active ? active.features : [],
+      activeSpecs: active ? active.specs.map((s) => ({ label: s[0], value: s[1] })) : [],
+    };
+  }
+}
+</script>
+</body>
+</html>
