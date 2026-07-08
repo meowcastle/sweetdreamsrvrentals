@@ -389,7 +389,7 @@ class Component extends DCLogic {
     const delivery = this.state.delivery === 'extended' ? 120 : 0;
     const addonsTotal = this.addonsList.filter((a) => this.state.addons[a.id]).reduce((s, a) => s + a.price, 0);
     const total = rental + prep + delivery + addonsTotal;
-    const hv = this.props.heroVariant || 'split';
+    const hv = this.props.heroVariant || 'statement';
 
     const cardBase = 'display:flex;flex-direction:column;gap:5px;border-radius:14px;padding:13px 14px;cursor:pointer;text-align:left;transition:transform .12s ease, box-shadow .12s ease;background:oklch(0.24 0.025 264 / 0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
     const chipBase = 'display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:9999px;font-weight:500;font-size:13.5px;cursor:pointer;color:#fff;background:oklch(0.24 0.025 264 / 0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all .12s ease;';

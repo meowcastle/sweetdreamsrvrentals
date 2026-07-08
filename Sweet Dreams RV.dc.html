@@ -1387,7 +1387,7 @@ Sweet Dreams RV Rentals`,
       .filter((a) => (this.state.addons[a.id] || 0) > 0)
       .map((a) => { const q = this.state.addons[a.id] || 0; return { label: a.name + (q > 1 ? ' ×' + q : ''), amount: this.fmt(a.price * q) }; });
     const total = rental + prep + delivery + addonsTotal;
-    const hv = this.props.heroVariant || 'split';
+    const hv = this.props.heroVariant || 'statement';
 
     // reserve modal derived values
     const deposit = cfg ? cfg.fees.deposit : 1000;
