@@ -3,7 +3,8 @@ const rateLimit = require('express-rate-limit');
 const stripe = require('../stripe');
 const { insertBooking } = require('./bookings');
 const { queueMessages } = require('./emailQueue');
-const { buildGuestEmails } = require('../guestEmails');
+const { buildGuestEmails, TRAILER_NAMES, money, dateLong } = require('../guestEmails');
+const { notifyTeam } = require('./notify');
 
 const router = express.Router();
 
@@ -75,9 +76,8 @@ async function handleCheckoutCompleted(session) {
     // A real race: something else took the trailer/dates between the
     // pre-check in create-checkout-session and this webhook firing, after
     // the customer already paid. Refund automatically rather than silently
-    // keeping money for a booking that doesn't exist - there's no
-    // NOTIFY_ENDPOINT wired up yet (step 14), so this is loud in the logs
-    // until then.
+    // keeping money for a booking that doesn't exist, and tell the team
+    // since this needs a human to sort out the double-booked guest.
     console.error(
       `[webhook] Booking conflict after payment: session ${session.id}, ` +
       `trailer ${m.trailerId}, ${m.arrival} x${m.nights} nights. Refunding payment_intent ${session.payment_intent}.`
@@ -89,30 +89,62 @@ async function handleCheckoutCompleted(session) {
         console.error('[webhook] Auto-refund after conflict failed:', refundErr);
       }
     }
+    try {
+      await notifyTeam(`Booking conflict, refunded: ${TRAILER_NAMES[m.trailerId] || m.trailerId}`, {
+        type: 'Booking conflict (auto-refunded)',
+        trailer: TRAILER_NAMES[m.trailerId] || m.trailerId,
+        guest: m.guest, email: m.email, phone: m.phone,
+        arrival: m.arrival, nights: m.nights,
+        session_id: session.id, payment_intent: session.payment_intent || '',
+      });
+    } catch (e) {
+      console.error(`[webhook] Failed to notify team of conflict for session ${session.id}:`, e);
+    }
     return;
   }
 
-  // Queue the guest's confirmation/reminder/refund email schedule now that
-  // the booking is real. Best-effort: a failure here shouldn't turn a
-  // successful booking into a 500 (which would just make Stripe retry the
-  // whole event - and insertBooking's own idempotency check above means a
-  // retry never reaches this point again anyway, since it short-circuits on
-  // the duplicate key before getting here).
+  // Queue the guest's confirmation/reminder/refund email schedule and tell
+  // the team, now that the booking is real. Both best-effort: a failure
+  // here shouldn't turn a successful booking into a 500 (which would just
+  // make Stripe retry the whole event - and insertBooking's own idempotency
+  // check above means a retry never reaches this point again anyway, since
+  // it short-circuits on the duplicate key before getting here).
+  const dueToday = Math.round(Number(m.dueTodayCents) / 100);
+  const balanceLater = Math.round(Number(m.balanceLaterCents) / 100);
+  const deposit = Math.round(Number(m.depositCents) / 100);
+  let trailerName, datesLabel;
   try {
-    const { trailerName, datesLabel, messages } = buildGuestEmails({
+    const built = buildGuestEmails({
       trailerId: m.trailerId, arrival: m.arrival, nights: Number(m.nights),
       guest: m.guest, email: m.email, site: m.site, plan: m.plan,
-      dueToday: Math.round(Number(m.dueTodayCents) / 100),
-      balanceLater: Math.round(Number(m.balanceLaterCents) / 100),
-      deposit: Math.round(Number(m.depositCents) / 100),
-      balanceChargeDate: m.balanceChargeDate || null,
+      dueToday, balanceLater, deposit, balanceChargeDate: m.balanceChargeDate || null,
     });
+    trailerName = built.trailerName;
+    datesLabel = built.datesLabel;
     await queueMessages({
       bookingId: session.id, guest: m.guest, email: m.email,
-      trailer: trailerName, dates: datesLabel, messages,
+      trailer: trailerName, dates: datesLabel, messages: built.messages,
     });
   } catch (e) {
     console.error(`[webhook] Failed to queue guest emails for booking ${session.id}:`, e);
+  }
+
+  try {
+    trailerName = trailerName || TRAILER_NAMES[m.trailerId] || m.trailerId;
+    datesLabel = datesLabel || `${m.arrival} · ${m.nights} nights`;
+    await notifyTeam(`New booking: ${trailerName}, ${m.guest || 'Online guest'}`, {
+      type: m.plan === 'firstnight' ? 'Booking (first-night reserve)' : 'Booking (paid in full)',
+      trailer: trailerName, guest: m.guest || 'Online guest', email: m.email || '', phone: m.phone || '',
+      dates: datesLabel, nights: m.nights, delivery_site: m.site || 'To be confirmed',
+      add_ons: addons.join(', ') || 'None',
+      trip_total: money(Number(m.tripTotalCents) / 100), deposit: money(deposit),
+      payment_plan: m.plan === 'firstnight' ? 'First night now, balance auto-charged' : 'Paid in full',
+      paid_today: money(dueToday),
+      balance_due: m.plan === 'firstnight' ? money(balanceLater) : '$0',
+      balance_charge_date: m.plan === 'firstnight' ? dateLong(m.balanceChargeDate) : 'N/A',
+    });
+  } catch (e) {
+    console.error(`[webhook] Failed to notify team of new booking ${session.id}:`, e);
   }
 }
 

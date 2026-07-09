@@ -156,4 +156,4 @@ Sweet Dreams RV Rentals`,
   return { trailerName, datesLabel, messages: msgs.filter((m) => m.to && m.sendAt) };
 }
 
-module.exports = { buildGuestEmails, TRAILER_NAMES };
+module.exports = { buildGuestEmails, TRAILER_NAMES, money, dateLong };
