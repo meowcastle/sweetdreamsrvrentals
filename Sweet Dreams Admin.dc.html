@@ -62,6 +62,7 @@
             <button onClick="{{ setCalendarView }}" style="{{ navCalStyle }}">Calendar</button>
             <button onClick="{{ setListView }}" style="{{ navListStyle }}">List</button>
             <button onClick="{{ setDepositsView }}" style="{{ navDepositsStyle }}">Deposits{{ navDepositsBadge }}</button>
+            <button onClick="{{ setCancelledView }}" style="{{ navCancelledStyle }}">Cancelled{{ navCancelledBadge }}</button>
             <a href="Sweet Dreams Pricing.dc.html" style="{{ navPricingStyle }}">Pricing</a>
           </div>
           <span style="display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.14);font-size:12.5px;color:oklch(0.82 0.015 270);"><span style="width:7px;height:7px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>{{ rangeLabel }}</span>
@@ -247,6 +248,39 @@
           </div>
         </sc-if>
 
+        <!-- cancelled bookings view -->
+        <sc-if value="{{ showCancelledView }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;background:oklch(0.15 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:20px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);">
+              <div>
+                <h3 style="margin:0;font-weight:700;font-size:15px;color:#fff;">Cancelled bookings</h3>
+                <p style="margin:3px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">Open one to restore it or revisit its refund</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'Archivo Black',sans-serif;font-size:11.5px;color:oklch(0.62 0.02 280);">{{ cancelledCountLabel }}</div>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <div style="min-width:640px;">
+                <div style="display:grid;grid-template-columns:1fr 1.4fr 1.3fr 1.2fr;gap:12px;padding:11px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);font-size:11px;font-weight:600;color:oklch(0.6 0.02 280);text-transform:uppercase;letter-spacing:0.04em;">
+                  <span>Trailer</span><span>Guest</span><span>Trip</span><span>Refund</span>
+                </div>
+                <sc-for list="{{ cancelledList }}" as="c" hint-placeholder-count="4">
+                  <button onClick="{{ c.openRow }}" style="display:grid;grid-template-columns:1fr 1.4fr 1.3fr 1.2fr;gap:12px;align-items:center;width:100%;text-align:left;padding:14px 20px;border:none;border-top:1px solid oklch(1 0 0 / 0.06);background:transparent;cursor:pointer;" style-hover="background:oklch(1 0 0 / 0.04);">
+                    <span style="font-family:'Archivo Black',sans-serif;font-size:13px;color:#fff;">{{ c.trailer }}</span>
+                    <span style="font-size:13.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.guest }}</span>
+                    <span style="font-size:13px;color:oklch(0.72 0.02 280);white-space:nowrap;">{{ c.dates }}</span>
+                    <span style="{{ c.refundLabelStyle }}">{{ c.refundLabel }}</span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{ cancelledEmpty }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:44px 16px;text-align:center;font-size:13px;color:oklch(0.62 0.02 280);line-height:1.55;">No cancelled bookings.<br>Cancelled trips show up here so they're never lost track of.</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
         <!-- schedule + occupancy -->
         <div style="margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
           <div style="background:oklch(0.16 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:18px;padding:20px;">
@@ -403,6 +437,13 @@
                 <sc-if value="{{ selDone }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;background:oklch(0.4 0.01 280 / 0.32);border:1px solid oklch(1 0 0 / 0.12);color:oklch(0.8 0.015 280);font-weight:600;font-size:14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.06 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Trip complete · trailer returned</div>
                 </sc-if>
+                <sc-if value="{{ selIsCancelled }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;background:oklch(0.5 0.16 25 / 0.1);border:1px solid oklch(0.6 0.16 25 / 0.35);color:oklch(0.82 0.13 28);font-weight:600;font-size:14px;">This booking is cancelled</div>
+                  <sc-if value="{{ selCancelledUnrefunded }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ openCancelRefund }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Refund {{ selCancelledPaidLabel }} via Stripe</button>
+                  </sc-if>
+                  <button onClick="{{ restoreBooking }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Restore booking</button>
+                </sc-if>
                 <div style="display:flex;gap:10px;">
                   <button style="flex:1;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.18);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Message guest</button>
                   <sc-if value="{{ selCanCancel }}" hint-placeholder-val="{{ true }}">
@@ -420,21 +461,6 @@
         </div>
       </sc-if>
 
-      <!-- ===== CANCEL CONFIRM MODAL ===== -->
-      <sc-if value="{{ showCancelConfirm }}" hint-placeholder-val="{{ false }}">
-        <div style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:20px;">
-          <div onClick="{{ dismissCancel }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
-          <div style="position:relative;width:100%;max-width:400px;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:20px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:24px;">
-            <span style="width:46px;height:46px;border-radius:9999px;background:oklch(0.5 0.16 25 / 0.16);border:1px solid oklch(0.6 0.16 25 / 0.45);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="oklch(0.82 0.15 30)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-            <h2 style="margin:15px 0 0;font-weight:700;font-size:19px;color:#fff;">Cancel this booking?</h2>
-            <p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);"><strong style="color:#fff;">{{ cancelConfirmName }}</strong>, {{ cancelConfirmMeta }}. This frees the trailer for those dates. You can undo it right after, but the guest should be notified separately.</p>
-            <div style="display:flex;gap:10px;margin-top:22px;">
-              <button onClick="{{ dismissCancel }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Keep booking</button>
-              <button onClick="{{ cancelBooking }}" style="flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.55 0.19 25), oklch(0.6 0.17 15));color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.55 0.19 25 / 0.8);">Cancel booking</button>
-            </div>
-          </div>
-        </div>
-      </sc-if>
 
       <!-- ===== REFUND CONFIRM MODAL ===== -->
       <sc-if value="{{ showRefundConfirm }}" hint-placeholder-val="{{ false }}">
@@ -442,8 +468,13 @@
           <div onClick="{{ dismissRefund }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
           <div style="position:relative;width:100%;max-width:410px;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:20px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:26px;">
             <span style="width:46px;height:46px;border-radius:9999px;background:oklch(0.5781 0.2303 264.8 / 0.16);border:1px solid oklch(0.6 0.16 288 / 0.45);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M7 15h4M6 4h12a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z" stroke="oklch(0.82 0.12 292)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-            <h2 style="margin:15px 0 0;font-weight:700;font-size:19px;color:#fff;">Refund deposit?</h2>
-            <p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);">Stripe refund to <strong style="color:#fff;">{{ refundConfirmName }}</strong> ({{ refundConfirmMeta }}). Deposit on file is <strong style="color:#fff;">{{ refundConfirmMaxLabel }}</strong> — refund all of it or a partial amount.</p>
+            <h2 style="margin:15px 0 0;font-weight:700;font-size:19px;color:#fff;">{{ refundModalTitle }}</h2>
+            <sc-if value="{{ refundContextIsCancel }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);">Cancelling <strong style="color:#fff;">{{ refundConfirmName }}</strong>'s booking ({{ refundConfirmMeta }}). Amount charged so far is <strong style="color:#fff;">{{ refundConfirmMaxLabel }}</strong> — refund all, some, or none of it via Stripe.</p>
+            </sc-if>
+            <sc-if value="{{ refundContextIsDeposit }}" hint-placeholder-val="{{ true }}">
+              <p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);">Stripe refund to <strong style="color:#fff;">{{ refundConfirmName }}</strong> ({{ refundConfirmMeta }}). Deposit on file is <strong style="color:#fff;">{{ refundConfirmMaxLabel }}</strong> — refund all of it or a partial amount.</p>
+            </sc-if>
             <div style="margin-top:18px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;">
                 <span style="font-size:12px;font-weight:600;color:oklch(0.72 0.02 280);">Refund amount</span>
@@ -458,7 +489,7 @@
                 <span style="font-size:11.5px;color:oklch(0.6 0.02 280);white-space:nowrap;">of {{ refundConfirmMaxLabel }}</span>
               </div>
               <sc-if value="{{ refundIsPartial }}" hint-placeholder-val="{{ false }}">
-                <div style="margin-top:8px;font-size:12px;color:oklch(0.78 0.1 78);">Partial refund · the rest of the deposit is kept.</div>
+                <div style="margin-top:8px;font-size:12px;color:oklch(0.78 0.1 78);">Partial refund · {{ refundPartialNote }}</div>
               </sc-if>
             </div>
             <div style="margin-top:16px;">
@@ -487,10 +518,19 @@
             <sc-if value="{{ refundHasError }}" hint-placeholder-val="{{ false }}">
               <div style="margin-top:14px;padding:11px 13px;border-radius:12px;background:oklch(0.62 0.16 25 / 0.14);border:1px solid oklch(0.66 0.16 25 / 0.4);font-size:12.5px;color:oklch(0.86 0.09 30);">{{ refundErrorMsg }}</div>
             </sc-if>
-            <div style="display:flex;gap:10px;margin-top:22px;">
-              <button onClick="{{ dismissRefund }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Not yet</button>
-              <button onClick="{{ confirmRefund }}" style="{{ refundConfirmButtonStyle }}">{{ refundConfirmLabel }}</button>
-            </div>
+            <sc-if value="{{ refundContextIsCancel }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:10px;margin-top:22px;">
+                <button onClick="{{ dismissRefund }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Keep booking</button>
+                <button onClick="{{ cancelNoRefundConfirm }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(0.6 0.16 25 / 0.4);background:oklch(0.5 0.16 25 / 0.12);color:oklch(0.82 0.13 25);font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Cancel, no refund</button>
+              </div>
+              <button onClick="{{ confirmRefund }}" style="width:100%;margin-top:10px;{{ refundConfirmButtonStyle }}">{{ refundConfirmLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ refundContextIsDeposit }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:10px;margin-top:22px;">
+                <button onClick="{{ dismissRefund }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Not yet</button>
+                <button onClick="{{ confirmRefund }}" style="{{ refundConfirmButtonStyle }}">{{ refundConfirmLabel }}</button>
+              </div>
+            </sc-if>
           </div>
         </div>
       </sc-if>
@@ -915,7 +955,7 @@ class Component extends DCLogic {
     cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
     cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
     cqRate: 149, cqDelivery: 0, cqAdjust: 0,
-    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '', retryBusy: false };
+    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, refundConfirm: null, refundContext: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '', retryBusy: false };
 
   // Full-sync upsert to the API. Mirrors the old "write the whole blob"
   // shape exactly (see backend/src/routes/overrides.js) so none of the
@@ -1076,17 +1116,35 @@ class Component extends DCLogic {
   }
   refundDone(b) { return !!(b && this.state.refunds[b.id]); }
   refundReasons = ['No damage — full return', 'Cleaning fee deducted', 'Damage repair deducted', 'Late return fee', 'Goodwill gesture', 'Other'];
+  cancelRefundReasons = ['Guest requested cancellation', 'Owner cancelled — trailer unavailable', 'Weather', 'No-show', 'Duplicate booking', 'Other'];
   // Amount already refunded for a booking (partial supported; legacy `true` = full deposit).
   refundedAmt(b) { const v = b && this.state.refunds[b.id]; if (v && typeof v === 'object') return v.amount; return typeof v === 'number' ? v : (v ? this.depAmt(b) : 0); }
   refundReasonOf(b) { const v = b && this.state.refunds[b.id]; return (v && typeof v === 'object' && v.reason) ? v.reason : ''; }
   refundEmailOf(b) { const v = b && this.state.refunds[b.id]; return (v && typeof v === 'object' && v.emailed) ? (v.email || '') : ''; }
-  // Shared refund action — used by the drawer button and the Deposits tab,
-  // after confirm. This moves real money through Stripe, so unlike the other
-  // status actions on this page there's no optimistic local update and no
-  // "undo" — the source of truth is the server's response, applied only
-  // after the refund actually succeeds, and refundBusy blocks a second
-  // submit while the first request is still in flight.
-  async doRefund(id, amount, reason, sendEmail) {
+  // Opens the shared refund-confirm modal, in one of two contexts:
+  // 'deposit' (drawer/Deposits tab, post-return, capped at the $1,000 hold)
+  // or 'cancel' (the guest Cancel button, capped at everything actually
+  // charged so far — trip + deposit). Same modal, same doRefund() below,
+  // just a different cap and reason list depending on which button opened it.
+  openRefundModal(id, context) {
+    const b = this.combinedBookings().find((x) => x.id === id);
+    const max = context === 'cancel' ? this.paidAmt(b) : this.depAmt(b);
+    const reasons = context === 'cancel' ? this.cancelRefundReasons : this.refundReasons;
+    this.setState({
+      refundConfirm: id, refundContext: context, refundAmt: String(max),
+      refundReason: reasons[0], refundReasonNote: '', refundEmail: true, refundError: '',
+    });
+  }
+  // Shared refund action — used by the drawer button, the Deposits tab, and
+  // cancellation (thenCancel: true folds "mark cancelled" into the same
+  // confirmed action, since a cancelled booking used to be unreachable
+  // afterward — see the Cancelled tab — so cancel-time is the one guaranteed
+  // chance to decide on a refund). This moves real money through Stripe, so
+  // unlike the other status actions on this page there's no optimistic local
+  // update and no "undo" — the source of truth is the server's response,
+  // applied only after the refund actually succeeds, and refundBusy blocks a
+  // second submit while the first request is still in flight.
+  async doRefund(id, amount, reason, sendEmail, maxAmount, thenCancel) {
     if (!id || this.state.refundBusy) return;
     this.setState({ refundBusy: true, refundError: '' });
     try {
@@ -1098,23 +1156,64 @@ class Component extends DCLogic {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data && data.error || 'refund_failed');
-      const dep = this.depAmt(this.combinedBookings().find((x) => x.id === id));
-      const partial = data.amount < dep;
+      const partial = data.amount < maxAmount;
+      const nextRefunds = { ...this.state.refunds, [id]: { amount: data.amount, reason: data.reason, emailed: data.emailed, email: data.email } };
+      const nextCancelled = thenCancel ? { ...this.state.cancelled, [id]: true } : this.state.cancelled;
       this.setState({
-        refunds: { ...this.state.refunds, [id]: { amount: data.amount, reason: data.reason, emailed: data.emailed, email: data.email } },
-        refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', sel: null, refundBusy: false,
+        refunds: nextRefunds, cancelled: nextCancelled,
+        refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundContext: null, sel: null, refundBusy: false,
       });
+      this.persistOverrides(this.state.status, nextCancelled, this.state.charges, nextRefunds);
       if (window.SDBookings) window.SDBookings.refreshOverrides();
-      this.showToast('Stripe refund issued · ' + this.fmt(data.amount) + (partial ? ' (partial)' : '') + ' · ' + data.reason + (data.emailed ? ' · receipt emailed' : ''));
+      this.showToast((thenCancel ? 'Booking cancelled · Stripe refund issued · ' : 'Stripe refund issued · ') + this.fmt(data.amount) + (partial ? ' (partial)' : '') + ' · ' + data.reason + (data.emailed ? ' · receipt emailed' : ''));
     } catch (e) {
-      const msg = e.message === 'already_refunded' ? 'This deposit has already been refunded.'
+      const msg = e.message === 'already_refunded' ? 'This has already been refunded.'
         : e.message === 'no_stripe_payment' ? 'No Stripe payment on file for this booking — nothing to refund automatically.'
+        : e.message === 'nothing_to_refund' ? 'Nothing has been charged yet — there’s nothing to refund.'
         : 'Refund failed. Please try again.';
       this.setState({ refundBusy: false, refundError: msg });
     }
   }
+  // Cancels without touching Stripe — used for maintenance blocks (which
+  // never carry a payment) and as the explicit "no refund" choice when
+  // cancelling a guest booking.
+  cancelNoRefund(id) {
+    const b = this.combinedBookings().find((x) => x.id === id);
+    const name = b ? b.guest : 'Booking';
+    const next = { ...this.state.cancelled, [id]: true };
+    this.setState({ cancelled: next, sel: null, refundConfirm: null, refundContext: null });
+    this.persistOverrides(this.state.status, next);
+    this.showToast(name + ' cancelled, no refund issued', () => { const cx = { ...this.state.cancelled, [id]: false }; this.setState({ cancelled: cx }); this.persistOverrides(this.state.status, cx); });
+  }
+  // Reverses a cancellation (does not touch any refund already issued -
+  // that stays on file, same as any other refund record).
+  restoreBooking(id) {
+    const b = this.combinedBookings().find((x) => x.id === id);
+    const next = { ...this.state.cancelled };
+    delete next[id];
+    this.setState({ cancelled: next, sel: null });
+    this.persistOverrides(this.state.status, next);
+    this.showToast((b ? b.guest : 'Booking') + ' restored');
+  }
   // Deposit amount for a booking (default $1000 hold when not explicitly set; never for blocks).
   depAmt(b) { if (!b || b.type === 'block') return 0; return b.deposit != null ? b.deposit : 1000; }
+  // Total actually charged to the guest's card so far - trip portion
+  // collected plus the deposit once IT'S been collected too. Mirrors
+  // paid_today on the backend (routes/bookings.js's insertBooking/
+  // chargeBalance), which the refund endpoint clamps against - this is the
+  // real ceiling on what a refund (deposit-only or full cancellation) can
+  // actually return to the guest.
+  paidAmt(b) {
+    if (!b || b.type === 'block') return 0;
+    const type = this.state.status[b.id] || b.type;
+    const isFN = b.plan === 'firstnight';
+    const chFailed = this.chargeFailed(b);
+    const balanceCharged = isFN && b.start <= 14 && !chFailed;
+    const tripCollected = !b.plan ? b.total : isFN ? (balanceCharged ? b.total : (b.paidToday != null ? b.paidToday : 0)) : b.total;
+    const dep = this.depAmt(b);
+    const depCollected = dep > 0 && type !== 'pending' && (!isFN || balanceCharged);
+    return tripCollected + (depCollected ? dep : 0);
+  }
   dLabel(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
   toISO(d) { const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
 
@@ -1247,12 +1346,20 @@ class Component extends DCLogic {
     const pendingDepositRaw = live
       .filter((b) => b.type !== 'block' && eff(b) === 'returned' && this.depAmt(b) > 0 && !this.refundDone(b))
       .sort((a, c) => (a.start + a.nights) - (c.start + c.nights));
-    // ---- refund confirm (supports partial amounts) ----
+    // Cancelled bookings - excluded from `live` (they don't occupy the
+    // calendar or count toward stats), so this is the one place they're
+    // still findable afterward to review or revisit a refund decision.
+    const cancelledRaw = allItems.filter((b) => eff(b) === 'cancelled').sort((a, c) => c.start - a.start);
+    // ---- refund confirm (supports partial amounts; the cap depends on
+    // context - a plain deposit refund is capped at the $1,000 hold, a
+    // cancellation refund is capped at everything actually charged so far) ----
     const rcB = allItems.find((b) => b.id === this.state.refundConfirm);
-    const rcDep = rcB ? this.depAmt(rcB) : 0;
+    const refundContext = this.state.refundContext || 'deposit';
+    const refundContextIsCancel = refundContext === 'cancel';
+    const rcMax = rcB ? (refundContextIsCancel ? this.paidAmt(rcB) : this.depAmt(rcB)) : 0;
     let rcAmt = Number(this.state.refundAmt);
-    if (!isFinite(rcAmt) || rcAmt <= 0) rcAmt = rcDep;
-    rcAmt = Math.min(rcAmt, rcDep);
+    if (!isFinite(rcAmt) || rcAmt <= 0) rcAmt = rcMax;
+    rcAmt = Math.min(rcAmt, rcMax);
     // Uncollected trip balances: first-night reserves whose balance hasn't auto-charged
     // yet (auto-charge fires ~14 days before arrival, i.e. while start > 14).
     const toCollect = live.reduce((s, b) => {
@@ -1465,8 +1572,9 @@ class Component extends DCLogic {
       Object.assign(statusMap, {
         out: 'background:oklch(0.5 0.12 205 / 0.18);border:1px solid oklch(0.6 0.13 205 / 0.5);color:oklch(0.84 0.1 208);',
         returned: 'background:oklch(0.4 0.01 280 / 0.32);border:1px solid oklch(1 0 0 / 0.12);color:oklch(0.72 0.015 280);',
+        cancelled: 'background:oklch(0.5 0.16 25 / 0.14);border:1px solid oklch(0.6 0.16 25 / 0.4);color:oklch(0.82 0.13 28);',
       });
-      const labelMap = { confirmed: 'Confirmed', pending: 'Pending review', block: 'Maintenance block', out: 'Out on trip', returned: 'Returned · trip complete' };
+      const labelMap = { confirmed: 'Confirmed', pending: 'Pending review', block: 'Maintenance block', out: 'Out on trip', returned: 'Returned · trip complete', cancelled: 'Cancelled' };
       // ----- money delineation: trip payment vs refundable deposit -----
       const dep = this.depAmt(selB);
       const hasPlan = !!selB.plan;
@@ -1539,8 +1647,16 @@ class Component extends DCLogic {
         selCanDeliver: selB.type !== 'block' && type === 'confirmed' && selB.start <= 0,
         selCanReturn: selB.type !== 'block' && type === 'out' && (selB.start + selB.nights) <= 0,
         selDone: selB.type !== 'block' && type === 'returned',
-        // Cancel only while the trip is still upcoming or active — not once returned or past.
-        selCanCancel: selB.type !== 'block' && type !== 'returned' && (selB.start + selB.nights) > 0,
+        // Cancel only while the trip is still upcoming or active — not once returned, past, or already cancelled.
+        selCanCancel: selB.type !== 'block' && type !== 'returned' && type !== 'cancelled' && (selB.start + selB.nights) > 0,
+        selIsCancelled: type === 'cancelled',
+        // A cancelled booking that was never refunded (admin chose "Cancel,
+        // no refund" at the time, or it never collected any payment at all) —
+        // surfaced here so that choice can still be revisited later.
+        selCancelledUnrefunded: type === 'cancelled' && !depRefunded && this.paidAmt(selB) > 0,
+        selCancelledPaidLabel: this.fmt(this.paidAmt(selB)),
+        restoreBooking: () => this.restoreBooking(selB.id),
+        openCancelRefund: () => this.openRefundModal(selB.id, 'cancel'),
         selHasPay: !!selB.pay,
         selPayLabel: selB.pay ? (selB.pay.status + ' · ' + selB.pay.method) : '',
         selIsWeb: selB.source === 'web',
@@ -1624,15 +1740,19 @@ class Component extends DCLogic {
       showCalendar: this.state.view === 'calendar',
       showList: this.state.view === 'list',
       showDeposits: this.state.view === 'deposits',
+      showCancelledView: this.state.view === 'cancelled',
       calTabStyle: 'padding:8px 18px;border-radius:9999px;border:none;cursor:pointer;font-weight:600;font-size:13px;font-family:\'Nunito Sans\',sans-serif;' + (this.state.view === 'calendar' ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;' : 'background:transparent;color:oklch(0.74 0.02 280);'),
       listTabStyle: 'padding:8px 18px;border-radius:9999px;border:none;cursor:pointer;font-weight:600;font-size:13px;font-family:\'Nunito Sans\',sans-serif;' + (this.state.view === 'list' ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;' : 'background:transparent;color:oklch(0.74 0.02 280);'),
       setCalendarView: () => this.setState({ view: 'calendar' }),
       setListView: () => this.setState({ view: 'list' }),
       setDepositsView: () => this.setState({ view: 'deposits' }),
+      setCancelledView: () => this.setState({ view: 'cancelled' }),
       navCalStyle: this.navTabStyle(this.state.view === 'calendar'),
       navListStyle: this.navTabStyle(this.state.view === 'list'),
       navDepositsStyle: this.navTabStyle(this.state.view === 'deposits'),
       navDepositsBadge: pendingDepositRaw.length ? (' · ' + pendingDepositRaw.length) : '',
+      navCancelledStyle: this.navTabStyle(this.state.view === 'cancelled'),
+      navCancelledBadge: cancelledRaw.length ? (' · ' + cancelledRaw.length) : '',
       pendingDepositList: pendingDepositRaw.map((b) => {
         const backIdx = b.start + b.nights;
         return {
@@ -1642,12 +1762,26 @@ class Component extends DCLogic {
           returnedLabel: (backIdx <= 0 ? 'Returned ' : 'Returns ') + this.dLabel(this.dateAt(backIdx)),
           deposit: this.fmt(this.depAmt(b)),
           openRow: () => this.setState({ sel: b.id }),
-          refund: () => this.setState({ refundConfirm: b.id, refundAmt: String(this.depAmt(b)), refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true, refundError: '' }),
+          refund: () => this.openRefundModal(b.id, 'deposit'),
         };
       }),
       pendingDepositEmpty: pendingDepositRaw.length === 0,
       pendingDepositTotalLabel: this.fmt(pendingDepositRaw.reduce((s, b) => s + this.depAmt(b), 0)),
       pendingDepositCountLabel: pendingDepositRaw.length + (pendingDepositRaw.length === 1 ? ' deposit pending' : ' deposits pending'),
+      cancelledList: cancelledRaw.map((b) => {
+        const refunded = this.refundDone(b);
+        const paid = this.paidAmt(b);
+        return {
+          trailer: trailerName(b.trailer),
+          guest: b.guest,
+          dates: this.dLabel(this.dateAt(b.start)) + ' – ' + this.dLabel(this.dateAt(b.start + b.nights)),
+          refundLabel: refunded ? (this.fmt(this.refundedAmt(b)) + ' refunded') : (paid > 0 ? (this.fmt(paid) + ' not refunded') : 'Nothing charged'),
+          refundLabelStyle: 'font-size:11.5px;font-weight:600;color:' + (refunded ? 'oklch(0.82 0.08 152)' : paid > 0 ? 'oklch(0.82 0.13 28)' : 'oklch(0.6 0.02 280)') + ';',
+          openRow: () => this.setState({ sel: b.id }),
+        };
+      }),
+      cancelledEmpty: cancelledRaw.length === 0,
+      cancelledCountLabel: cancelledRaw.length + (cancelledRaw.length === 1 ? ' cancelled booking' : ' cancelled bookings'),
       navPricingStyle: this.navTabStyle(false),
 
       hasSelection: !!selB,
@@ -1673,15 +1807,11 @@ class Component extends DCLogic {
         this.persistOverrides(next, this.state.cancelled);
         this.showToast(name + ' marked returned', () => { const st = { ...this.state.status, [id]: 'out' }; this.setState({ status: st }); this.persistOverrides(st, this.state.cancelled); });
       },
-      cancelBooking: () => {
-        const id = this.state.sel, name = selB ? selB.guest : 'Booking';
-        const next = { ...this.state.cancelled, [id]: true };
-        this.setState({ cancelled: next, sel: null, cancelConfirm: false });
-        this.persistOverrides(this.state.status, next);
-        this.showToast(name + ' cancelled', () => { const cx = { ...this.state.cancelled, [id]: false }; this.setState({ cancelled: cx }); this.persistOverrides(this.state.status, cx); });
-      },
-      requestCancel: () => this.setState({ cancelConfirm: true }),
-      dismissCancel: () => this.setState({ cancelConfirm: false }),
+      // Blocks never carry a payment, so clearing one just cancels outright -
+      // no refund step needed. Guest bookings go through requestCancel
+      // instead, which opens the combined cancel+refund modal.
+      cancelBooking: () => this.cancelNoRefund(this.state.sel),
+      requestCancel: () => this.openRefundModal(this.state.sel, 'cancel'),
       // Real money through Stripe, same as doRefund above: no optimistic
       // update, no undo, and a busy flag blocks a second submit while one
       // request is in flight.
@@ -1712,27 +1842,29 @@ class Component extends DCLogic {
         const id = this.state.sel, b = allItems.find((x) => x.id === id);
         this.showToast('Payment reminder sent to ' + (b ? b.guest : 'the guest'));
       },
-      showCancelConfirm: this.state.cancelConfirm && !!selB,
-      cancelConfirmName: selB ? selB.guest : '',
-      cancelConfirmMeta: selB ? (trailerName(selB.trailer) + ' · ' + this.dLabel(this.dateAt(selB.start)) + ' – ' + this.dLabel(this.dateAt(selB.start + selB.nights))) : '',
       showRefundConfirm: !!rcB,
+      refundContextIsCancel: refundContextIsCancel,
+      refundContextIsDeposit: !refundContextIsCancel,
+      refundModalTitle: refundContextIsCancel ? 'Cancel & refund?' : 'Refund deposit?',
       refundConfirmName: rcB ? rcB.guest : '',
       refundConfirmMeta: rcB ? (trailerName(rcB.trailer) + ' · ' + this.dLabel(this.dateAt(rcB.start)) + ' – ' + this.dLabel(this.dateAt(rcB.start + rcB.nights))) : '',
       refundConfirmAmount: this.fmt(rcAmt),
-      refundConfirmMaxLabel: this.fmt(rcDep),
-      refundIsPartial: rcAmt > 0 && rcAmt < rcDep,
+      refundConfirmMaxLabel: this.fmt(rcMax),
+      refundIsPartial: rcAmt > 0 && rcAmt < rcMax,
+      refundPartialNote: refundContextIsCancel ? 'the rest is not refunded.' : 'the rest of the deposit is kept.',
       refundBusy: this.state.refundBusy,
-      refundConfirmLabel: this.state.refundBusy ? 'Processing…' : ('Refund ' + this.fmt(rcAmt)),
-      refundConfirmButtonStyle: "flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.5781 0.2303 264.8 / 0.8);" + (this.state.refundBusy ? 'opacity:0.6;cursor:not-allowed;' : 'cursor:pointer;'),
+      refundConfirmLabel: this.state.refundBusy ? 'Processing…' : ((refundContextIsCancel ? 'Cancel & refund ' : 'Refund ') + this.fmt(rcAmt)),
+      refundConfirmButtonStyle: "flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.5781 0.2303 264.8 / 0.8);text-align:center;" + (this.state.refundBusy ? 'opacity:0.6;cursor:not-allowed;' : 'cursor:pointer;'),
       refundHasError: !!this.state.refundError,
       refundErrorMsg: this.state.refundError,
       refundAmtValue: this.state.refundAmt,
-      refundAmtInvalid: !(Number(this.state.refundAmt) > 0) || Number(this.state.refundAmt) > rcDep,
+      refundAmtInvalid: !(Number(this.state.refundAmt) > 0) || Number(this.state.refundAmt) > rcMax,
       onRefundAmt: (e) => this.setState({ refundAmt: e.target.value }),
-      setRefundFull: () => this.setState({ refundAmt: String(rcDep) }),
-      setRefundHalf: () => this.setState({ refundAmt: String(Math.round(rcDep / 2)) }),
+      setRefundFull: () => this.setState({ refundAmt: String(rcMax) }),
+      setRefundHalf: () => this.setState({ refundAmt: String(Math.round(rcMax / 2)) }),
+      cancelNoRefundConfirm: () => this.cancelNoRefund(this.state.refundConfirm),
       refundReasonValue: this.state.refundReason,
-      refundReasonOpts: this.refundReasons.map((r) => ({ value: r, label: r })),
+      refundReasonOpts: (refundContextIsCancel ? this.cancelRefundReasons : this.refundReasons).map((r) => ({ value: r, label: r })),
       onRefundReason: (e) => this.setState({ refundReason: e.target.value }),
       refundReasonIsOther: this.state.refundReason === 'Other',
       refundReasonNoteValue: this.state.refundReasonNote,
@@ -1783,10 +1915,10 @@ class Component extends DCLogic {
       refundSwitchTrack: 'position:relative;width:44px;height:26px;border-radius:9999px;cursor:pointer;flex:none;transition:background .15s ease;border:none;' + (autoRefund ? 'background:oklch(0.62 0.19 152);' : 'background:oklch(1 0 0 / 0.16);'),
       refundSwitchKnob: 'position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:9999px;background:#fff;transition:transform .15s ease;transform:translateX(' + (autoRefund ? '18px' : '0') + ');',
       toggleRefund: () => { const v = !this.state.autoRefund; this.setState({ autoRefund: v }); this.persistAutomations({ refund: v }); },
-      markRefunded: () => { const b = allItems.find((x) => x.id === this.state.sel); this.setState({ refundConfirm: this.state.sel, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true, refundError: '' }); },
-      requestRefund: (id) => { const b = allItems.find((x) => x.id === id); this.setState({ refundConfirm: id, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true, refundError: '' }); },
-      confirmRefund: () => this.doRefund(this.state.refundConfirm, this.state.refundAmt, this.state.refundReason === 'Other' ? (this.state.refundReasonNote || 'Other') : this.state.refundReason, this.state.refundEmail),
-      dismissRefund: () => { if (this.state.refundBusy) return; this.setState({ refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundError: '' }); },
+      markRefunded: () => this.openRefundModal(this.state.sel, 'deposit'),
+      requestRefund: (id) => this.openRefundModal(id, 'deposit'),
+      confirmRefund: () => this.doRefund(this.state.refundConfirm, this.state.refundAmt, this.state.refundReason === 'Other' ? (this.state.refundReasonNote || 'Other') : this.state.refundReason, this.state.refundEmail, rcMax, refundContextIsCancel),
+      dismissRefund: () => { if (this.state.refundBusy) return; this.setState({ refundConfirm: null, refundContext: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundError: '' }); },
       openAutomations: () => this.setState({ autoOpen: true }),
       closeAutomations: () => this.setState({ autoOpen: false }),
       toggleNudge: () => { const v = !this.state.autoNudge; this.setState({ autoNudge: v }); this.persistAutomations({ nudge: v }); },

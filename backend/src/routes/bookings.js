@@ -173,12 +173,13 @@ router.post('/admin', requireAdminAuth, async (req, res) => {
   }
 });
 
-// Wires up the admin's refund modal (doRefund, Admin file line 1096). Build
-// order step 11. The deposit is part of the original Checkout charge, not a
-// separate authorize/capture hold, so a real refund is the Refunds API
-// against that same payment_intent - there's no "release the hold" version
-// of this. Amount is never trusted from the client beyond a sanity check:
-// it's clamped to the deposit on file, same as the admin UI already does.
+// Wires up the admin's refund modal (doRefund, Admin file). Build order step
+// 11, later extended to also back the combined cancel+refund flow. The
+// deposit and trip charge are both part of the original Checkout charge,
+// not a separate authorize/capture hold, so a real refund is the Refunds
+// API against that same payment_intent - there's no "release the hold"
+// version of this. Amount is never trusted from the client beyond a sanity
+// check: it's clamped to paid_today, same as the admin UI already does.
 router.post('/:id/refund-deposit', requireAdminAuth, async (req, res) => {
   const client = await pool.connect();
   try {
@@ -200,10 +201,17 @@ router.post('/:id/refund-deposit', requireAdminAuth, async (req, res) => {
     if (!booking.stripe_payment_intent_id) { await client.query('ROLLBACK'); return res.status(400).json({ error: 'no_stripe_payment' }); }
     if (booking.refund_amount != null) { await client.query('ROLLBACK'); return res.status(409).json({ error: 'already_refunded' }); }
 
-    const depositOnFile = booking.deposit != null ? booking.deposit : 1000;
+    // Clamped to what was actually charged and not yet refunded - paid_today
+    // already reflects the true amount collected (trip + deposit for a
+    // full-pay booking, first-night-only until the balance auto-charges for
+    // a firstnight plan), so this same endpoint covers a plain deposit
+    // refund after return AND a full cancellation refund without needing
+    // two separate code paths.
+    const maxRefundable = Number(booking.paid_today) || 0;
     let amount = Number(req.body && req.body.amount);
-    if (!Number.isFinite(amount) || amount <= 0) amount = depositOnFile;
-    amount = Math.min(amount, depositOnFile);
+    if (!Number.isFinite(amount) || amount <= 0) amount = maxRefundable;
+    amount = Math.min(amount, maxRefundable);
+    if (amount <= 0) { await client.query('ROLLBACK'); return res.status(400).json({ error: 'nothing_to_refund' }); }
     const reason = ((req.body && req.body.reason) || '').trim() || 'No reason given';
     const emailed = !!(req.body && req.body.sendEmail && booking.email);
 
