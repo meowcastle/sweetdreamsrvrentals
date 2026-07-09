@@ -22,6 +22,15 @@ fi
 DB="${POSTGRES_DB:-sweetdreams}"
 USER="${POSTGRES_USER:-sweetdreams}"
 
+# Some Synology Container Manager installs only ship the older hyphenated
+# docker-compose binary, not the `docker compose` plugin subcommand this
+# repo otherwise assumes - detect whichever is actually available.
+if docker compose version > /dev/null 2>&1; then
+  DC=(docker compose)
+else
+  DC=(docker-compose)
+fi
+
 echo "This will DROP and recreate every table in the '$DB' database, then"
 echo "restore from: $DUMP_FILE"
 read -p "Type the database name ($DB) to confirm: " CONFIRM
@@ -30,8 +39,8 @@ if [ "$CONFIRM" != "$DB" ]; then
   exit 1
 fi
 
-docker compose exec -T postgres psql -U "$USER" -d "$DB" -v ON_ERROR_STOP=1 \
+"${DC[@]}" exec -T postgres psql -U "$USER" -d "$DB" -v ON_ERROR_STOP=1 \
   -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-gunzip -c "$DUMP_FILE" | docker compose exec -T postgres psql -U "$USER" -d "$DB" -v ON_ERROR_STOP=1
+gunzip -c "$DUMP_FILE" | "${DC[@]}" exec -T postgres psql -U "$USER" -d "$DB" -v ON_ERROR_STOP=1
 
 echo "Restore complete."

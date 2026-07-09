@@ -14,7 +14,15 @@ set -a
 source .env 2>/dev/null || true
 set +a
 
-docker compose up -d --build
+# Some Synology Container Manager installs only ship the older hyphenated
+# docker-compose binary, not the `docker compose` plugin subcommand.
+if docker compose version > /dev/null 2>&1; then
+  DC=(docker compose)
+else
+  DC=(docker-compose)
+fi
+
+"${DC[@]}" up -d --build
 
 echo "Waiting for app health check..."
 until curl -sf "http://127.0.0.1:${APP_HOST_PORT:-3000}/api/health" > /dev/null; do sleep 1; done

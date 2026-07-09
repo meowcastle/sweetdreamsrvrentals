@@ -21,13 +21,22 @@ set -a
 source .env 2>/dev/null || true
 set +a
 
+# Some Synology Container Manager installs only ship the older hyphenated
+# docker-compose binary, not the `docker compose` plugin subcommand this
+# repo otherwise assumes - detect whichever is actually available.
+if docker compose version > /dev/null 2>&1; then
+  DC=(docker compose)
+else
+  DC=(docker-compose)
+fi
+
 BACKUP_DIR="${BACKUP_DIR:-${DATA_DIR:-./data}/../backups}"
 RETENTION_DAYS="${RETENTION_DAYS:-30}"
 STAMP=$(date +%Y-%m-%d-%H%M%S)
 
 mkdir -p "$BACKUP_DIR"
 
-docker compose exec -T postgres pg_dump -U "${POSTGRES_USER:-sweetdreams}" "${POSTGRES_DB:-sweetdreams}" \
+"${DC[@]}" exec -T postgres pg_dump -U "${POSTGRES_USER:-sweetdreams}" "${POSTGRES_DB:-sweetdreams}" \
   | gzip > "$BACKUP_DIR/sweetdreams-$STAMP.sql.gz"
 
 find "$BACKUP_DIR" -name 'sweetdreams-*.sql.gz' -mtime "+$RETENTION_DAYS" -delete
