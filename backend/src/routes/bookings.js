@@ -62,6 +62,7 @@ async function insertBooking(fields) {
     id, trailer, arrival, nights, guest, phone, email, site, addons, total,
     type, source, payStatus, payMethod, plan, deposit, paidToday, grandTotal,
     dueToday, balanceLater, balanceChargeDate,
+    stripeCheckoutSessionId, stripePaymentIntentId, stripeCustomerId, stripePaymentMethodId,
   } = fields;
 
   const client = await pool.connect();
@@ -72,13 +73,19 @@ async function insertBooking(fields) {
     // conflict check and double-book it. Released automatically at COMMIT.
     await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [trailer]);
 
+    // Excludes b.id = $4 (this row's own id): without that, retrying an
+    // already-successful insert with the same id (Stripe's webhooks are
+    // at-least-once) matches the row's own prior insert here and gets
+    // misreported as a trailer conflict - complete with an unwarranted
+    // auto-refund - instead of ever reaching the INSERT below, where it
+    // should hit a duplicate-key no-op.
     const conflict = await client.query(
       `SELECT 1 FROM bookings b
        LEFT JOIN booking_status_overrides o ON o.booking_id = b.id
-       WHERE b.trailer = $1 AND COALESCE(o.cancelled, false) = false
+       WHERE b.trailer = $1 AND b.id != $4 AND COALESCE(o.cancelled, false) = false
          AND daterange(b.arrival, b.arrival + b.nights) && daterange($2::date, $2::date + $3::int)
        LIMIT 1`,
-      [trailer, arrival, nights]
+      [trailer, arrival, nights, id]
     );
     if (conflict.rows.length) {
       await client.query('ROLLBACK');
@@ -89,13 +96,16 @@ async function insertBooking(fields) {
       `INSERT INTO bookings (
          id, trailer, arrival, nights, guest, phone, email, site, addons, total,
          type, source, pay_status, pay_method, plan, deposit, paid_today,
-         grand_total, due_today, balance_later, balance_charge_date
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
+         grand_total, due_today, balance_later, balance_charge_date,
+         stripe_checkout_session_id, stripe_payment_intent_id, stripe_customer_id, stripe_payment_method_id
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
        RETURNING *`,
       [id, trailer, arrival, nights, guest, phone || null, email || null, site || null,
         addons || [], total || 0, type, source, payStatus || null, payMethod || null,
         plan || null, deposit ?? null, paidToday ?? null, grandTotal ?? null,
-        dueToday ?? null, balanceLater ?? null, balanceChargeDate || null],
+        dueToday ?? null, balanceLater ?? null, balanceChargeDate || null,
+        stripeCheckoutSessionId || null, stripePaymentIntentId || null,
+        stripeCustomerId || null, stripePaymentMethodId || null],
     );
     await client.query('COMMIT');
     return { row: rows[0] };
@@ -175,3 +185,7 @@ router.post('/:id/retry-charge', requireAdminAuth, (req, res) => {
 });
 
 module.exports = router;
+// Reused by the webhook handler (step 10) so a real Stripe payment writes a
+// booking through the exact same conflict-checked, advisory-locked path a
+// direct POST /api/bookings does.
+module.exports.insertBooking = insertBooking;

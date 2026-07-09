@@ -30,6 +30,15 @@ CREATE TABLE IF NOT EXISTS bookings (
 
 CREATE INDEX IF NOT EXISTS bookings_trailer_arrival_idx ON bookings (trailer, arrival);
 
+-- Added for step 10 (webhook handler). Additive ALTERs rather than columns
+-- on the original CREATE TABLE, since that statement is skipped entirely
+-- once the table already exists - these need to apply to already-migrated
+-- databases (local + the Synology) too, not just fresh ones.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_checkout_session_id TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_payment_method_id TEXT;
+
 -- One row per booking. Mirrors the old sd_admin_overrides shape
 -- ({status, cancelled, charges, refunds}, each keyed by booking id) as real
 -- columns instead of four parallel maps.
