@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const pool = require('../db');
 const stripe = require('../stripe');
 const { getEffectiveConfig, computeExpected } = require('../pricing');
@@ -6,6 +7,17 @@ const { getEffectiveConfig, computeExpected } = require('../pricing');
 const router = express.Router();
 
 const TRAILER_IDS = ['charlie', 'ella', 'virginia', 'marylou', 'jerry', 'patricia', 'nola', 'billybob'];
+
+// Generous enough for a real customer building/rebuilding a quote and
+// retrying (different dates, add-ons, plan), tight enough to bound
+// automated abuse now that this is reachable from the open internet.
+const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_attempts' },
+});
 
 function isValidDateString(s) {
   return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(new Date(s + 'T00:00:00'));
@@ -24,7 +36,7 @@ function isoLocal(d) {
 // list, that only happens when the checkout.session.completed webhook fires
 // (step 10), since the browser reaching successUrl proves nothing about
 // whether payment actually went through.
-router.post('/create-checkout-session', async (req, res) => {
+router.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   const b = req.body || {};
 
   if (!TRAILER_IDS.includes(b.trailerId)) return res.status(400).json({ error: 'invalid_trailer' });
