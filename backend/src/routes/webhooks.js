@@ -2,6 +2,8 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const stripe = require('../stripe');
 const { insertBooking } = require('./bookings');
+const { queueMessages } = require('./emailQueue');
+const { buildGuestEmails } = require('../guestEmails');
 
 const router = express.Router();
 
@@ -87,6 +89,30 @@ async function handleCheckoutCompleted(session) {
         console.error('[webhook] Auto-refund after conflict failed:', refundErr);
       }
     }
+    return;
+  }
+
+  // Queue the guest's confirmation/reminder/refund email schedule now that
+  // the booking is real. Best-effort: a failure here shouldn't turn a
+  // successful booking into a 500 (which would just make Stripe retry the
+  // whole event - and insertBooking's own idempotency check above means a
+  // retry never reaches this point again anyway, since it short-circuits on
+  // the duplicate key before getting here).
+  try {
+    const { trailerName, datesLabel, messages } = buildGuestEmails({
+      trailerId: m.trailerId, arrival: m.arrival, nights: Number(m.nights),
+      guest: m.guest, email: m.email, site: m.site, plan: m.plan,
+      dueToday: Math.round(Number(m.dueTodayCents) / 100),
+      balanceLater: Math.round(Number(m.balanceLaterCents) / 100),
+      deposit: Math.round(Number(m.depositCents) / 100),
+      balanceChargeDate: m.balanceChargeDate || null,
+    });
+    await queueMessages({
+      bookingId: session.id, guest: m.guest, email: m.email,
+      trailer: trailerName, dates: datesLabel, messages,
+    });
+  } catch (e) {
+    console.error(`[webhook] Failed to queue guest emails for booking ${session.id}:`, e);
   }
 }
 
