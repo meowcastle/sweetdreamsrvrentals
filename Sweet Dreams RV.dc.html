@@ -962,7 +962,7 @@ class Component extends DCLogic {
   // Point CHECKOUT_ENDPOINT at your route, e.g. '/api/create-checkout-session'.
   // While unset, the button runs a demo confirmation so the page is still clickable.
   // ─────────────────────────────────────────────────────────────
-  CHECKOUT_ENDPOINT = ''; // e.g. '/api/create-checkout-session'  (leave '' for demo mode)
+  CHECKOUT_ENDPOINT = '/api/create-checkout-session';
 
   notifyTeam(subject, fields) {
     const url = this.NOTIFY_ENDPOINT;
