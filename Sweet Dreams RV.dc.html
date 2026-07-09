@@ -457,7 +457,7 @@
           <span style="width:40px;height:40px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;flex:none;"><img src="trailer-white.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;"></span>
           <div style="flex:1;min-width:0;">
             <div style="font-family:'Quicksand',sans-serif;font-weight:700;font-size:16px;color:#fff;line-height:1.15;">{{ reserveHeading }}</div>
-            <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">{{ selectedName }} · {{ nights }} nights</div>
+            <div style="font-size:12.5px;color:oklch(0.7 0.02 280);">{{ headerSubtitle }}</div>
           </div>
           <button onClick="{{ closeReserve }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
         </div>
@@ -748,22 +748,44 @@
         <!-- STEP 3: CONFIRMATION -->
         <sc-if value="{{ stepConfirmed }}" hint-placeholder-val="{{ false }}">
           <div style="padding:32px 22px 28px;text-align:center;">
-            <span style="width:64px;height:64px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-            <h3 style="margin:18px 0 0;font-weight:700;font-size:22px;color:#fff;">You're booked!</h3>
-            <p style="margin:10px auto 0;font-size:14.5px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:38ch;">{{ selectedName }} is reserved for <strong style="color:#fff;">{{ tripDatesLabel }}</strong>. We'll deliver and set up at {{ siteLabel }}.</p>
-            <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.04);padding:16px;text-align:left;display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
-              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Paid today</span><span style="font-weight:600;color:#fff;">{{ dueTodayLabel }}</span></div>
-              <sc-if value="{{ planFirstNight }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Balance auto-charged {{ balanceChargeLabel }}</span><span style="font-weight:600;color:#fff;">{{ balanceLaterLabel }}</span></div>
-              </sc-if>
-              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Refundable deposit (of above)</span><span style="font-weight:600;color:#fff;">{{ depositLabel }}</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Confirmation sent to</span><span style="font-weight:600;color:#fff;">{{ emailLabel }}</span></div>
-            </div>
-            <sc-if value="{{ planFirstNight }}" hint-placeholder-val="{{ false }}">
-              <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:42ch;">Your card on file will be charged the {{ balanceLaterLabel }} balance on <strong style="color:oklch(0.82 0.015 270);">{{ balanceChargeLabel }}</strong>. We'll email a reminder first, and the {{ depositLabel }} deposit is returned after the trailer comes back.</p>
+            <!-- A real Stripe checkout redirects the browser away and back, which
+                 wipes all in-memory state (trailer, dates, plan, etc.), so this can't
+                 just re-read this.state the way the old demo-mode completion did.
+                 Fetches the real booking by Checkout Session id instead (see
+                 fetchConfirmedBooking) and shows a brief loading state while the
+                 checkout.session.completed webhook may still be finishing. -->
+            <sc-if value="{{ confirmedLoading }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 0;">
+                <div style="width:36px;height:36px;border-radius:9999px;border:3px solid oklch(1 0 0 / 0.15);border-top-color:oklch(0.72 0.18 300);margin:0 auto;animation:spin 0.8s linear infinite;"></div>
+                <h3 style="margin:20px 0 0;font-weight:700;font-size:18px;color:#fff;">Finalizing your reservation…</h3>
+                <p style="margin:8px auto 0;font-size:13px;line-height:1.5;color:oklch(0.7 0.015 270);max-width:36ch;">This only takes a moment.</p>
+              </div>
             </sc-if>
-            <p style="margin:12px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:40ch;">A confirmation email is on its way, and we've added your trip to the fleet calendar. Questions? Reply to that email or call (541) 630-4795.</p>
-            <button onClick="{{ closeReserve }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:15px;">Done</button>
+            <sc-if value="{{ confirmedFailed }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:16px 0;">
+                <h3 style="margin:0;font-weight:700;font-size:20px;color:#fff;">Payment received!</h3>
+                <p style="margin:10px auto 0;font-size:13.5px;line-height:1.55;color:oklch(0.78 0.015 270);max-width:38ch;">We're still finalizing your reservation details. You'll get a confirmation email shortly - reply to it or call (541) 630-4795 if you don't see it soon.</p>
+                <button onClick="{{ closeReserve }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:15px;">Done</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ confirmedReady }}" hint-placeholder-val="{{ true }}">
+              <span style="width:64px;height:64px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+              <h3 style="margin:18px 0 0;font-weight:700;font-size:22px;color:#fff;">You're booked!</h3>
+              <p style="margin:10px auto 0;font-size:14.5px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:38ch;">{{ confirmTrailerName }} is reserved for <strong style="color:#fff;">{{ confirmDatesLabel }}</strong>. We'll deliver and set up at {{ confirmSiteLabel }}.</p>
+              <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.12);background:oklch(1 0 0 / 0.04);padding:16px;text-align:left;display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Paid today</span><span style="font-weight:600;color:#fff;">{{ confirmDueTodayLabel }}</span></div>
+                <sc-if value="{{ confirmPlanFirstNight }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Balance auto-charged {{ confirmBalanceChargeLabel }}</span><span style="font-weight:600;color:#fff;">{{ confirmBalanceLaterLabel }}</span></div>
+                </sc-if>
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Refundable deposit (of above)</span><span style="font-weight:600;color:#fff;">{{ confirmDepositLabel }}</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Confirmation sent to</span><span style="font-weight:600;color:#fff;">{{ confirmEmailLabel }}</span></div>
+              </div>
+              <sc-if value="{{ confirmPlanFirstNight }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:42ch;">Your card on file will be charged the {{ confirmBalanceLaterLabel }} balance on <strong style="color:oklch(0.82 0.015 270);">{{ confirmBalanceChargeLabel }}</strong>. We'll email a reminder first, and the {{ confirmDepositLabel }} deposit is returned after the trailer comes back.</p>
+              </sc-if>
+              <p style="margin:12px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:40ch;">A confirmation email is on its way, and we've added your trip to the fleet calendar. Questions? Reply to that email or call (541) 630-4795.</p>
+              <button onClick="{{ closeReserve }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:15px;">Done</button>
+            </sc-if>
           </div>
         </sc-if>
 
@@ -936,6 +958,7 @@ class Component extends DCLogic {
     cancelOpen: false, cancelStep: 'form',
     cName: '', cEmail: '', cDetails: '', cReason: '',
     checkoutBusy: false, checkoutError: false, payPlan: 'firstnight',
+    confirmedBooking: null, confirmedLoadFailed: false,
     carIdx: 0, dragging: false, dragPos: 0 };
 
   carouselList = ['fan-1.png', 'fan-2.png', 'fan-3.png', 'fan-4.png', 'fan-5.png', 'fan-6.png'];
@@ -1152,6 +1175,48 @@ Sweet Dreams RV Rentals`,
     if (window.SDPricing) { if (!this.pricing) this.pricing = window.SDPricing.load(); return this.pricing; }
     return this.pricing || null;
   }
+  // Looks up the real, just-paid booking by its Stripe Checkout Session id
+  // (passed back via the {CHECKOUT_SESSION_ID} template variable in
+  // startCheckout's successUrl) and populates confirmedBooking, the sole
+  // source the confirmation step's markup reads from. Needed because the
+  // browser navigated away to Stripe and back - a real page load, not a
+  // client-side step change - so none of this.state survives to describe
+  // what was actually booked. 404 (the checkout.session.completed webhook
+  // may not have written the booking yet) retries a few times before
+  // giving up.
+  async fetchConfirmedBooking(sessionId, attempt) {
+    attempt = attempt || 0;
+    try {
+      const res = await fetch('/api/bookings/by-session/' + encodeURIComponent(sessionId));
+      if (res.ok) {
+        const b = await res.json();
+        const trailer = this.trailers.find((x) => x.id === b.trailer);
+        const arrivalDate = new Date(b.arrival + 'T00:00:00');
+        const departureDate = new Date(arrivalDate.getTime() + b.nights * 86400000);
+        const balanceChargeDate = b.balanceChargeDate ? new Date(b.balanceChargeDate + 'T00:00:00') : null;
+        this.setState({
+          confirmedBooking: {
+            trailerName: trailer ? trailer.name : b.trailer,
+            nights: b.nights,
+            datesLabel: this.fmtDate(arrivalDate) + ' – ' + this.fmtDate(departureDate),
+            siteLabel: b.site || 'your campsite',
+            emailLabel: b.email || 'your email',
+            dueToday: b.dueToday != null ? b.dueToday : b.paidToday,
+            deposit: b.deposit || 0,
+            balanceLater: b.balanceLater || 0,
+            balanceChargeLabel: balanceChargeDate ? this.fmtDate(balanceChargeDate) : 'two weeks before delivery',
+            planFirstNight: b.plan === 'firstnight',
+          },
+        });
+        return;
+      }
+      if (res.status === 404 && attempt < 6) {
+        setTimeout(() => this.fetchConfirmedBooking(sessionId, attempt + 1), 1500);
+        return;
+      }
+    } catch (e) {}
+    this.setState({ confirmedLoadFailed: true });
+  }
   componentDidMount() {
     // If the pricing script finished loading after construction, pick it up now.
     if (!this.pricing && window.SDPricing) { this.pricing = window.SDPricing.load(); this.forceUpdate(); }
@@ -1170,8 +1235,15 @@ Sweet Dreams RV Rentals`,
         this.setState({ trailerId: id });
       }
       // Returning from a successful Stripe Checkout → show the confirmation.
+      // The session id is only absent if successUrl's {CHECKOUT_SESSION_ID}
+      // template variable somehow didn't get substituted - shouldn't happen
+      // in practice, but fail into the same "still finalizing" state rather
+      // than showing fabricated details.
       if (params.get('booking') === 'success') {
+        const sessionId = params.get('session_id');
         this.setState({ reserveOpen: true, step: 'confirmed' });
+        if (sessionId) this.fetchConfirmedBooking(sessionId);
+        else this.setState({ confirmedLoadFailed: true });
       }
     } catch (e) {}
     // Pre-fill contact details for a returning guest (saved on their last booking).
@@ -1370,6 +1442,11 @@ Sweet Dreams RV Rentals`,
     const addonsList = (cfg && Array.isArray(cfg.addons)) ? cfg.addons.filter((a) => a.active !== false) : this.addonsList;
     const t = baseTrailers.find((x) => x.id === this.state.trailerId) || baseTrailers[0];
     const nights = this.state.nights;
+    // A real Stripe checkout redirects away and back, wiping this.state
+    // (trailerId/nights/payPlan/etc. all revert to their defaults), so the
+    // confirmation step can't trust any of the live values below once it's
+    // showing real, fetched data - see fetchConfirmedBooking().
+    const confirmed = (this.state.step === 'confirmed') ? this.state.confirmedBooking : null;
     const fleetMinRate = Math.min.apply(null, baseTrailers.map((x) => x.rate));
     // reserve modal date values (computed up-front so weekend/summer rates can apply)
     const arrivalDate = this.state.fArrival ? new Date(this.state.fArrival + 'T00:00:00') : null;
@@ -1610,7 +1687,18 @@ Sweet Dreams RV Rentals`,
         balance_due: payPlan === 'firstnight' ? this.fmt(balanceLater) : '$0',
         balance_charge_date: payPlan === 'firstnight' ? balanceChargeLabel : 'N/A',
       });
-      this.setState({ step: 'confirmed', checkoutBusy: false });
+      // Snapshot into the same shape fetchConfirmedBooking() populates, since
+      // the confirmation step's markup reads only from confirmedBooking now.
+      this.setState({
+        step: 'confirmed', checkoutBusy: false,
+        confirmedBooking: {
+          trailerName: t.name, nights, datesLabel: tripDatesLabel,
+          siteLabel: this.state.fSite || 'your campsite',
+          emailLabel: this.state.fEmail || 'your email',
+          dueToday, deposit, balanceLater, balanceChargeLabel,
+          planFirstNight: payPlan === 'firstnight',
+        },
+      });
     };
 
     return {
@@ -1765,6 +1853,24 @@ Sweet Dreams RV Rentals`,
       farOut,
       planFirstNight: payPlan === 'firstnight',
       planFull: payPlan === 'full',
+      // ----- confirmation step: fed by the fetched real booking once
+      // available (see fetchConfirmedBooking), never by the live values
+      // above - those reflect whatever's currently in the builder, not what
+      // was actually booked and charged.
+      confirmedLoading: confirmed === null && this.state.step === 'confirmed' && this.state.confirmedLoadFailed !== true,
+      confirmedFailed: this.state.step === 'confirmed' && this.state.confirmedLoadFailed === true,
+      confirmedReady: !!confirmed,
+      headerSubtitle: confirmed ? (confirmed.trailerName + ' · ' + confirmed.nights + ' nights')
+        : (this.state.step === 'confirmed' ? '' : (t.name + ' · ' + nights + ' nights')),
+      confirmTrailerName: confirmed ? confirmed.trailerName : '',
+      confirmDatesLabel: confirmed ? confirmed.datesLabel : '',
+      confirmSiteLabel: confirmed ? confirmed.siteLabel : '',
+      confirmDueTodayLabel: confirmed ? this.fmt(confirmed.dueToday) : '',
+      confirmPlanFirstNight: !!(confirmed && confirmed.planFirstNight),
+      confirmBalanceChargeLabel: confirmed ? confirmed.balanceChargeLabel : '',
+      confirmBalanceLaterLabel: confirmed ? this.fmt(confirmed.balanceLater) : '',
+      confirmDepositLabel: confirmed ? this.fmt(confirmed.deposit) : '',
+      confirmEmailLabel: confirmed ? confirmed.emailLabel : '',
       dueTodaySubLabel: payPlan === 'firstnight'
         ? ('First night · balance ' + balanceChargeLabel)
         : (this.fmt(total) + ' trip + ' + this.fmt(deposit) + ' refundable deposit'),
@@ -1846,7 +1952,10 @@ Sweet Dreams RV Rentals`,
               // payment_intent_data.setup_future_usage = 'off_session'.
               savePaymentMethod: payPlan === 'firstnight',
               currency: 'usd',
-              successUrl: base + '?booking=success',
+              // Stripe substitutes {CHECKOUT_SESSION_ID} with the real session id
+              // on redirect - fetchConfirmedBooking uses it to show the guest
+              // what was actually booked and charged, not stale page state.
+              successUrl: base + '?booking=success&session_id={CHECKOUT_SESSION_ID}',
               cancelUrl: window.location.href,
             }),
           });

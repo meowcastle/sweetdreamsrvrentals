@@ -5,7 +5,7 @@
 const { expect } = require('@playwright/test');
 const { DAY, iso } = require('./invariants');
 const api = require('./api');
-const { resetDb } = require('./db');
+const { resetDb, setCheckoutSessionId } = require('./db');
 
 // Single-segment path; encodeURIComponent handles the spaces in the filename.
 const APP_PATH = '/' + encodeURIComponent('Sweet Dreams RV.dc.html');
@@ -101,7 +101,13 @@ class App {
     let b;
     try { b = req.postDataJSON(); } catch (e) { b = {}; }
     const toDollars = (cents) => (Number(cents) || 0) / 100;
+    // Real webhook-created bookings always have id === stripe_checkout_session_id
+    // (see backend/src/routes/webhooks.js) - using a fake session id as this
+    // mock booking's own id reproduces that, and the confirmation page's
+    // fetchConfirmedBooking() needs it to resolve GET /api/bookings/by-session/:id.
+    const sessionId = 'pw_test_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const { status, body } = await api.createBooking({
+      id: sessionId,
       trailer: b.trailerId, arrival: b.arrival, nights: Number(b.nights),
       guest: b.guest, email: b.email, phone: b.phone, site: b.deliverySite,
       addons: b.addons, total: toDollars(b.tripTotalCents),
@@ -113,7 +119,10 @@ class App {
       await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ url: b.successUrl }) });
+    await setCheckoutSessionId(sessionId, sessionId);
+    // Mirrors Stripe's own {CHECKOUT_SESSION_ID} substitution on redirect.
+    const url = (b.successUrl || '').replace('{CHECKOUT_SESSION_ID}', sessionId);
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ url }) });
   }
 
   // The DC streams in; wait until the hero reserve CTA has actually rendered.

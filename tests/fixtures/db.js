@@ -19,8 +19,20 @@ async function resetDb() {
   await pool.query('TRUNCATE bookings, booking_status_overrides, email_queue RESTART IDENTITY CASCADE');
 }
 
+// Test-only: the checkout mock (fixtures/app.js) creates bookings through
+// the public POST /api/bookings route, which never accepts or sets
+// stripe_checkout_session_id - only the real checkout.session.completed
+// webhook does that (deliberately: letting an unauthenticated client claim
+// any session id would be a real trust boundary to give up). Real webhook
+// bookings always have id === stripe_checkout_session_id, so setting it
+// directly here afterward reproduces that same invariant for the mock
+// without touching the production route at all.
+async function setCheckoutSessionId(bookingId, sessionId) {
+  await pool.query('UPDATE bookings SET stripe_checkout_session_id = $1 WHERE id = $2', [sessionId, bookingId]);
+}
+
 async function closeDb() {
   await pool.end();
 }
 
-module.exports = { resetDb, closeDb };
+module.exports = { resetDb, closeDb, setCheckoutSessionId };

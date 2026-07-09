@@ -51,6 +51,33 @@ router.get('/availability', async (req, res) => {
   res.json(rows);
 });
 
+// Public: looks up a single booking by its Stripe Checkout Session id (the
+// booking's own primary key - see webhooks.js). Used by the post-checkout
+// confirmation screen: the browser redirects away to Stripe and back for a
+// real payment, a genuine page navigation that wipes all client-side state,
+// so the confirmation can't just re-read what the customer picked earlier
+// in the same page session - it has to ask the backend what was actually
+// booked and charged. The session id is a long, Stripe-generated opaque
+// token (not practically guessable), so this is safe to expose without
+// auth - still limited to exactly the fields the confirmation screen shows,
+// not the full row (no guest name/phone).
+router.get('/by-session/:sessionId', async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT b.*, COALESCE(o.cancelled, false) AS cancelled FROM bookings b
+     LEFT JOIN booking_status_overrides o ON o.booking_id = b.id
+     WHERE b.stripe_checkout_session_id = $1`,
+    [req.params.sessionId],
+  );
+  const row = rows[0];
+  if (!row || row.cancelled) return res.status(404).json({ error: 'not_found' });
+  const b = rowToBooking(row);
+  res.json({
+    trailer: b.trailer, arrival: b.arrival, nights: b.nights, site: b.site,
+    email: b.email, plan: b.plan, deposit: b.deposit, paidToday: b.paidToday,
+    dueToday: b.dueToday, balanceLater: b.balanceLater, balanceChargeDate: b.balanceChargeDate,
+  });
+});
+
 // Admin: full detail, used by the owner dashboard and the pricing page's
 // next-up queues.
 router.get('/', requireAdminAuth, async (req, res) => {
