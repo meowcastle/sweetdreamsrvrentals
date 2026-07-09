@@ -484,9 +484,12 @@
             <sc-if value="{{ refundNoEmail }}" hint-placeholder-val="{{ false }}">
               <div style="margin-top:14px;padding:11px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);font-size:12px;color:oklch(0.64 0.02 280);">No email on file — receipt can't be sent automatically.</div>
             </sc-if>
+            <sc-if value="{{ refundHasError }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;padding:11px 13px;border-radius:12px;background:oklch(0.62 0.16 25 / 0.14);border:1px solid oklch(0.66 0.16 25 / 0.4);font-size:12.5px;color:oklch(0.86 0.09 30);">{{ refundErrorMsg }}</div>
+            </sc-if>
             <div style="display:flex;gap:10px;margin-top:22px;">
               <button onClick="{{ dismissRefund }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Not yet</button>
-              <button onClick="{{ confirmRefund }}" style="flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.5781 0.2303 264.8 / 0.8);">Refund {{ refundConfirmAmount }}</button>
+              <button onClick="{{ confirmRefund }}" style="{{ refundConfirmButtonStyle }}">{{ refundConfirmLabel }}</button>
             </div>
           </div>
         </div>
@@ -912,7 +915,7 @@ class Component extends DCLogic {
     cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
     cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
     cqRate: 149, cqDelivery: 0, cqAdjust: 0,
-    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true };
+    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '' };
 
   // Full-sync upsert to the API. Mirrors the old "write the whole blob"
   // shape exactly (see backend/src/routes/overrides.js) so none of the
@@ -1077,25 +1080,38 @@ class Component extends DCLogic {
   refundedAmt(b) { const v = b && this.state.refunds[b.id]; if (v && typeof v === 'object') return v.amount; return typeof v === 'number' ? v : (v ? this.depAmt(b) : 0); }
   refundReasonOf(b) { const v = b && this.state.refunds[b.id]; return (v && typeof v === 'object' && v.reason) ? v.reason : ''; }
   refundEmailOf(b) { const v = b && this.state.refunds[b.id]; return (v && typeof v === 'object' && v.emailed) ? (v.email || '') : ''; }
-  emailFor(b) { return (b && b.email) ? b.email : ''; }
-  // Shared refund action — used by the drawer button and the Deposits tab, after confirm.
-  doRefund(id, amount, reason, sendEmail) {
-    if (!id) return;
-    const all = this.combinedBookings();
-    const b = all.find((x) => x.id === id);
-    const dep = this.depAmt(b);
-    let amt = Number(amount);
-    if (!isFinite(amt) || amt <= 0) amt = dep;
-    amt = Math.min(amt, dep);
-    const partial = amt < dep;
-    const rsn = (reason || '').trim() || 'No reason given';
-    const email = this.emailFor(b);
-    const emailed = !!(sendEmail && email);
-    const prev = this.state.refunds[id];
-    const next = { ...this.state.refunds, [id]: { amount: amt, reason: rsn, emailed: emailed, email: email } };
-    this.setState({ refunds: next, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', sel: null });
-    this.persistOverrides(this.state.status, this.state.cancelled, this.state.charges, next);
-    this.showToast('Stripe refund issued · ' + this.fmt(amt) + (partial ? ' (partial)' : '') + ' · ' + rsn + (emailed ? ' · receipt emailed' : ''), () => { const rx = { ...this.state.refunds }; if (prev === undefined) delete rx[id]; else rx[id] = prev; this.setState({ refunds: rx }); this.persistOverrides(this.state.status, this.state.cancelled, this.state.charges, rx); });
+  // Shared refund action — used by the drawer button and the Deposits tab,
+  // after confirm. This moves real money through Stripe, so unlike the other
+  // status actions on this page there's no optimistic local update and no
+  // "undo" — the source of truth is the server's response, applied only
+  // after the refund actually succeeds, and refundBusy blocks a second
+  // submit while the first request is still in flight.
+  async doRefund(id, amount, reason, sendEmail) {
+    if (!id || this.state.refundBusy) return;
+    this.setState({ refundBusy: true, refundError: '' });
+    try {
+      const res = await fetch('/api/bookings/' + encodeURIComponent(id) + '/refund-deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ amount: Number(amount), reason: (reason || '').trim(), sendEmail: !!sendEmail }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data && data.error || 'refund_failed');
+      const dep = this.depAmt(this.combinedBookings().find((x) => x.id === id));
+      const partial = data.amount < dep;
+      this.setState({
+        refunds: { ...this.state.refunds, [id]: { amount: data.amount, reason: data.reason, emailed: data.emailed, email: data.email } },
+        refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', sel: null, refundBusy: false,
+      });
+      if (window.SDBookings) window.SDBookings.refreshOverrides();
+      this.showToast('Stripe refund issued · ' + this.fmt(data.amount) + (partial ? ' (partial)' : '') + ' · ' + data.reason + (data.emailed ? ' · receipt emailed' : ''));
+    } catch (e) {
+      const msg = e.message === 'already_refunded' ? 'This deposit has already been refunded.'
+        : e.message === 'no_stripe_payment' ? 'No Stripe payment on file for this booking — nothing to refund automatically.'
+        : 'Refund failed. Please try again.';
+      this.setState({ refundBusy: false, refundError: msg });
+    }
   }
   // Deposit amount for a booking (default $1000 hold when not explicitly set; never for blocks).
   depAmt(b) { if (!b || b.type === 'block') return 0; return b.deposit != null ? b.deposit : 1000; }
@@ -1626,7 +1642,7 @@ class Component extends DCLogic {
           returnedLabel: (backIdx <= 0 ? 'Returned ' : 'Returns ') + this.dLabel(this.dateAt(backIdx)),
           deposit: this.fmt(this.depAmt(b)),
           openRow: () => this.setState({ sel: b.id }),
-          refund: () => this.setState({ refundConfirm: b.id, refundAmt: String(this.depAmt(b)), refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true }),
+          refund: () => this.setState({ refundConfirm: b.id, refundAmt: String(this.depAmt(b)), refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true, refundError: '' }),
         };
       }),
       pendingDepositEmpty: pendingDepositRaw.length === 0,
@@ -1688,6 +1704,11 @@ class Component extends DCLogic {
       refundConfirmAmount: this.fmt(rcAmt),
       refundConfirmMaxLabel: this.fmt(rcDep),
       refundIsPartial: rcAmt > 0 && rcAmt < rcDep,
+      refundBusy: this.state.refundBusy,
+      refundConfirmLabel: this.state.refundBusy ? 'Processing…' : ('Refund ' + this.fmt(rcAmt)),
+      refundConfirmButtonStyle: "flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.5781 0.2303 264.8 / 0.8);" + (this.state.refundBusy ? 'opacity:0.6;cursor:not-allowed;' : 'cursor:pointer;'),
+      refundHasError: !!this.state.refundError,
+      refundErrorMsg: this.state.refundError,
       refundAmtValue: this.state.refundAmt,
       refundAmtInvalid: !(Number(this.state.refundAmt) > 0) || Number(this.state.refundAmt) > rcDep,
       onRefundAmt: (e) => this.setState({ refundAmt: e.target.value }),
@@ -1745,10 +1766,10 @@ class Component extends DCLogic {
       refundSwitchTrack: 'position:relative;width:44px;height:26px;border-radius:9999px;cursor:pointer;flex:none;transition:background .15s ease;border:none;' + (autoRefund ? 'background:oklch(0.62 0.19 152);' : 'background:oklch(1 0 0 / 0.16);'),
       refundSwitchKnob: 'position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:9999px;background:#fff;transition:transform .15s ease;transform:translateX(' + (autoRefund ? '18px' : '0') + ');',
       toggleRefund: () => { const v = !this.state.autoRefund; this.setState({ autoRefund: v }); this.persistAutomations({ refund: v }); },
-      markRefunded: () => { const b = allItems.find((x) => x.id === this.state.sel); this.setState({ refundConfirm: this.state.sel, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true }); },
-      requestRefund: (id) => { const b = allItems.find((x) => x.id === id); this.setState({ refundConfirm: id, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true }); },
+      markRefunded: () => { const b = allItems.find((x) => x.id === this.state.sel); this.setState({ refundConfirm: this.state.sel, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true, refundError: '' }); },
+      requestRefund: (id) => { const b = allItems.find((x) => x.id === id); this.setState({ refundConfirm: id, refundAmt: b ? String(this.depAmt(b)) : '', refundReason: this.refundReasons[0], refundReasonNote: '', refundEmail: true, refundError: '' }); },
       confirmRefund: () => this.doRefund(this.state.refundConfirm, this.state.refundAmt, this.state.refundReason === 'Other' ? (this.state.refundReasonNote || 'Other') : this.state.refundReason, this.state.refundEmail),
-      dismissRefund: () => this.setState({ refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '' }),
+      dismissRefund: () => { if (this.state.refundBusy) return; this.setState({ refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundError: '' }); },
       openAutomations: () => this.setState({ autoOpen: true }),
       closeAutomations: () => this.setState({ autoOpen: false }),
       toggleNudge: () => { const v = !this.state.autoNudge; this.setState({ autoNudge: v }); this.persistAutomations({ nudge: v }); },

@@ -1,6 +1,7 @@
 const express = require('express');
 const requireAdminAuth = require('../middleware/adminAuth');
 const pool = require('../db');
+const stripe = require('../stripe');
 
 const router = express.Router();
 
@@ -174,9 +175,62 @@ router.post('/admin', requireAdminAuth, async (req, res) => {
   }
 });
 
-// Wires up the admin's refund modal (doRefund, Admin file line 1096). Build order step 11.
-router.post('/:id/refund-deposit', requireAdminAuth, (req, res) => {
-  res.status(501).json({ error: 'not_implemented', route: 'POST /api/bookings/:id/refund-deposit' });
+// Wires up the admin's refund modal (doRefund, Admin file line 1096). Build
+// order step 11. The deposit is part of the original Checkout charge, not a
+// separate authorize/capture hold, so a real refund is the Refunds API
+// against that same payment_intent - there's no "release the hold" version
+// of this. Amount is never trusted from the client beyond a sanity check:
+// it's clamped to the deposit on file, same as the admin UI already does.
+router.post('/:id/refund-deposit', requireAdminAuth, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Advisory lock keyed by booking id: without it, two near-simultaneous
+    // requests (a double-click, or a retried request after a slow response)
+    // can both read refund_amount as still null and both call Stripe,
+    // refunding the deposit twice. Released automatically at COMMIT/ROLLBACK.
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [req.params.id]);
+
+    const { rows } = await client.query(
+      `SELECT b.*, o.refund_amount FROM bookings b
+       LEFT JOIN booking_status_overrides o ON o.booking_id = b.id
+       WHERE b.id = $1`,
+      [req.params.id],
+    );
+    const booking = rows[0];
+    if (!booking) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'not_found' }); }
+    if (!booking.stripe_payment_intent_id) { await client.query('ROLLBACK'); return res.status(400).json({ error: 'no_stripe_payment' }); }
+    if (booking.refund_amount != null) { await client.query('ROLLBACK'); return res.status(409).json({ error: 'already_refunded' }); }
+
+    const depositOnFile = booking.deposit != null ? booking.deposit : 1000;
+    let amount = Number(req.body && req.body.amount);
+    if (!Number.isFinite(amount) || amount <= 0) amount = depositOnFile;
+    amount = Math.min(amount, depositOnFile);
+    const reason = ((req.body && req.body.reason) || '').trim() || 'No reason given';
+    const emailed = !!(req.body && req.body.sendEmail && booking.email);
+
+    await stripe.refunds.create({
+      payment_intent: booking.stripe_payment_intent_id,
+      amount: Math.round(amount * 100),
+      reason: 'requested_by_customer',
+      metadata: { admin_reason: reason },
+    });
+
+    await client.query(
+      `INSERT INTO booking_status_overrides (booking_id, refund_amount, refund_reason, refund_emailed, refund_email, updated_at)
+       VALUES ($1,$2,$3,$4,$5, now())
+       ON CONFLICT (booking_id) DO UPDATE SET
+         refund_amount = $2, refund_reason = $3, refund_emailed = $4, refund_email = $5, updated_at = now()`,
+      [req.params.id, amount, reason, emailed, booking.email || null],
+    );
+    await client.query('COMMIT');
+    res.json({ amount, reason, emailed, email: booking.email || null });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 });
 
 // Wires up retryCharge (Admin file, line 1666). Build order step 12.
