@@ -100,6 +100,21 @@ const CAMPGROUND_MILES = {
   'Union Creek': 96, 'Farewell Bend': 112, 'Natural Bridge': 106,
 };
 
+// The client combines the picked campground with an optional site number/
+// address into one string before sending it - siteValue() in the RV file
+// joins them as "<campground> · <detail>" whenever a detail is present.
+// CAMPGROUND_MILES is keyed on the bare campground name, so without this,
+// any booking that both (a) picks a campground beyond the free-delivery
+// radius and (b) fills in a site number - which is the normal, expected
+// case, not an edge case - fails this lookup, computes delivery as $0
+// server-side, mismatches the client's real (non-zero) delivery charge, and
+// gets rejected as a price mismatch.
+function campgroundNameFrom(deliverySite) {
+  const s = String(deliverySite || '');
+  const i = s.indexOf(' · ');
+  return i === -1 ? s : s.slice(0, i);
+}
+
 // Parses "Kayak" or "Kayak ×2" (see selectedAddonNames in the RV file) back
 // into { name, qty } and looks up its current price.
 function addonsTotalFor(addonLabels, cfg) {
@@ -129,7 +144,7 @@ function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons
   const prep = cfg.fees.prep || 0;
   const deposit = cfg.fees.deposit || 0;
 
-  const miles = CAMPGROUND_MILES[deliverySite];
+  const miles = CAMPGROUND_MILES[campgroundNameFrom(deliverySite)];
   const radius = cfg.delivery.freeRadius || 100;
   const delivery = (typeof miles === 'number' && miles > radius) ? (cfg.delivery.beyondFee || 0) : 0;
 
