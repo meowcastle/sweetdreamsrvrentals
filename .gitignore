@@ -16,3 +16,6 @@ dist/
 
 # docker-compose local Postgres bind mount (see DATA_DIR in .env.example)
 /data/
+
+# local pg_dump output from scripts/backup-db.sh (see BACKUP_DIR)
+/backups/
