@@ -5,7 +5,7 @@
 const { expect } = require('@playwright/test');
 const { DAY, iso } = require('./invariants');
 const api = require('./api');
-const { resetDb, setCheckoutSessionId } = require('./db');
+const { resetDb, setCheckoutSessionId, createBooking } = require('./db');
 
 // Single-segment path; encodeURIComponent handles the spaces in the filename.
 const APP_PATH = '/' + encodeURIComponent('Sweet Dreams RV.dc.html');
@@ -70,9 +70,9 @@ class App {
   // own origin, separate from the real backend, so relative fetch('/api/...')
   // calls need forwarding. Also short-circuits create-checkout-session: a
   // real Stripe test-mode checkout is too slow/networked for a chaos loop, so
-  // the intercepted request is instead turned into a direct, real booking via
-  // POST /api/bookings - the same conflict-checked insertBooking() path the
-  // real checkout.session.completed webhook uses in production - and the
+  // the intercepted request is instead turned into a direct booking write via
+  // fixtures/db.js's createBooking() - the same conflict-checked insert the
+  // real checkout.session.completed webhook does in production - and the
   // response is faked as a Stripe {url} pointing straight at successUrl.
   async _installBackendRouting() {
     await this.page.route('**/api/**', async (route) => {
@@ -106,7 +106,7 @@ class App {
     // mock booking's own id reproduces that, and the confirmation page's
     // fetchConfirmedBooking() needs it to resolve GET /api/bookings/by-session/:id.
     const sessionId = 'pw_test_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const { status, body } = await api.createBooking({
+    const { status, body } = await createBooking({
       id: sessionId,
       trailer: b.trailerId, arrival: b.arrival, nights: Number(b.nights),
       guest: b.guest, email: b.email, phone: b.phone, site: b.deliverySite,
@@ -135,7 +135,7 @@ class App {
   // availability fetch picks them up.
   async seed(bookings) {
     for (const b of bookings) {
-      const { status, body } = await api.createBooking({
+      const { status, body } = await createBooking({
         guest: 'Seed Guest', ...b,
       });
       if (status >= 400) throw new Error(`seed booking failed: ${status} ${JSON.stringify(body)}`);

@@ -145,35 +145,6 @@ async function insertBooking(fields) {
   }
 }
 
-// Public: wires up completeBooking() in `Sweet Dreams RV.dc.html`. source and
-// type are never taken from the client — every request here is a web
-// booking, full stop, regardless of what's in the body.
-router.post('/', async (req, res) => {
-  const b = req.body || {};
-  if (!TRAILER_IDS.includes(b.trailer)) return res.status(400).json({ error: 'invalid_trailer' });
-  if (!isValidDateString(b.arrival)) return res.status(400).json({ error: 'invalid_arrival' });
-  const nights = Number(b.nights);
-  if (!Number.isInteger(nights) || nights <= 0) return res.status(400).json({ error: 'invalid_nights' });
-  if (!b.guest || typeof b.guest !== 'string') return res.status(400).json({ error: 'invalid_guest' });
-
-  try {
-    const result = await insertBooking({
-      id: b.id || ('web' + Date.now()),
-      trailer: b.trailer, arrival: b.arrival, nights, guest: b.guest,
-      phone: b.phone, email: b.email, site: b.site, addons: b.addons, total: b.total,
-      type: 'confirmed', source: 'web',
-      plan: b.paymentPlan, deposit: b.deposit, paidToday: b.dueToday,
-      grandTotal: b.grandTotal, dueToday: b.dueToday, balanceLater: b.balanceLater,
-      balanceChargeDate: b.balanceChargeDate,
-    });
-    if (result.conflict) return res.status(409).json({ error: 'trailer_unavailable' });
-    res.status(201).json(rowToBooking(result.row));
-  } catch (e) {
-    if (e.code === '23505') return res.status(409).json({ error: 'duplicate_id' });
-    throw e;
-  }
-});
-
 // Admin: wires up addBlock (maintenance blocks) and confirmPhoneBooking
 // (phone reservations) in `Sweet Dreams Admin.dc.html`. Only reachable with
 // a valid admin session, so it's safe to trust type/source/pay from the body.

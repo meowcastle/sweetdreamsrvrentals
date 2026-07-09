@@ -135,11 +135,14 @@ booking policy changes (min/max nights, turnaround), update both together.
 - `create-checkout-session` is intercepted (`fixtures/app.js`,
   `_handleCheckoutMock`) rather than driven through a real Stripe test-mode
   checkout: a real hosted-checkout round trip is too slow/networked for a
-  fuzz loop. The intercept turns it into a direct `POST /api/bookings` -
-  the same conflict-checked, advisory-locked path the real
-  `checkout.session.completed` webhook uses in production - so the actual
-  booking invariants under test are exercised for real; only Stripe's own
-  hosted page is skipped.
+  fuzz loop. The intercept turns it into a direct booking write via
+  `fixtures/db.js`'s `createBooking()` - the same conflict-checked insert the
+  real `checkout.session.completed` webhook uses in production - so the
+  actual booking invariants under test are exercised for real; only Stripe's
+  own hosted page is skipped. There is no public `POST /api/bookings` route
+  anymore (it was an unauthenticated way to write a "confirmed, paid"
+  booking from client-claimed totals, removed as a security fix); fixtures
+  talk to Postgres directly instead.
 - The calendar only blocks a date once **every** trailer is booked that
   night (`fleetBookedNights()` in the DC file) - a single trailer's booking
   leaves the date pickable for a guest willing to take a different trailer.

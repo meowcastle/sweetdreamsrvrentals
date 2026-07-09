@@ -45,19 +45,4 @@ async function getAllBookings() {
   return res.json();
 }
 
-// Real confirmed booking through the same conflict-checked, advisory-locked
-// insertBooking() path the checkout.session.completed webhook uses in
-// production (see backend/src/routes/bookings.js) - this is the public,
-// no-Stripe-needed POST /api/bookings route, still live even though the UI
-// itself only calls it from the dead demo-mode completeBooking() path.
-async function createBooking(fields) {
-  const res = await fetch(`${BASE_URL}/api/bookings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(fields),
-  });
-  const body = await res.json().catch(() => ({}));
-  return { status: res.status, body };
-}
-
-module.exports = { BASE_URL, checkBackendUp, adminLogin, getAllBookings, createBooking };
+module.exports = { BASE_URL, checkBackendUp, adminLogin, getAllBookings };
