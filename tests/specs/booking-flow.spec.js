@@ -36,7 +36,7 @@ test.describe('booking happy path', () => {
     await app.checkAvailability();
     await app.continueButton().click();
     await app.payButton().click();
-    await expect(page.getByText(/reservation confirmed|is reserved for/i)).toBeVisible();
+    await expect(page.getByText(/reservation confirmed|is reserved for/i).filter({ visible: true }).first()).toBeVisible();
 
     const [rec] = await app.webBookings();
     expect(rec.site).toContain('Indian Mary');
@@ -45,8 +45,10 @@ test.describe('booking happy path', () => {
 
   test('remembers the guest on the next visit', async ({ page }) => {
     await app.completeBooking({ trailer: 'Ella', nights: 3, guest: { name: 'Dana Guest', email: 'dana@example.com', phone: '5415550111' } });
-    await page.reload();
-    await app.waitReady();
+    // A plain reload would reopen the confirmation modal (the URL still has
+    // ?booking=success from the checkout redirect) - navigate to the clean
+    // URL instead, like a guest genuinely returning fresh would.
+    await app.goto();
     await app.openReserve();
     await expect(page.getByPlaceholder('Full name')).toHaveValue('Dana Guest');
     await expect(page.getByPlaceholder('you@email.com')).toHaveValue('dana@example.com');

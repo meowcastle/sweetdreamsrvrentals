@@ -28,6 +28,14 @@ asserts the booking rules can never be violated.
 
 ## Setup
 
+The real backend (build order step 15) must be running first - the frontend
+still gets served statically, but every fetch it makes now goes to Postgres,
+not localStorage:
+
+```bash
+docker compose up -d   # from the project root
+```
+
 ```bash
 cd tests
 npm install
@@ -94,9 +102,12 @@ CHAOS_RUNS=25 CHAOS_STEPS=200 npm run test:chaos
 ```
 tests/
   playwright.config.js     # serves project root, desktop + mobile projects
+  global-setup.js          # pins CHAOS_SEED once; fails fast if the backend isn't up
   package.json
   fixtures/
     app.js                 # page object: every selector + flow (openReserve, pickValidRange, completeBooking, …)
+    api.js                 # direct HTTP to the real backend from Node: seeding, admin login, reading bookings back
+    db.js                  # direct Postgres TRUNCATE for clearStore() - not a backend endpoint, test-only
     invariants.js          # pure booking rules: overlaps(), validateStore(), isPlaceable()
     rng.js                 # seedable PRNG so chaos failures reproduce
   specs/
@@ -116,10 +127,26 @@ booking policy changes (min/max nights, turnaround), update both together.
 
 ## Notes / assumptions
 
-- Payment runs in **demo mode** (`CHECKOUT_ENDPOINT = ''`), so "Pay deposit"
-  completes the booking locally and writes to `sd_web_bookings`. When you wire a real
-  Stripe endpoint, add an intercept (`page.route`) mocking the checkout session and
-  point tests at the success return URL (`?booking=success`).
-- The suite seeds availability through `localStorage.sd_occupancy` (the baseline the
-  app treats as pre-existing) and never touches the user's real preview data — each
-  test clears the store first.
+- Booking data is the real backend's Postgres now (build order step 15), not
+  `localStorage` - `app.seed()`, `webBookings()`/`allBookings()`, and
+  `clearStore()` all go through `fixtures/api.js`/`db.js` instead. The only
+  `localStorage` key left is `sd_guest` (returning-guest contact prefill),
+  which `clearStore()` still resets between tests.
+- `create-checkout-session` is intercepted (`fixtures/app.js`,
+  `_handleCheckoutMock`) rather than driven through a real Stripe test-mode
+  checkout: a real hosted-checkout round trip is too slow/networked for a
+  fuzz loop. The intercept turns it into a direct `POST /api/bookings` -
+  the same conflict-checked, advisory-locked path the real
+  `checkout.session.completed` webhook uses in production - so the actual
+  booking invariants under test are exercised for real; only Stripe's own
+  hosted page is skipped.
+- The calendar only blocks a date once **every** trailer is booked that
+  night (`fleetBookedNights()` in the DC file) - a single trailer's booking
+  leaves the date pickable for a guest willing to take a different trailer.
+  Tests that need to see a specific day struck through seed the whole fleet
+  for those dates, not just one trailer (see `fleetBooking()` in
+  `date-logic.spec.js`).
+- The calendar is a 2-up display (this month + next, both always mounted).
+  `dayCells()` takes an optional month label to scope the query to one
+  month's grid - without it, a day number like "10" can resolve to either
+  visible month depending on DOM order.

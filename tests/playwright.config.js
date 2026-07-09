@@ -22,10 +22,14 @@ const channelUse = CHANNEL ? { channel: CHANNEL } : {};
 
 module.exports = defineConfig({
   testDir: './specs',
+  globalSetup: require.resolve('./global-setup'),
   // Chaos runs can take a while; give them room. Override per-project below.
   timeout: 60_000,
   expect: { timeout: 10_000 },
-  fullyParallel: false, // booking state lives in localStorage; keep runs isolated & serial
+  // Booking state is the real backend's Postgres now (build order step 15),
+  // shared across every test/project - parallel runs would clearStore() out
+  // from under each other. Keep serial.
+  fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],

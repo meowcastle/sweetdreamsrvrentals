@@ -1805,6 +1805,10 @@ Sweet Dreams RV Rentals`,
         if (!url) { completeBooking(); return; }
         if (this.state.checkoutBusy) return;
         this.setState({ checkoutBusy: true, checkoutError: false });
+        // Remember this guest's contact details for next time - same as the
+        // demo-mode completeBooking() path does, just before the redirect
+        // to checkout rather than after a synchronous confirmation.
+        try { localStorage.setItem('sd_guest', JSON.stringify({ name: this.state.fName || '', email: this.state.fEmail || '', phone: this.state.fPhone || '' })); } catch (e) {}
         try {
           const base = window.location.origin + window.location.pathname;
           const res = await fetch(url, {

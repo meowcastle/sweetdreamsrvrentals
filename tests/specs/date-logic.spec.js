@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { App } = require('../fixtures/app');
-const { iso, DAY } = require('../fixtures/invariants');
+const { iso, DAY, TRAILER_IDS } = require('../fixtures/invariants');
 
 // Deterministic regardless of the day the suite runs: work in a month two ahead
 // of today so every referenced date is comfortably in the future & fully visible.
@@ -11,6 +11,16 @@ function targetMonth() {
 }
 function isoFor(year, monthIndex, day) {
   return iso(new Date(year, monthIndex, day).getTime());
+}
+
+// The calendar only blocks a date once EVERY trailer is booked that night
+// (fleetBookedNights() in the DC file) - a single trailer's booking leaves
+// the date pickable for a guest willing to take a different trailer, with
+// the per-trailer conflict surfaced only after dates are chosen. Tests that
+// want to see a day struck through in the calendar itself need the whole
+// fleet booked, not just one trailer.
+function fleetBooking(arrival, nights) {
+  return TRAILER_IDS.map((trailer, i) => ({ id: `seed-${trailer}`, trailer, arrival, nights }));
 }
 
 test.describe('date & availability logic', () => {
@@ -58,15 +68,13 @@ test.describe('date & availability logic', () => {
 
   test('a night blocked by an existing booking is struck through / unselectable', async () => {
     const { year, monthIndex, monthName } = targetMonth();
-    // Charlie booked the 10th–13th (3 nights) of the target month.
-    await app.seed([
-      { id: 'seed1', trailer: 'charlie', arrival: isoFor(year, monthIndex, 10), nights: 3 },
-    ]);
+    // Whole fleet booked the 10th–13th (3 nights) of the target month.
+    await app.seed(fleetBooking(isoFor(year, monthIndex, 10), 3));
     await app.openReserve('Charlie');
     await app.openCalendar();
     await app.gotoMonth(monthName, year);
 
-    const cells = await app.dayCells();
+    const cells = await app.dayCells(`${monthName} ${year}`);
     // The booked nights are the 10, 11, 12 (checkout on the 13th is free again).
     for (const day of [10, 11, 12]) {
       const cell = cells.find((c) => c.day === day);
@@ -76,48 +84,42 @@ test.describe('date & availability logic', () => {
 
   test('arrival without 3 free nights ahead is not selectable', async () => {
     const { year, monthIndex, monthName } = targetMonth();
-    // Book the 12th–15th. The 10th only has 2 free nights (10,11) before the block,
-    // so the 10th must NOT be a valid arrival.
-    await app.seed([
-      { id: 'seed2', trailer: 'charlie', arrival: isoFor(year, monthIndex, 12), nights: 3 },
-    ]);
+    // Book the 12th–15th. The 10th's 3-night window (10,11,12) touches the
+    // block, so the 10th must NOT be a valid arrival. The 9th's window
+    // (9,10,11) doesn't touch it at all and stays a valid arrival.
+    await app.seed(fleetBooking(isoFor(year, monthIndex, 12), 3));
     await app.openReserve('Charlie');
     await app.openCalendar();
     await app.gotoMonth(monthName, year);
 
-    const cells = await app.dayCells();
+    const cells = await app.dayCells(`${monthName} ${year}`);
     const tenth = cells.find((c) => c.day === 10);
     if (tenth) expect(tenth.selectable, 'the 10th lacks 3 free nights ahead').toBe(false);
-    const ninth = cells.find((c) => c.day === 9);
-    if (ninth) expect(ninth.selectable, 'the 9th also lacks 3 free nights ahead').toBe(false);
   });
 
   test('same-day turnaround is allowed (checkout day is bookable as an arrival)', async () => {
     const { year, monthIndex, monthName } = targetMonth();
-    // Booked 5th–8th → checkout on the 8th. The 8th should be a valid arrival.
-    await app.seed([
-      { id: 'seed3', trailer: 'charlie', arrival: isoFor(year, monthIndex, 5), nights: 3 },
-    ]);
+    // Whole fleet booked 5th–8th → checkout on the 8th. The 8th should be a
+    // valid arrival despite being adjacent to the fully-booked range.
+    await app.seed(fleetBooking(isoFor(year, monthIndex, 5), 3));
     await app.openReserve('Charlie');
     await app.openCalendar();
     await app.gotoMonth(monthName, year);
 
-    const cells = await app.dayCells();
+    const cells = await app.dayCells(`${monthName} ${year}`);
     const eighth = cells.find((c) => c.day === 8);
     if (eighth) expect(eighth.selectable, 'the 8th is a turnaround day and should be selectable').toBe(true);
   });
 
   test('cannot double-book: once booked, those nights become unselectable', async () => {
     const { year, monthIndex, monthName } = targetMonth();
-    // Pre-book Charlie 10th–13th, then try to book Charlie again in the same month.
-    await app.seed([
-      { id: 'seedD', trailer: 'charlie', arrival: isoFor(year, monthIndex, 10), nights: 3 },
-    ]);
+    // Pre-book the whole fleet 10th–13th, then try to book Charlie again in the same month.
+    await app.seed(fleetBooking(isoFor(year, monthIndex, 10), 3));
     await app.openReserve('Charlie');
     await app.openCalendar();
     await app.gotoMonth(monthName, year);
 
-    const cells = await app.dayCells();
+    const cells = await app.dayCells(`${monthName} ${year}`);
     // Every already-booked night must be unavailable to the next guest.
     for (const day of [10, 11, 12]) {
       const cell = cells.find((c) => c.day === day);

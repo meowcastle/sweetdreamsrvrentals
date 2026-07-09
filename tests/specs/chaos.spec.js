@@ -39,10 +39,16 @@ async function step(app, page, rng) {
     ['back', 1],
   ]);
 
+  // Any open modal (reserve form OR the post-checkout confirmation view,
+  // which has no "Full name" input at all) shows this backdrop - a more
+  // reliable "is something blocking clicks right now" signal than checking
+  // for one specific modal's own content.
+  const modalOpen = await app.backdrop().isVisible().catch(() => false);
+
   try {
     switch (action) {
       case 'open':
-        if (await app.reserveOpener().isVisible().catch(() => false)) await app.openReserve();
+        if (!modalOpen && await app.reserveOpener().isVisible().catch(() => false)) await app.openReserve();
         break;
       case 'close':
         await app.closeReserve();
@@ -50,7 +56,6 @@ async function step(app, page, rng) {
       case 'trailer': {
         // Trailer chips live behind the modal; only click them when it's closed,
         // otherwise the click hangs on pointer interception.
-        const modalOpen = await page.getByPlaceholder('Full name').isVisible().catch(() => false);
         if (!modalOpen) await app.pickTrailer(rng.pick(TRAILERS));
         break;
       }
@@ -129,7 +134,11 @@ test.describe('chaos / fuzz', () => {
     const seed = `${BASE_SEED}-${run}`;
 
     test(`random session #${run + 1} keeps every invariant (seed=${seed})`, async ({ page }) => {
-      test.setTimeout(120_000);
+      // Generous now that every action can involve a real network round trip
+      // to the backend (build order step 15) instead of a synchronous
+      // localStorage write - occasional first-run browser/OS warmup cost
+      // alone can eat a large chunk of a tighter budget.
+      test.setTimeout(180_000);
       const app = new App(page);
       const rng = makeRng(seed);
       await app.goto();
@@ -167,6 +176,11 @@ test.describe('chaos / fuzz', () => {
     expect(afterFirst).toBe(1);
     const first = (await app.webBookings())[0];
 
+    // completeBooking() leaves the page on ?booking=success with the
+    // confirmation modal still open (and its backdrop blocking clicks) -
+    // navigate to a clean URL before driving more UI interaction.
+    await app.goto();
+
     // Try five more times to grab overlapping dates on the same trailer. The
     // calendar should block those nights, so no second overlapping record appears.
     for (let i = 0; i < 5; i++) {
@@ -174,13 +188,16 @@ test.describe('chaos / fuzz', () => {
       await app.openCalendar();
       // Navigate to the month of the existing booking and try to pick its nights.
       const d = new Date(first.arrival + 'T00:00:00');
-      await app.gotoMonth(d.toLocaleString('en-US', { month: 'long' }), d.getFullYear());
-      const cells = await app.dayCells();
+      const monthName = d.toLocaleString('en-US', { month: 'long' });
+      const monthYear = d.getFullYear();
+      await app.gotoMonth(monthName, monthYear);
+      const monthLabel = `${monthName} ${monthYear}`;
+      const cells = await app.dayCells(monthLabel);
       const bookedDay = cells.find((c) => c.day === d.getDate());
       if (bookedDay && bookedDay.selectable) {
         // If somehow selectable, drive the full flow — the store guard must still reject overlap.
         await app.clickDay(bookedDay.idx);
-        const after = (await app.dayCells()).filter((c) => c.selectable);
+        const after = (await app.dayCells(monthLabel)).filter((c) => c.selectable);
         if (after.length) await app.clickDay(after[0].idx);
         await app.fillGuest({ campground: 'Indian Mary' });
         await app.checkAvailability();
