@@ -39,6 +39,11 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT;
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_payment_method_id TEXT;
 
+-- Added for step 12 (balance auto-charge). Separate from
+-- stripe_payment_intent_id (the original deposit/first-night charge) since
+-- the balance is a second, later PaymentIntent against the saved card.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_balance_payment_intent_id TEXT;
+
 -- One row per booking. Mirrors the old sd_admin_overrides shape
 -- ({status, cancelled, charges, refunds}, each keyed by booking id) as real
 -- columns instead of four parallel maps.

@@ -233,9 +233,74 @@ router.post('/:id/refund-deposit', requireAdminAuth, async (req, res) => {
   }
 });
 
-// Wires up retryCharge (Admin file, line 1666). Build order step 12.
-router.post('/:id/retry-charge', requireAdminAuth, (req, res) => {
-  res.status(501).json({ error: 'not_implemented', route: 'POST /api/bookings/:id/retry-charge' });
+// Off-session charge for the deferred balance of a 'firstnight' plan booking.
+// Shared by the daily cron sweep (build order step 12) and the admin's
+// retry-charge button, so a manual retry and an automatic sweep attempt can
+// never race into a double charge - both go through the same advisory lock.
+// A decline creates a NEW PaymentIntent on the next attempt rather than
+// reusing the declined one: Stripe's own guidance for off-session retries,
+// since a PI that failed (especially one requiring authentication) can't
+// always just be re-confirmed without the customer present.
+async function chargeBalance(id) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [id]);
+
+    const { rows } = await client.query(
+      `SELECT b.*, COALESCE(o.cancelled, false) AS cancelled FROM bookings b
+       LEFT JOIN booking_status_overrides o ON o.booking_id = b.id
+       WHERE b.id = $1`,
+      [id],
+    );
+    const booking = rows[0];
+    if (!booking) { await client.query('ROLLBACK'); return { error: 'not_found' }; }
+    if (booking.cancelled) { await client.query('ROLLBACK'); return { error: 'cancelled' }; }
+    if (booking.plan !== 'firstnight') { await client.query('ROLLBACK'); return { error: 'not_applicable' }; }
+    if (!booking.stripe_customer_id || !booking.stripe_payment_method_id) { await client.query('ROLLBACK'); return { error: 'no_stripe_payment' }; }
+    const owed = Number(booking.grand_total) - Number(booking.paid_today || 0);
+    if (owed <= 0) { await client.query('ROLLBACK'); return { error: 'already_charged' }; }
+
+    let pi;
+    try {
+      pi = await stripe.paymentIntents.create({
+        amount: Math.round(owed * 100), currency: 'usd',
+        customer: booking.stripe_customer_id, payment_method: booking.stripe_payment_method_id,
+        off_session: true, confirm: true,
+      });
+    } catch (e) {
+      await client.query('UPDATE bookings SET balance_charge_failed = true WHERE id = $1', [id]);
+      await client.query('COMMIT');
+      // No NOTIFY_ENDPOINT wired up yet (step 14), so this is loud in the
+      // logs until then - same as the webhook's conflict-refund case.
+      console.error(`[balance-charge] Declined for booking ${id} (${booking.guest}, $${owed.toFixed(2)}): ${e.message}`);
+      return { error: 'charge_failed', declineMessage: e.message };
+    }
+
+    await client.query(
+      `UPDATE bookings SET paid_today = grand_total, pay_status = 'Paid in full',
+         balance_charge_failed = false, stripe_balance_payment_intent_id = $2
+       WHERE id = $1`,
+      [id, pi.id],
+    );
+    await client.query('COMMIT');
+    return { charged: owed, paymentIntentId: pi.id };
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+// Wires up retryCharge (Admin file, line 1685).
+router.post('/:id/retry-charge', requireAdminAuth, async (req, res) => {
+  const result = await chargeBalance(req.params.id);
+  if (result.error) {
+    const status = result.error === 'not_found' ? 404 : 400;
+    return res.status(status).json(result);
+  }
+  res.json(result);
 });
 
 module.exports = router;
@@ -243,3 +308,5 @@ module.exports = router;
 // booking through the exact same conflict-checked, advisory-locked path a
 // direct POST /api/bookings does.
 module.exports.insertBooking = insertBooking;
+// Reused by the balance-charge cron sweep (step 12).
+module.exports.chargeBalance = chargeBalance;

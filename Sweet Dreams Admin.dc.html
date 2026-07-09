@@ -915,7 +915,7 @@ class Component extends DCLogic {
     cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
     cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
     cqRate: 149, cqDelivery: 0, cqAdjust: 0,
-    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '' };
+    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, cancelConfirm: false, refundConfirm: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '', retryBusy: false };
 
   // Full-sync upsert to the API. Mirrors the old "write the whole blob"
   // shape exactly (see backend/src/routes/overrides.js) so none of the
@@ -1682,14 +1682,31 @@ class Component extends DCLogic {
       },
       requestCancel: () => this.setState({ cancelConfirm: true }),
       dismissCancel: () => this.setState({ cancelConfirm: false }),
-      retryCharge: () => {
+      // Real money through Stripe, same as doRefund above: no optimistic
+      // update, no undo, and a busy flag blocks a second submit while one
+      // request is in flight.
+      retryCharge: async () => {
+        if (this.state.retryBusy) return;
         const id = this.state.sel, b = allItems.find((x) => x.id === id);
-        const amt = b ? Math.max(0, b.total - (b.paidToday || 0)) : 0;
         const name = b ? b.guest : 'Balance';
-        const next = { ...this.state.charges, [id]: 'paid' };
-        this.setState({ charges: next, sel: null });
-        this.persistOverrides(this.state.status, this.state.cancelled, next);
-        this.showToast('Balance charged · ' + this.fmt(amt) + ' collected from ' + name, () => { const cx = { ...this.state.charges }; delete cx[id]; this.setState({ charges: cx }); this.persistOverrides(this.state.status, this.state.cancelled, cx); });
+        this.setState({ retryBusy: true });
+        try {
+          const res = await fetch('/api/bookings/' + encodeURIComponent(id) + '/retry-charge', { method: 'POST', credentials: 'include' });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error((data && data.error) || 'retry_failed');
+          this.setState({ sel: null, retryBusy: false });
+          if (window.SDBookings) window.SDBookings.refreshAll();
+          this.showToast('Balance charged · ' + this.fmt(data.charged) + ' collected from ' + name);
+        } catch (e) {
+          const msg = e.message === 'already_charged' ? 'This balance has already been charged.'
+            : e.message === 'no_stripe_payment' ? 'No saved card on file for this booking.'
+            : e.message === 'charge_failed' ? 'The card was declined again.'
+            : e.message === 'not_applicable' ? 'This booking isn\'t on a first-night payment plan.'
+            : e.message === 'cancelled' ? 'This booking has been cancelled.'
+            : 'Could not charge the balance. Please try again.';
+          this.setState({ retryBusy: false });
+          this.showToast(msg);
+        }
       },
       contactGuest: () => {
         const id = this.state.sel, b = allItems.find((x) => x.id === id);
