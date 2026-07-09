@@ -10,13 +10,17 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+set -a
+source .env 2>/dev/null || true
+set +a
+
 docker compose up -d --build
 
 echo "Waiting for app health check..."
-until curl -sf http://127.0.0.1:3000/api/health > /dev/null; do sleep 1; done
+until curl -sf "http://127.0.0.1:${APP_HOST_PORT:-3000}/api/health" > /dev/null; do sleep 1; done
 
 echo "App healthy. Starting the dev server..."
-node scripts/dev-server.js &
+API_PORT="${APP_HOST_PORT:-3000}" node scripts/dev-server.js &
 DEV_SERVER_PID=$!
 trap "kill $DEV_SERVER_PID 2>/dev/null" EXIT
 

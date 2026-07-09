@@ -38,8 +38,10 @@ services:
         condition: service_healthy
     ports:
       # Loopback-only: DSM's own reverse proxy (or a Cloudflare Tunnel
-      # container) forwards 443 to this, nothing else should reach it directly.
-      - "127.0.0.1:3000:3000"
+      # container) forwards 443 to this, nothing else should reach it
+      # directly. Host-side port is configurable since 3000 is a common
+      # default other services on the same host may already be using.
+      - "127.0.0.1:${APP_HOST_PORT:-3000}:3000"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
       interval: 10s
