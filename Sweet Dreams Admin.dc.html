@@ -485,9 +485,12 @@
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);">
                 <span style="font-size:16px;font-weight:700;color:oklch(0.72 0.02 280);">$</span>
-                <input type="number" min="1" value="{{ refundAmtValue }}" onInput="{{ onRefundAmt }}" style="flex:1;padding:13px 0;border:none;background:transparent;color:#fff;font-weight:700;font-size:16px;font-family:'Nunito Sans',sans-serif;outline:none;" />
+                <input type="number" min="0" value="{{ refundAmtValue }}" onInput="{{ onRefundAmt }}" style="flex:1;padding:13px 0;border:none;background:transparent;color:#fff;font-weight:700;font-size:16px;font-family:'Nunito Sans',sans-serif;outline:none;" />
                 <span style="font-size:11.5px;color:oklch(0.6 0.02 280);white-space:nowrap;">of {{ refundConfirmMaxLabel }}</span>
               </div>
+              <sc-if value="{{ refundPolicyShow }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:8px;font-size:12px;line-height:1.5;color:oklch(0.7 0.09 288);">Per policy: {{ refundPolicyNote }}</div>
+              </sc-if>
               <sc-if value="{{ refundIsPartial }}" hint-placeholder-val="{{ false }}">
                 <div style="margin-top:8px;font-size:12px;color:oklch(0.78 0.1 78);">Partial refund · {{ refundPartialNote }}</div>
               </sc-if>
@@ -523,7 +526,12 @@
                 <button onClick="{{ dismissRefund }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.2);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:14px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Keep booking</button>
                 <button onClick="{{ cancelNoRefundConfirm }}" style="flex:1;padding:13px;border-radius:12px;border:1px solid oklch(0.6 0.16 25 / 0.4);background:oklch(0.5 0.16 25 / 0.12);color:oklch(0.82 0.13 25);font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Cancel, no refund</button>
               </div>
-              <button onClick="{{ confirmRefund }}" style="width:100%;margin-top:10px;{{ refundConfirmButtonStyle }}">{{ refundConfirmLabel }}</button>
+              <sc-if value="{{ refundZeroShow }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:10px;font-size:12px;line-height:1.5;color:oklch(0.62 0.015 275);text-align:center;">Refund amount is $0 — use "Cancel, no refund" above, or raise the amount to issue a Stripe refund instead.</div>
+              </sc-if>
+              <sc-if value="{{ refundNonZeroShow }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ confirmRefund }}" style="width:100%;margin-top:10px;{{ refundConfirmButtonStyle }}">{{ refundConfirmLabel }}</button>
+              </sc-if>
             </sc-if>
             <sc-if value="{{ refundContextIsDeposit }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;gap:10px;margin-top:22px;">
@@ -1130,8 +1138,12 @@ class Component extends DCLogic {
     const b = this.combinedBookings().find((x) => x.id === id);
     const max = context === 'cancel' ? this.paidAmt(b) : this.depAmt(b);
     const reasons = context === 'cancel' ? this.cancelRefundReasons : this.refundReasons;
+    // Cancelling defaults to what the cancellation policy actually owes the
+    // guest (not just "everything" or "nothing") - admin can still override
+    // for exceptions (goodwill, etc.), same as before.
+    const defaultAmt = context === 'cancel' ? this.cancellationPolicy(b.start, max).amount : max;
     this.setState({
-      refundConfirm: id, refundContext: context, refundAmt: String(max),
+      refundConfirm: id, refundContext: context, refundAmt: String(defaultAmt),
       refundReason: reasons[0], refundReasonNote: '', refundEmail: true, refundError: '',
     });
   }
@@ -1213,6 +1225,23 @@ class Component extends DCLogic {
     const dep = this.depAmt(b);
     const depCollected = dep > 0 && type !== 'pending' && (!isFN || balanceCharged);
     return tripCollected + (depCollected ? dep : 0);
+  }
+  // Cancellation refund policy - mirrors "Request a cancellation" and the
+  // FAQ in Sweet Dreams RV.dc.html word for word; keep these three in sync
+  // if the policy ever changes. Tiered on days-until-arrival AT THE MOMENT
+  // OF CANCELLING (daysOut), applied to whatever was actually charged so
+  // far (paid, from paidAmt() - trip + deposit once collected), not just
+  // the trip total.
+  cancellationPolicy(daysOut, paid) {
+    if (!(paid > 0)) return { amount: 0, label: 'Nothing has been charged yet.' };
+    if (daysOut >= 14) {
+      const fee = Math.max(Math.round(paid * 0.03), 10);
+      return { amount: Math.max(0, paid - fee), label: '14+ days before arrival — full refund minus the 3% cancellation fee (min $10), per policy.' };
+    }
+    if (daysOut > 7) {
+      return { amount: Math.round(paid * 0.5), label: 'Under 14 days before arrival — 50% is non-refundable, per policy.' };
+    }
+    return { amount: 0, label: '7 days or less before arrival — non-refundable, per policy.' };
   }
   dLabel(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
   toISO(d) { const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
@@ -1357,8 +1386,13 @@ class Component extends DCLogic {
     const refundContext = this.state.refundContext || 'deposit';
     const refundContextIsCancel = refundContext === 'cancel';
     const rcMax = rcB ? (refundContextIsCancel ? this.paidAmt(rcB) : this.depAmt(rcB)) : 0;
+    const rcPolicy = (rcB && refundContextIsCancel) ? this.cancellationPolicy(rcB.start, rcMax) : null;
     let rcAmt = Number(this.state.refundAmt);
-    if (!isFinite(rcAmt) || rcAmt <= 0) rcAmt = rcMax;
+    // A cancellation can genuinely default to $0 (non-refundable per
+    // policy) - only treat the field as "unset, use the max" when it's
+    // actually invalid/empty, not when it's a deliberate policy-driven zero.
+    const rcAmtIsPolicyZero = refundContextIsCancel && this.state.refundAmt === '0';
+    if (!rcAmtIsPolicyZero && (!isFinite(rcAmt) || rcAmt <= 0)) rcAmt = rcMax;
     rcAmt = Math.min(rcAmt, rcMax);
     // Uncollected trip balances: first-night reserves whose balance hasn't auto-charged
     // yet (auto-charge fires ~14 days before arrival, i.e. while start > 14).
@@ -1852,6 +1886,10 @@ class Component extends DCLogic {
       refundConfirmMaxLabel: this.fmt(rcMax),
       refundIsPartial: rcAmt > 0 && rcAmt < rcMax,
       refundPartialNote: refundContextIsCancel ? 'the rest is not refunded.' : 'the rest of the deposit is kept.',
+      refundPolicyShow: !!rcPolicy,
+      refundPolicyNote: rcPolicy ? rcPolicy.label : '',
+      refundZeroShow: refundContextIsCancel && !(rcAmt > 0),
+      refundNonZeroShow: !refundContextIsCancel || rcAmt > 0,
       refundBusy: this.state.refundBusy,
       refundConfirmLabel: this.state.refundBusy ? 'Processing…' : ((refundContextIsCancel ? 'Cancel & refund ' : 'Refund ') + this.fmt(rcAmt)),
       refundConfirmButtonStyle: "flex:1;padding:13px;border-radius:12px;border:none;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:700;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 28px -10px oklch(0.5781 0.2303 264.8 / 0.8);text-align:center;" + (this.state.refundBusy ? 'opacity:0.6;cursor:not-allowed;' : 'cursor:pointer;'),
