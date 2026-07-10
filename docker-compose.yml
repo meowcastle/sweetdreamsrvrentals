@@ -47,3 +47,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  web:
+    # Serves the static site (.dc.html files, images, sd-*.js) and proxies
+    # /api/* to the app service - see scripts/dev-server.js. Stock node
+    # image, no build step: the repo root is bind-mounted read-only instead
+    # of copied into an image, so a plain `git pull` on the host takes
+    # effect immediately, no rebuild needed for static content changes.
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /site
+    command: ["node", "scripts/dev-server.js"]
+    environment:
+      PORT: 3000
+      API_HOST: app
+      API_PORT: 3000
+    volumes:
+      - .:/site:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      # Loopback-only, same posture as the app service - nothing public
+      # until the Cloudflare Tunnel/reverse proxy work happens. This is the
+      # one port a tunnel would eventually point at, since it fronts both
+      # the static files and the API under one origin.
+      - "127.0.0.1:${WEB_HOST_PORT:-4321}:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

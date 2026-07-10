@@ -7,6 +7,14 @@
 // pointing a browser straight at "Sweet Dreams RV.dc.html" as a file:// URL,
 // or serving it from a bare static server on its own port, both break that.
 //
+// Also runs containerized as the compose "web" service (see
+// docker-compose.yml), bind-mounting the repo root instead of copying it
+// into an image - static content updates (like a git pull) take effect
+// immediately with no rebuild, same as running this directly on a host.
+// API_HOST defaults to 'localhost' for that host-run case; the web service
+// overrides it to 'app' (the compose service name) since containers don't
+// share a loopback with each other.
+//
 // Usage:
 //   docker compose up -d --build   # backend + Postgres, port 3000
 //   node scripts/dev-server.js     # this, port 4321
@@ -17,6 +25,7 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = process.env.PORT || 4321;
+const API_HOST = process.env.API_HOST || 'localhost';
 const API_PORT = process.env.API_PORT || 3000;
 
 // Only the static site lives at the root; everything else here is backend
@@ -33,7 +42,7 @@ const MIME = {
 http.createServer((req, res) => {
   if (req.url.startsWith('/api/')) {
     const proxyReq = http.request(
-      { host: 'localhost', port: API_PORT, path: req.url, method: req.method, headers: req.headers },
+      { host: API_HOST, port: API_PORT, path: req.url, method: req.method, headers: req.headers },
       (proxyRes) => { res.writeHead(proxyRes.statusCode, proxyRes.headers); proxyRes.pipe(res); },
     );
     proxyReq.on('error', () => { res.writeHead(502); res.end('backend unreachable - is docker compose up?'); });
