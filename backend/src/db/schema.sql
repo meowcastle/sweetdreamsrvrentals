@@ -101,3 +101,17 @@ ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS last_error TEXT;
 -- Nullable: a message queued with only `body` still sends fine as
 -- plain-text-only, so nothing upstream is forced to supply this.
 ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS html TEXT;
+
+-- Replaces the single ADMIN_EMAIL/ADMIN_PASSWORD_HASH env-var pair with real
+-- named logins - every row is an equal-privilege admin (no roles), matching
+-- how this dashboard has always worked, just no longer limited to one
+-- person. scripts/migrate.js seeds the first row from those env vars the
+-- first time this table is empty, so an existing deployment's login keeps
+-- working without manual intervention.
+CREATE TABLE IF NOT EXISTS admin_users (
+  id SERIAL PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

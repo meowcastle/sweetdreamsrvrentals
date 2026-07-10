@@ -8,21 +8,24 @@ const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 // internal owner dashboard, not a security issue.
 const sessions = new Map();
 
-function createSession() {
+function createSession(adminUserId) {
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, { expiresAt: Date.now() + SESSION_TTL_MS });
+  sessions.set(token, { adminUserId, expiresAt: Date.now() + SESSION_TTL_MS });
   return token;
 }
 
+// Returns the session record (so callers can read adminUserId) or null,
+// rather than a boolean - requireAdminAuth needs to know *which* admin is
+// making the request, not just that someone is.
 function verifySession(token) {
-  if (!token) return false;
+  if (!token) return null;
   const session = sessions.get(token);
-  if (!session) return false;
+  if (!session) return null;
   if (session.expiresAt < Date.now()) {
     sessions.delete(token);
-    return false;
+    return null;
   }
-  return true;
+  return session;
 }
 
 function destroySession(token) {
