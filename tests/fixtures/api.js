@@ -23,7 +23,15 @@ async function checkBackendUp() {
 // sessions last 12h server-side, and re-logging in on every read burns
 // through the login route's own rate limiter (10 attempts/15min) almost
 // immediately across a full test run.
-let cachedCookie = null;
+//
+// That per-process cache isn't enough on its own though - Playwright can
+// spawn more worker processes than the rate limit's attempt budget over the
+// course of a full run (each worker gets a fresh module cache, so a fresh
+// cachedCookie), which trips the limiter mid-run. global-setup.js logs in
+// once, in the single main process before any worker starts, and shares the
+// result via TEST_ADMIN_COOKIE (env vars set there are inherited by every
+// worker), so the real login endpoint only ever gets hit once per run.
+let cachedCookie = process.env.TEST_ADMIN_COOKIE || null;
 async function adminLogin() {
   if (cachedCookie) return cachedCookie;
   const res = await fetch(`${BASE_URL}/api/admin/login`, {

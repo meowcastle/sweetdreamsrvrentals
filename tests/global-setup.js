@@ -21,4 +21,11 @@ module.exports = async () => {
       `Backend not reachable at ${api.BASE_URL}/api/health - start it first (docker compose up -d from the project root).`,
     );
   }
+
+  // One real login here, in the single main process, shared to every
+  // worker via env - see the comment in fixtures/api.js for why each worker
+  // logging in independently trips the login route's rate limiter.
+  if (!process.env.TEST_ADMIN_COOKIE) {
+    process.env.TEST_ADMIN_COOKIE = await api.adminLogin();
+  }
 };
