@@ -63,10 +63,10 @@
             <button onClick="{{ setListView }}" style="{{ navListStyle }}">List</button>
             <button onClick="{{ setDepositsView }}" style="{{ navDepositsStyle }}">Deposits{{ navDepositsBadge }}</button>
             <button onClick="{{ setCancelledView }}" style="{{ navCancelledStyle }}">Cancelled{{ navCancelledBadge }}</button>
-            <a href="Sweet Dreams Pricing.dc.html" style="{{ navPricingStyle }}">Pricing</a>
           </div>
           <span style="display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9999px;background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.14);font-size:12.5px;color:oklch(0.82 0.015 270);"><span style="width:7px;height:7px;border-radius:9999px;background:oklch(0.6769 0.17 152.62);"></span>{{ rangeLabel }}</span>
-          <span style="width:34px;height:34px;border-radius:9999px;background:oklch(0.3 0.04 300);display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none;">JS</span>
+          <a href="Sweet Dreams Pricing.dc.html" style="text-decoration:none;padding:8px 15px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Pricing</a>
+          <button onClick="{{ openTeam }}" title="Manage admin logins" style="width:34px;height:34px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));border:none;display:grid;place-items:center;flex:none;cursor:pointer;padding:0;"><img src="trailer-white.png" alt="" style="width:19px;height:19px;object-fit:contain;"></button>
           <button onClick="{{ signOut }}" style="padding:8px 13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Log out</button>
         </div>
       </header>
@@ -667,6 +667,94 @@
         </div>
       </sc-if>
 
+      <!-- ===== TEAM MODAL ===== -->
+      <sc-if value="{{ teamOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div onClick="{{ closeTeam }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);"></div>
+          <div style="position:relative;width:100%;max-width:460px;max-height:86vh;overflow-y:auto;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:22px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:24px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div style="display:flex;align-items:center;gap:11px;">
+                <span style="width:40px;height:40px;border-radius:12px;background:oklch(0.5781 0.2303 264.8 / 0.18);display:grid;place-items:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 20v-1.6a3.6 3.6 0 0 0-3.6-3.6H6.6A3.6 3.6 0 0 0 3 18.4V20M9.8 11.2a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2ZM21 20v-1.6a3.6 3.6 0 0 0-2.7-3.48M15.2 4.14a3.6 3.6 0 0 1 0 6.98" stroke="oklch(0.82 0.11 288)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                <div><h2 style="margin:0;font-weight:700;font-size:19px;color:#fff;">Team</h2><p style="margin:2px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">Who can log into this dashboard</p></div>
+              </div>
+              <button onClick="{{ closeTeam }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);color:#fff;cursor:pointer;flex:none;display:grid;place-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
+            </div>
+
+            <sc-if value="{{ teamError }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;padding:11px 13px;border-radius:12px;background:oklch(0.62 0.16 25 / 0.14);border:1px solid oklch(0.66 0.16 25 / 0.4);font-size:12.5px;color:oklch(0.86 0.09 30);">{{ teamErrorText }}</div>
+            </sc-if>
+
+            <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ teamRows }}" as="u" hint-placeholder-count="2">
+                <div style="border-radius:14px;border:1px solid oklch(1 0 0 / 0.09);background:oklch(1 0 0 / 0.03);padding:13px 14px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <div style="min-width:0;">
+                      <div style="display:flex;align-items:center;gap:7px;">
+                        <div style="min-width:0;font-weight:600;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ u.label }}</div>
+                        <sc-if value="{{ u.isYou }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex:none;padding:2px 8px;border-radius:9999px;background:oklch(1 0 0 / 0.08);font-size:10.5px;font-weight:700;color:oklch(0.75 0.02 280);">YOU</span>
+                        </sc-if>
+                      </div>
+                      <div style="font-size:11.5px;color:oklch(0.62 0.02 280);margin-top:2px;">{{ u.email }} · added {{ u.createdLabel }}</div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex:none;">
+                      <button onClick="{{ u.onReset }}" style="padding:7px 11px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.14);background:oklch(1 0 0 / 0.05);color:#fff;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Reset password</button>
+                      <sc-if value="{{ u.canRemove }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ u.onRemove }}" style="padding:7px 11px;border-radius:9999px;border:1px solid oklch(0.66 0.16 25 / 0.35);background:oklch(0.62 0.16 25 / 0.1);color:oklch(0.86 0.09 30);font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Nunito Sans',sans-serif;">Remove</button>
+                      </sc-if>
+                    </div>
+                  </div>
+
+                  <sc-if value="{{ u.resetOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:11px;padding-top:11px;border-top:1px solid oklch(1 0 0 / 0.08);">
+                      <input type="password" value="{{ teamResetPassword }}" onChange="{{ onTeamResetPassword }}" placeholder="New password (min. 8 characters)" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+                      <sc-if value="{{ teamResetError }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:8px;font-size:11.5px;color:oklch(0.86 0.09 30);">{{ teamResetError }}</div>
+                      </sc-if>
+                      <div style="margin-top:9px;display:flex;gap:8px;">
+                        <button onClick="{{ u.onSaveReset }}" style="flex:1;padding:9px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:12.5px;">{{ teamResetSaveLabel }}</button>
+                        <button onClick="{{ closeTeamReset }}" style="padding:9px 14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:transparent;color:oklch(0.8 0.02 280);font-weight:600;font-size:12.5px;cursor:pointer;">Cancel</button>
+                      </div>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ u.removeOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:11px;padding-top:11px;border-top:1px solid oklch(1 0 0 / 0.08);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                      <div style="font-size:12px;color:oklch(0.8 0.06 30);">Remove this login for good?</div>
+                      <div style="display:flex;gap:8px;flex:none;">
+                        <button onClick="{{ u.onConfirmRemove }}" style="padding:8px 13px;border-radius:9999px;border:none;cursor:pointer;background:oklch(0.62 0.16 25);color:#fff;font-weight:600;font-size:12px;">{{ teamRemoveLabel }}</button>
+                        <button onClick="{{ closeTeamRemove }}" style="padding:8px 13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:transparent;color:oklch(0.8 0.02 280);font-weight:600;font-size:12px;cursor:pointer;">Cancel</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:16px;">
+              <div style="font-weight:700;font-size:14px;color:#fff;">Add an admin</div>
+              <p style="margin:4px 0 0;font-size:12px;line-height:1.5;color:oklch(0.66 0.02 280);">They'll get full access to bookings, refunds, and pricing - same as you.</p>
+              <label style="display:flex;flex-direction:column;gap:5px;margin-top:13px;">
+                <span style="font-size:11.5px;font-weight:600;color:oklch(0.78 0.015 270);">Name (optional)</span>
+                <input type="text" value="{{ teamNewName }}" onChange="{{ onTeamNewName }}" placeholder="Jamie" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">
+                <span style="font-size:11.5px;font-weight:600;color:oklch(0.78 0.015 270);">Email</span>
+                <input type="email" value="{{ teamNewEmail }}" onChange="{{ onTeamNewEmail }}" placeholder="jamie@sweetdreamsrvrentals.com" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">
+                <span style="font-size:11.5px;font-weight:600;color:oklch(0.78 0.015 270);">Password</span>
+                <input type="password" value="{{ teamNewPassword }}" onChange="{{ onTeamNewPassword }}" placeholder="Min. 8 characters" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+              </label>
+              <sc-if value="{{ teamAddError }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:10px;font-size:12px;color:oklch(0.86 0.09 30);">{{ teamAddError }}</div>
+              </sc-if>
+              <button onClick="{{ addTeamUser }}" style="width:100%;margin-top:13px;padding:11px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:13.5px;">{{ teamAddLabel }}</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
       <!-- ===== UNDO TOAST ===== -->
       <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
         <div style="position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;background:oklch(0.14 0.02 264 / 0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);">
@@ -963,7 +1051,12 @@ class Component extends DCLogic {
     cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
     cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
     cqRate: 149, cqDelivery: 0, cqAdjust: 0,
-    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, refundConfirm: null, refundContext: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '', retryBusy: false };
+    cqPayStatus: 'full', cqPayMethod: 'cash', toast: null, refundConfirm: null, refundContext: null, refundAmt: '', refundReason: '', refundReasonNote: '', refundEmail: true, refundBusy: false, refundError: '', retryBusy: false,
+    currentAdminId: null,
+    teamOpen: false, teamUsers: [], teamLoading: false, teamError: '',
+    teamNewName: '', teamNewEmail: '', teamNewPassword: '', teamAddBusy: false, teamAddError: '',
+    teamResetOpenId: null, teamResetPassword: '', teamResetBusy: false, teamResetError: '',
+    teamRemoveConfirmId: null, teamRemoveBusy: false };
 
   // Full-sync upsert to the API. Mirrors the old "write the whole blob"
   // shape exactly (see backend/src/routes/overrides.js) so none of the
@@ -990,13 +1083,20 @@ class Component extends DCLogic {
   componentDidMount() {
     fetch('/api/admin/session', { credentials: 'include' })
       .then((res) => res.json())
-      .then((data) => { if (data && data.authed) this.setState({ authed: true }); })
+      .then((data) => {
+        if (data && data.authed) {
+          this.setState({ authed: true, currentAdminId: data.id });
+        }
+      })
       .catch(() => {});
-    // Deep-link support: ?view=list opens the list tab; ?sel=<id> opens a booking.
+    // Deep-link support: ?view=list|deposits|cancelled opens that tab (used by
+    // the Pricing page's own nav, since Pricing is a separate file rather
+    // than a view within this one) - ?sel=<id> opens a booking.
     try {
       const params = new URLSearchParams(location.search);
       const patch = {};
-      if (params.get('view') === 'list') patch.view = 'list';
+      const view = params.get('view');
+      if (view === 'list' || view === 'deposits' || view === 'cancelled') patch.view = view;
       if (params.get('sel')) patch.sel = params.get('sel');
       if (Object.keys(patch).length) this.setState(patch);
     } catch (e) {}
@@ -1206,6 +1306,89 @@ class Component extends DCLogic {
     this.setState({ cancelled: next, sel: null });
     this.persistOverrides(this.state.status, next);
     this.showToast((b ? b.guest : 'Booking') + ' restored');
+  }
+  // ----- team management (any logged-in admin can add/remove/reset the
+  // others - flat, no roles, matching how this dashboard has always treated
+  // whoever's logged in as fully trusted) -----
+  openTeam() {
+    this.setState({ teamOpen: true, teamError: '', teamResetOpenId: null, teamRemoveConfirmId: null });
+    this.loadTeamUsers();
+  }
+  closeTeam() {
+    this.setState({
+      teamOpen: false, teamNewName: '', teamNewEmail: '', teamNewPassword: '', teamAddError: '',
+      teamResetOpenId: null, teamResetPassword: '', teamResetError: '', teamRemoveConfirmId: null,
+    });
+  }
+  async loadTeamUsers() {
+    this.setState({ teamLoading: true });
+    try {
+      const res = await fetch('/api/admin/users', { credentials: 'include' });
+      if (!res.ok) throw new Error('load_failed');
+      const data = await res.json();
+      this.setState({ teamUsers: data.users || [], teamLoading: false });
+    } catch (e) {
+      this.setState({ teamLoading: false, teamError: 'Could not load the team list.' });
+    }
+  }
+  async addTeamUser() {
+    if (this.state.teamAddBusy) return;
+    const email = this.state.teamNewEmail.trim();
+    const password = this.state.teamNewPassword;
+    if (!email || !password) { this.setState({ teamAddError: 'Email and password are required.' }); return; }
+    if (password.length < 8) { this.setState({ teamAddError: 'Password must be at least 8 characters.' }); return; }
+    this.setState({ teamAddBusy: true, teamAddError: '' });
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ email, name: this.state.teamNewName.trim() || null, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data && data.error) || 'add_failed');
+      this.setState({ teamAddBusy: false, teamNewName: '', teamNewEmail: '', teamNewPassword: '' });
+      this.loadTeamUsers();
+      this.showToast('Added ' + email + ' as an admin');
+    } catch (e) {
+      const msg = e.message === 'email_taken' ? 'That email already has a login.'
+        : e.message === 'password_too_short' ? 'Password must be at least 8 characters.'
+        : 'Could not add that admin.';
+      this.setState({ teamAddBusy: false, teamAddError: msg });
+    }
+  }
+  async removeTeamUser(id) {
+    if (this.state.teamRemoveBusy) return;
+    this.setState({ teamRemoveBusy: true });
+    try {
+      const res = await fetch('/api/admin/users/' + id, { method: 'DELETE', credentials: 'include' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data && data.error) || 'remove_failed');
+      this.setState({ teamRemoveBusy: false, teamRemoveConfirmId: null });
+      this.loadTeamUsers();
+      this.showToast('Admin removed');
+    } catch (e) {
+      this.setState({
+        teamRemoveBusy: false, teamRemoveConfirmId: null,
+        teamError: e.message === 'last_admin' ? 'Can’t remove the last remaining admin.' : 'Could not remove that admin.',
+      });
+    }
+  }
+  async resetTeamPassword(id) {
+    if (this.state.teamResetBusy) return;
+    const password = this.state.teamResetPassword;
+    if (!password || password.length < 8) { this.setState({ teamResetError: 'Password must be at least 8 characters.' }); return; }
+    this.setState({ teamResetBusy: true, teamResetError: '' });
+    try {
+      const res = await fetch('/api/admin/users/' + id + '/reset-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data && data.error) || 'reset_failed');
+      this.setState({ teamResetBusy: false, teamResetOpenId: null, teamResetPassword: '' });
+      this.showToast('Password reset');
+    } catch (e) {
+      this.setState({ teamResetBusy: false, teamResetError: 'Could not reset that password.' });
+    }
   }
   // Deposit amount for a booking (default $1000 hold when not explicitly set; never for blocks).
   depAmt(b) { if (!b || b.type === 'block') return 0; return b.deposit != null ? b.deposit : 1000; }
@@ -1698,6 +1881,21 @@ class Component extends DCLogic {
       };
     }
 
+    const teamRows = (this.state.teamUsers || []).map((u) => ({
+      id: u.id,
+      label: u.name || u.email,
+      email: u.email,
+      createdLabel: new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      isYou: u.id === this.state.currentAdminId,
+      canRemove: this.state.teamUsers.length > 1,
+      resetOpen: this.state.teamResetOpenId === u.id,
+      removeOpen: this.state.teamRemoveConfirmId === u.id,
+      onReset: () => this.setState({ teamResetOpenId: u.id, teamResetPassword: '', teamResetError: '', teamRemoveConfirmId: null }),
+      onRemove: () => this.setState({ teamRemoveConfirmId: u.id, teamResetOpenId: null }),
+      onSaveReset: () => this.resetTeamPassword(u.id),
+      onConfirmRemove: () => this.removeTeamUser(u.id),
+    }));
+
     return {
       needsLogin: !this.state.authed,
       authed: this.state.authed,
@@ -1724,14 +1922,42 @@ class Component extends DCLogic {
           // this session existed and got 401s, so without this the dashboard
           // sits empty until the next 10s poll tick picks up real data.
           if (window.SDBookings) { window.SDBookings.refreshAll(); window.SDBookings.refreshOverrides(); }
+          fetch('/api/admin/session', { credentials: 'include' })
+            .then((r) => r.json())
+            .then((data) => { if (data && data.authed) this.setState({ currentAdminId: data.id }); })
+            .catch(() => {});
         } catch (e) {
           this.setState({ loginBusy: false, loginError: 'Incorrect email or password.' });
         }
       },
       signOut: () => {
         fetch('/api/admin/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
-        this.setState({ authed: false, sel: null });
+        this.setState({ authed: false, sel: null, currentAdminId: null, teamOpen: false });
       },
+
+      // ----- team -----
+      openTeam: () => this.openTeam(),
+      teamOpen: this.state.teamOpen,
+      closeTeam: () => this.closeTeam(),
+      teamError: !!this.state.teamError,
+      teamErrorText: this.state.teamError || '',
+      teamRows,
+      teamNewName: this.state.teamNewName,
+      onTeamNewName: (e) => this.setState({ teamNewName: e.target.value }),
+      teamNewEmail: this.state.teamNewEmail,
+      onTeamNewEmail: (e) => this.setState({ teamNewEmail: e.target.value }),
+      teamNewPassword: this.state.teamNewPassword,
+      onTeamNewPassword: (e) => this.setState({ teamNewPassword: e.target.value }),
+      teamAddError: this.state.teamAddError || '',
+      teamAddLabel: this.state.teamAddBusy ? 'Adding…' : 'Add admin',
+      addTeamUser: () => this.addTeamUser(),
+      teamResetPassword: this.state.teamResetPassword,
+      onTeamResetPassword: (e) => this.setState({ teamResetPassword: e.target.value }),
+      teamResetError: this.state.teamResetError || '',
+      teamResetSaveLabel: this.state.teamResetBusy ? 'Saving…' : 'Save',
+      closeTeamReset: () => this.setState({ teamResetOpenId: null, teamResetPassword: '', teamResetError: '' }),
+      teamRemoveLabel: this.state.teamRemoveBusy ? 'Removing…' : 'Remove',
+      closeTeamRemove: () => this.setState({ teamRemoveConfirmId: null }),
 
       days, rows, stats, deliveries, pickups,
       rangeLabel: monthLabel,
@@ -1816,7 +2042,6 @@ class Component extends DCLogic {
       }),
       cancelledEmpty: cancelledRaw.length === 0,
       cancelledCountLabel: cancelledRaw.length + (cancelledRaw.length === 1 ? ' cancelled booking' : ' cancelled bookings'),
-      navPricingStyle: this.navTabStyle(false),
 
       hasSelection: !!selB,
       closeDetail: () => this.setState({ sel: null }),
