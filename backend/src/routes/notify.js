@@ -1,6 +1,14 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { queueMessages } = require('./emailQueue');
+const { teamAlertHtml } = require('../emailTemplates');
+
+// Once sweetdreamsrvrentals.com is live (build order step 16), this becomes
+// the real admin dashboard URL these alerts link to. Deliberately hardcoded
+// rather than read from an env var - it's the one domain this whole project
+// is built around, and by the time live bookings ever trigger this (step 17
+// comes after step 16), the domain will already be pointed at this app.
+const ADMIN_URL = 'https://sweetdreamsrvrentals.com/Sweet%20Dreams%20Admin.dc.html';
 
 const router = express.Router();
 
@@ -34,9 +42,16 @@ function formatBody(fields) {
 // keeps it from being usable as an open relay.
 async function notifyTeam(subject, fields) {
   const to = process.env.NOTIFY_TO_EMAIL || 'info@sweetdreamsrvrentals.com';
+  const html = teamAlertHtml({
+    title: subject,
+    subtitle: (fields && fields.type) || 'Team alert',
+    fields: fields || {},
+    ctaHref: ADMIN_URL,
+    note: 'Reply to this email to reach the guest directly, or open the dashboard to follow up.',
+  });
   await queueMessages({
     bookingId: null, guest: null, email: to, trailer: null, dates: null,
-    messages: [{ to, sendAt: todayIso(), subject, body: formatBody(fields || {}), kind: 'team-notification' }],
+    messages: [{ to, sendAt: todayIso(), subject, body: formatBody(fields || {}), html, kind: 'team-notification' }],
   });
 }
 

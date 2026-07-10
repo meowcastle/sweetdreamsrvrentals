@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const pool = require('./db');
 const { chargeBalance } = require('./routes/bookings');
+const { sendMail } = require('./mail');
 
 // Daily balance auto-charge sweep (build order step 12). Only picks up
 // bookings that haven't been attempted yet (balance_charge_failed = false) -
@@ -33,24 +34,31 @@ async function runBalanceChargeSweep() {
 // rows sitting in email_queue for events that will never happen - those are
 // suppressed here rather than sent.
 //
-// No real mail provider is wired in yet (no SMTP/SendGrid/etc. credentials
-// anywhere in this project), so "sending" is a loud log line for now. Swap
-// this for a real provider call when one exists; the queue/sweep mechanics
-// around it don't need to change.
+// Sends for real via Resend (see mail.js). A failed send is never marked
+// sent - it's left for the next sweep to retry, up to 5 attempts, with the
+// error recorded so it's visible via GET /api/email-queue rather than only
+// in logs.
 async function runEmailQueueSweep() {
   const { rows } = await pool.query(
     `SELECT q.*, COALESCE(o.cancelled, false) AS cancelled FROM email_queue q
      LEFT JOIN booking_status_overrides o ON o.booking_id = q.booking_id
-     WHERE NOT q.sent AND q.send_at <= CURRENT_DATE
+     WHERE NOT q.sent AND q.send_at <= CURRENT_DATE AND q.attempts < 5
      ORDER BY q.send_at`,
   );
   for (const row of rows) {
     if (row.cancelled) {
       console.log(`[email-queue-sweep] booking ${row.booking_id} cancelled, suppressing "${row.kind}" to ${row.recipient}`);
-    } else {
-      console.log(`[email-queue-sweep] SEND "${row.subject}" to ${row.recipient} (kind=${row.kind}, booking=${row.booking_id})`);
+      await pool.query('UPDATE email_queue SET sent = true, sent_at = now() WHERE id = $1', [row.id]);
+      continue;
     }
-    await pool.query('UPDATE email_queue SET sent = true, sent_at = now() WHERE id = $1', [row.id]);
+    try {
+      await sendMail({ to: row.recipient, subject: row.subject, body: row.body, html: row.html });
+      await pool.query('UPDATE email_queue SET sent = true, sent_at = now(), last_error = NULL WHERE id = $1', [row.id]);
+      console.log(`[email-queue-sweep] sent "${row.subject}" to ${row.recipient} (kind=${row.kind}, booking=${row.booking_id})`);
+    } catch (e) {
+      console.error(`[email-queue-sweep] failed to send "${row.subject}" to ${row.recipient} (attempt ${row.attempts + 1}):`, e.message || e);
+      await pool.query('UPDATE email_queue SET attempts = attempts + 1, last_error = $2 WHERE id = $1', [row.id, String(e.message || e)]);
+    }
   }
 }
 

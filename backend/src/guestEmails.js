@@ -6,6 +6,10 @@
 // webhook (step 10), which never touches the browser's JS at all, so the
 // guest email schedule has to be built here instead for it to ever run.
 // Keep this in sync with buildGuestEmails() if the copy or schedule changes.
+const {
+  confirmationFullHtml, confirmationFirstNightHtml, balanceReminderHtml,
+  balanceChargedHtml, deliveryReminderHtml, depositRefundHtml,
+} = require('./emailTemplates');
 
 const TRAILER_NAMES = {
   charlie: 'Charlie', ella: 'Ella', virginia: 'Virginia', marylou: 'Mary Lou',
@@ -68,6 +72,11 @@ Questions? Just reply to this email or call (541) 630-4795.
 
 See you out there,
 Sweet Dreams RV Rentals`,
+      html: confirmationFirstNightHtml({
+        first, trailerName, datesLabel, site, dueToday: booking.dueToday,
+        balanceLater: booking.balanceLater, deposit: booking.deposit,
+        balanceChargeDateLabel: dateLong(booking.balanceChargeDate), money,
+      }),
     });
     msgs.push({
       kind: 'balance-reminder', to: booking.email, sendAt: minus(booking.balanceChargeDate, 3),
@@ -83,6 +92,10 @@ A quick heads up: the remaining balance for your ${trailerName} trip (${datesLab
 If anything needs to change, please reply or call (541) 630-4795 before that date.
 
 Sweet Dreams RV Rentals`,
+      html: balanceReminderHtml({
+        first, trailerName, datesLabel, balanceLater: booking.balanceLater,
+        balanceChargeDateLabel: dateLong(booking.balanceChargeDate), money,
+      }),
     });
     msgs.push({
       kind: 'balance-charged', to: booking.email, sendAt: booking.balanceChargeDate,
@@ -100,6 +113,10 @@ The ${money(booking.deposit)} security deposit included here is refunded after t
 We can't wait to get you set up.
 
 Sweet Dreams RV Rentals`,
+      html: balanceChargedHtml({
+        first, trailerName, datesLabel, site, balanceLater: booking.balanceLater,
+        deposit: booking.deposit, money,
+      }),
     });
   } else {
     msgs.push({
@@ -121,6 +138,10 @@ Questions? Just reply to this email or call (541) 630-4795.
 
 See you out there,
 Sweet Dreams RV Rentals`,
+      html: confirmationFullHtml({
+        first, trailerName, datesLabel, site, dueToday: booking.dueToday,
+        deposit: booking.deposit, money,
+      }),
     });
   }
 
@@ -138,6 +159,9 @@ Your trip is almost here! We'll deliver and set up your ${trailerName} on ${date
 We'll walk you through everything on site. If your plans or site details changed, reply or call (541) 630-4795.
 
 Sweet Dreams RV Rentals`,
+    html: deliveryReminderHtml({
+      first, trailerName, arrivalLabel: dateLong(arrIso), departureLabel: dateLong(depIso), site, money,
+    }),
   });
 
   msgs.push({
@@ -151,6 +175,7 @@ Thanks for camping with us! Now that your ${trailerName} is back and checked ove
 We'd love to host you again.
 
 Sweet Dreams RV Rentals`,
+    html: depositRefundHtml({ first, trailerName, deposit: booking.deposit, money }),
   });
 
   return { trailerName, datesLabel, messages: msgs.filter((m) => m.to && m.sendAt) };

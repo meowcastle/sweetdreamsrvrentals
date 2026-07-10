@@ -88,3 +88,16 @@ CREATE TABLE IF NOT EXISTS email_queue (
 );
 
 CREATE INDEX IF NOT EXISTS email_queue_send_at_idx ON email_queue (send_at) WHERE NOT sent;
+
+-- Real send attempts (build order step 13, part 2 - wiring in an actual mail
+-- provider). A failed send must never be silently marked sent - it needs to
+-- be retried on the next sweep and stay visible to whoever checks
+-- GET /api/email-queue, so track both how many times it's been tried and
+-- what went wrong last.
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS attempts INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS last_error TEXT;
+
+-- Styled HTML alongside the plain-text `body` (see emailTemplates.js).
+-- Nullable: a message queued with only `body` still sends fine as
+-- plain-text-only, so nothing upstream is forced to supply this.
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS html TEXT;

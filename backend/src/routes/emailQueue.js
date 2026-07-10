@@ -16,10 +16,10 @@ async function queueMessages({ bookingId, guest, email, trailer, dates, messages
     for (const m of messages) {
       if (!m || !m.to || !m.subject || !m.body) continue;
       await client.query(
-        `INSERT INTO email_queue (booking_id, guest, recipient, trailer, dates_label, kind, subject, body, send_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        `INSERT INTO email_queue (booking_id, guest, recipient, trailer, dates_label, kind, subject, body, html, send_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
         [bookingId || null, guest || null, m.to, trailer || null, dates || null,
-          m.kind || null, m.subject, m.body, m.sendAt || null],
+          m.kind || null, m.subject, m.body, m.html || null, m.sendAt || null],
       );
     }
     await client.query('COMMIT');
