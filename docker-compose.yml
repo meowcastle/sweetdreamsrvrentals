@@ -48,6 +48,23 @@ services:
       timeout: 5s
       retries: 5
 
+  cloudflared:
+    # Outbound-only connection to Cloudflare's edge - no inbound port to
+    # open or forward on the router, unlike the DSM-reverse-proxy
+    # alternative the web/app services' comments mention. Only meaningful
+    # to actually run this on the NAS (the intended long-term host); running
+    # it locally too at the same time would make Cloudflare load-balance
+    # between two different origins under the one tunnel, which is never
+    # what you want. CLOUDFLARE_TUNNEL_TOKEN comes from the Cloudflare
+    # dashboard (Networking > Tunnels > sweetdreams-nas) - real secret,
+    # never committed, set in .env only.
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run", "--token", "${CLOUDFLARE_TUNNEL_TOKEN}"]
+    depends_on:
+      web:
+        condition: service_healthy
+
   web:
     # Serves the static site (.dc.html files, images, sd-*.js) and proxies
     # /api/* to the app service - see scripts/dev-server.js. Stock node
