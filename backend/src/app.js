@@ -14,6 +14,15 @@ const emailQueueRoutes = require('./routes/emailQueue');
 
 const app = express();
 
+// The Cloudflare Tunnel (cloudflared) is the only reverse-proxy hop between
+// the public internet and this app - trust exactly that one hop so req.ip
+// (and the admin login rate limiter, which keys on it) reflects the real
+// visitor's IP from X-Forwarded-For, not the tunnel's local address for
+// every request. Without this, every request looks like it comes from the
+// same IP, so the rate limiter buckets all traffic together instead of per
+// attacker.
+app.set('trust proxy', 1);
+
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // Stripe signature verification needs the raw request body, so this route is
