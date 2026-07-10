@@ -1241,6 +1241,17 @@ Sweet Dreams RV Rentals`,
       // than showing fabricated details.
       if (params.get('booking') === 'success') {
         const sessionId = params.get('session_id');
+        // Strip these one-time params from the URL right away, before doing
+        // anything else. Otherwise this exact URL sits in browser history
+        // forever - closing the modal and starting a second, different
+        // booking doesn't touch the address bar, so hitting "back" from
+        // THAT checkout (even one that's abandoned and never completes)
+        // reloads this page, re-runs this same handler, and re-shows this
+        // stale confirmation - making an unrelated, incomplete attempt look
+        // like it succeeded. replaceState rewrites this history entry in
+        // place, so a later back-navigation to it loads the clean URL and
+        // never re-triggers this branch.
+        history.replaceState(null, '', window.location.pathname);
         this.setState({ reserveOpen: true, step: 'confirmed' });
         if (sessionId) this.fetchConfirmedBooking(sessionId);
         else this.setState({ confirmedLoadFailed: true });
