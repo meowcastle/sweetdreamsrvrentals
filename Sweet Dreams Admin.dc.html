@@ -26,8 +26,19 @@
 
 <div style="position:relative;min-height:100vh;overflow-x:hidden;font-family:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:oklch(0.86 0.012 270);background:radial-gradient(1200px 600px at 80% -10%, oklch(0.17 0.05 280 / 0.7), transparent 60%), oklch(0.11 0.02 264);">
 
+  <!-- ===== CHECKING SESSION ===== -->
+  <!-- authed can't be known on first paint (it lives in an httpOnly cookie
+       client JS can't read), but assuming "logged out" while we ask the
+       server was flashing the login form on every refresh even for an
+       already-valid session. This neutral state fills that gap instead. -->
+  <sc-if value="{{ authChecking }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;">
+      <span style="width:44px;height:44px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;opacity:0.7;"><img src="trailer-white.png" alt="" style="width:28px;height:28px;object-fit:contain;"></span>
+    </div>
+  </sc-if>
+
   <!-- ===== LOGIN GATE ===== -->
-  <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ true }}">
+  <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ false }}">
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">
       <div style="width:100%;max-width:380px;background:oklch(0.16 0.02 264 / 0.7);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:32px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.7);">
         <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
@@ -1043,7 +1054,7 @@ class Component extends DCLogic {
   // authed starts false and is confirmed by the server in componentDidMount:
   // a real session lives in an httpOnly cookie, which client JS can't read,
   // so there's no way to know it's valid without asking the backend first.
-  state = { authed: false, loginEmail: '', loginPassword: '', loginError: null, loginBusy: false, sel: null,
+  state = { authed: false, authChecking: true, loginEmail: '', loginPassword: '', loginError: null, loginBusy: false, sel: null,
     status: {}, cancelled: {}, charges: {}, refunds: {},
     autoOpen: false,
     autoNudge: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.nudge !== false; } catch (e) { return true; } })(),
@@ -1095,7 +1106,8 @@ class Component extends DCLogic {
           this.setState({ authed: true, currentAdminId: data.id });
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => this.setState({ authChecking: false }));
     // Deep-link support: ?view=list|deposits|cancelled opens that tab (used by
     // the Pricing page's own nav, since Pricing is a separate file rather
     // than a view within this one) - ?sel=<id> opens a booking.
@@ -1904,7 +1916,8 @@ class Component extends DCLogic {
     }));
 
     return {
-      needsLogin: !this.state.authed,
+      authChecking: this.state.authChecking,
+      needsLogin: !this.state.authed && !this.state.authChecking,
       authed: this.state.authed,
       loginEmail: this.state.loginEmail,
       onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
