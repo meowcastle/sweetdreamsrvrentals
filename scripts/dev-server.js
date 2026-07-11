@@ -56,7 +56,13 @@ http.createServer((req, res) => {
   }
   if (urlPath.startsWith('/.env')) { res.writeHead(403); res.end('forbidden'); return; }
 
-  const filePath = path.join(ROOT, urlPath === '/' ? '/Sweet Dreams RV.dc.html' : urlPath);
+  // Reached via admin.<domain> (a separate Tunnel public hostname pointed
+  // at this same service) -> bare "/" should land on the admin login, not
+  // the customer site. Every other explicit path still resolves exactly
+  // the same regardless of which hostname it's reached through.
+  const host = (req.headers.host || '').split(':')[0];
+  const defaultPage = host.startsWith('admin.') ? '/Sweet Dreams Admin.dc.html' : '/Sweet Dreams RV.dc.html';
+  const filePath = path.join(ROOT, urlPath === '/' ? defaultPage : urlPath);
   if (!filePath.startsWith(ROOT)) { res.writeHead(403); res.end('forbidden'); return; }
 
   fs.readFile(filePath, (err, data) => {
