@@ -328,7 +328,7 @@
       <!-- right: photo -->
       <div style="position:relative;">
         <div style="position:relative;width:100%;aspect-ratio:3/2;border-radius:24px;overflow:hidden;border:1px solid oklch(1 0 0 / 0.14);box-shadow:0 24px 48px -14px oklch(0 0 0 / 0.6);">
-          <image-slot id="sdrv-why-photo" src="why-fleet.png" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a fleet photo"></image-slot>
+          <image-slot id="sdrv-why-photo" src="why-fleet.jpg" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a fleet photo"></image-slot>
         </div>
         <div style="position:absolute;left:-14px;bottom:-14px;background:oklch(0.14 0.02 264 / 0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.14);border-radius:16px;padding:14px 17px;box-shadow:0 16px 32px -10px oklch(0 0 0 / 0.55);animation:floaty 5s ease-in-out infinite;">
           <div style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#fff;line-height:1;">$120–$325</div>
@@ -955,7 +955,7 @@ class Component extends DCLogic {
     confirmedBooking: null, confirmedLoadFailed: false,
     carIdx: 0, dragging: false, dragPos: 0 };
 
-  carouselList = ['fan-1.png', 'fan-2.png', 'fan-3.png', 'fan-4.png', 'fan-5.png', 'fan-6.png'];
+  carouselList = ['fan-1.jpg', 'fan-2.jpg', 'fan-3.jpg', 'fan-4.jpg', 'fan-5.jpg', 'fan-6.jpg'];
 
   // ─────────────────────────────────────────────────────────────
   // TEAM NOTIFICATIONS  (booking / quote / cancellation → info@sweetdreamsrvrentals.com)
@@ -1275,7 +1275,7 @@ Sweet Dreams RV Rentals`,
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
-  photoMap = { charlie: 'charlie-exterior.png', ella: 'photo-ella.jpg', jerry: 'jerry-main.png', virginia: 'virginia-exterior.png', patricia: 'patricia-exterior.png', nola: 'photo-nola.jpg', marylou: 'marylou-exterior.png', billybob: 'billybob-bath.png' };
+  photoMap = { charlie: 'charlie-exterior.jpg', ella: 'photo-ella.jpg', jerry: 'jerry-main.jpg', virginia: 'virginia-exterior.jpg', patricia: 'patricia-exterior.png', nola: 'photo-nola.jpg', marylou: 'marylou-exterior.jpg', billybob: 'billybob-bath.jpg' };
 
   trailers = [
     { id: 'charlie',  name: 'Charlie',   rate: 139, tag: 'Mid-size SUV tow · under 4,533 lbs', sleeps: 'Sleeps 4–6', blurb: 'Our lightest trailer, tows under 4,533 lbs behind a mid-size SUV. The easy escape for a couple or a small crew.' },
