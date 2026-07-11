@@ -1,5 +1,6 @@
 require('express-async-errors');
 const express = require('express');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 
 const checkoutRoutes = require('./routes/checkout');
@@ -13,6 +14,11 @@ const overridesRoutes = require('./routes/overrides');
 const emailQueueRoutes = require('./routes/emailQueue');
 
 const app = express();
+
+// This app is a pure JSON API - no HTML/JS is served from here (that's the
+// separate "web" service), so helmet's defaults apply cleanly with no CSP
+// directives to hand-tune for a page that doesn't exist on this origin.
+app.use(helmet());
 
 // The Cloudflare Tunnel (cloudflared) is the only reverse-proxy hop between
 // the public internet and this app - trust exactly that one hop so req.ip
