@@ -13,7 +13,11 @@ const DEFAULTS = {
     jerry: 159, patricia: 159, nola: 159, billybob: 159,
   },
   summer: { amount: 20, startMonth: 6, startDay: 1, endMonth: 9, endDay: 15 },
-  delivery: { freeRadius: 100, beyondFee: 120 },
+  delivery: { tiers: [
+    { upTo: 24, fee: 120 },
+    { upTo: 49, fee: 175 },
+    { upTo: 100, fee: 325 },
+  ] },
   fees: { prep: 95, deposit: 1000, pet: 45 },
   stay: { min: 3, max: 14 },
   addons: [
@@ -88,7 +92,7 @@ function stayRental(base, startDate, nights, cfg) {
 }
 
 // From Sweet Dreams RV.dc.html's campgroundMiles - used only to validate the
-// delivery fee (0 vs. beyondFee), same as the frontend's own auto-detection.
+// delivery fee tier, same as the frontend's own auto-detection.
 const CAMPGROUND_MILES = {
   'Valley of the Rogue State Park': 18, 'Joseph H. Stewart Rec Area': 48,
   'Emigrant Lake': 45, 'Southern Oregon RV Park': 28, 'Willow Lake': 58,
@@ -113,6 +117,20 @@ function campgroundNameFrom(deliverySite) {
   const s = String(deliverySite || '');
   const i = s.indexOf(' · ');
   return i === -1 ? s : s.slice(0, i);
+}
+
+// Mirrors sd-pricing.js's deliveryFee(): looks up the tiered fee for a known
+// distance, capping at the top tier for anything beyond its upTo. Returns
+// null for an unknown distance (no site picked, or an unlisted address),
+// which the caller treats as $0 - those get confirmed with the quote
+// instead of an automatic charge.
+function deliveryFee(miles, cfg) {
+  if (typeof miles !== 'number') return null;
+  const tiers = (cfg.delivery && cfg.delivery.tiers) || DEFAULTS.delivery.tiers;
+  for (let i = 0; i < tiers.length; i++) {
+    if (miles <= tiers[i].upTo) return tiers[i].fee;
+  }
+  return tiers[tiers.length - 1].fee;
 }
 
 // Parses "Kayak" or "Kayak ×2" (see selectedAddonNames in the RV file) back
@@ -145,8 +163,7 @@ function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons
   const deposit = cfg.fees.deposit || 0;
 
   const miles = CAMPGROUND_MILES[campgroundNameFrom(deliverySite)];
-  const radius = cfg.delivery.freeRadius || 100;
-  const delivery = (typeof miles === 'number' && miles > radius) ? (cfg.delivery.beyondFee || 0) : 0;
+  const delivery = deliveryFee(miles, cfg) || 0;
 
   const addonsTotal = addonsTotalFor(addons, cfg);
 
@@ -170,4 +187,4 @@ function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons
   };
 }
 
-module.exports = { getEffectiveConfig, mergeConfig, DEFAULTS, computeExpected, pstToday };
+module.exports = { getEffectiveConfig, mergeConfig, DEFAULTS, computeExpected, pstToday, deliveryFee };

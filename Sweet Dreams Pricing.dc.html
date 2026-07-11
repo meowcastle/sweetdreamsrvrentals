@@ -133,7 +133,7 @@
           <section style="background:oklch(0.16 0.02 264 / 0.6);border:1px solid oklch(1 0 0 / 0.1);border-radius:20px;overflow:hidden;">
             <div style="padding:18px 20px;border-bottom:1px solid oklch(1 0 0 / 0.08);">
               <h2 style="margin:0;font-weight:700;font-size:16px;color:#fff;">Delivery &amp; fees</h2>
-              <p style="margin:3px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">Free within the radius, one flat fee beyond it.</p>
+              <p style="margin:3px 0 0;font-size:12.5px;color:oklch(0.66 0.02 280);">Tiered by delivery distance, no free tier.</p>
             </div>
             <div style="padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;">
               <sc-for list="{{ feeFields }}" as="f" hint-placeholder-count="6">
@@ -222,7 +222,7 @@
                 <div style="font-size:11.5px;font-weight:600;color:oklch(0.7 0.03 282);text-transform:uppercase;letter-spacing:0.04em;">Sample: {{ sampleLabel }}</div>
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">{{ sampleNightsLabel }}</span><span style="font-weight:600;color:#fff;">{{ sampleRental }}</span></div>
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Cleaning &amp; prep</span><span style="font-weight:600;color:#fff;">{{ samplePrep }}</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Delivery (beyond radius)</span><span style="font-weight:600;color:#fff;">{{ sampleDelivery }}</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Delivery (from)</span><span style="font-weight:600;color:#fff;">{{ sampleDelivery }}</span></div>
                 <div style="height:1px;background:oklch(1 0 0 / 0.1);margin:2px 0;"></div>
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.8 0.015 270);font-weight:600;">Trip total</span><span style="font-weight:700;color:#fff;font-size:15px;">{{ sampleTotal }}</span></div>
               </div>
@@ -359,8 +359,9 @@ class Component extends DCLogic {
     const summerWindow = this.monthNames[(cfg.summer.startMonth || 1) - 1] + ' ' + cfg.summer.startDay + ' – ' + this.monthNames[(cfg.summer.endMonth || 1) - 1] + ' ' + cfg.summer.endDay + ' each year.';
 
     const feeFields = [
-      { label: 'Free radius', prefix: '', suffix: 'mi', value: cfg.delivery.freeRadius, onChange: (e) => this.edit((c) => { c.delivery.freeRadius = this.num(e.target.value); }) },
-      { label: 'Delivery beyond', prefix: '$', suffix: 'flat', value: cfg.delivery.beyondFee, onChange: (e) => this.edit((c) => { c.delivery.beyondFee = this.num(e.target.value); }) },
+      { label: 'Delivery (up to 24 mi)', prefix: '$', suffix: '', value: cfg.delivery.tiers[0].fee, onChange: (e) => this.edit((c) => { c.delivery.tiers[0].fee = this.num(e.target.value); }) },
+      { label: 'Delivery (25-49 mi)', prefix: '$', suffix: '', value: cfg.delivery.tiers[1].fee, onChange: (e) => this.edit((c) => { c.delivery.tiers[1].fee = this.num(e.target.value); }) },
+      { label: 'Delivery (50-100 mi)', prefix: '$', suffix: '', value: cfg.delivery.tiers[2].fee, onChange: (e) => this.edit((c) => { c.delivery.tiers[2].fee = this.num(e.target.value); }) },
       { label: 'Cleaning / prep', prefix: '$', suffix: '', value: cfg.fees.prep, onChange: (e) => this.edit((c) => { c.fees.prep = this.num(e.target.value); }) },
       { label: 'Security deposit', prefix: '$', suffix: '', value: cfg.fees.deposit, onChange: (e) => this.edit((c) => { c.fees.deposit = this.num(e.target.value); }) },
       { label: 'Min nights', prefix: '', suffix: 'nt', value: cfg.stay.min, onChange: (e) => this.edit((c) => { c.stay.min = Math.max(1, this.num(e.target.value)); }) },
@@ -467,8 +468,8 @@ class Component extends DCLogic {
       sampleNightsLabel: '3 nights (Fri–Mon)',
       sampleRental: fmt(sampleRentalN),
       samplePrep: fmt(cfg.fees.prep),
-      sampleDelivery: fmt(cfg.delivery.beyondFee),
-      sampleTotal: fmt(sampleRentalN + cfg.fees.prep + cfg.delivery.beyondFee),
+      sampleDelivery: fmt(cfg.delivery.tiers[0].fee),
+      sampleTotal: fmt(sampleRentalN + cfg.fees.prep + cfg.delivery.tiers[0].fee),
     };
   }
 }

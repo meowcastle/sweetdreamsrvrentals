@@ -17,8 +17,14 @@
     },
     // Flat $ added to each night that falls inside the summer window.
     summer: { amount: 20, startMonth: 6, startDay: 1, endMonth: 9, endDay: 15 },
-    // Delivery: free inside the radius, one flat fee beyond it.
-    delivery: { freeRadius: 100, beyondFee: 120 },
+    // Delivery: tiered by distance, capped at the top tier for anything
+    // beyond the last upTo (there's no free tier - every delivery costs
+    // something).
+    delivery: { tiers: [
+      { upTo: 24, fee: 120 },
+      { upTo: 49, fee: 175 },
+      { upTo: 100, fee: 325 },
+    ] },
     fees: { prep: 95, deposit: 1000, pet: 45 },
     stay: { min: 3, max: 14 },
     // qty:true lets guests pick more than one, up to maxQty. qty:false = single unit.
@@ -133,10 +139,24 @@
 
   function fmt(n) { return '$' + Number(n).toLocaleString('en-US'); }
 
+  // Looks up the delivery fee for a distance. Returns null when the
+  // distance isn't known yet (no site picked, or "Other"/unlisted address -
+  // those get confirmed with the quote instead of an automatic charge).
+  // Anything beyond the last tier's upTo is capped at that tier's fee.
+  function deliveryFee(miles, cfg) {
+    if (typeof miles !== 'number') return null;
+    var tiers = (cfg && cfg.delivery && cfg.delivery.tiers) || DEFAULTS.delivery.tiers;
+    for (var i = 0; i < tiers.length; i++) {
+      if (miles <= tiers[i].upTo) return tiers[i].fee;
+    }
+    return tiers[tiers.length - 1].fee;
+  }
+
   window.SDPricing = {
     KEY: KEY, DEFAULTS: DEFAULTS, clone: clone, merge: merge,
     load: load, save: save, refresh: refresh,
     isSummer: isSummer,
     nightlyRate: nightlyRate, stayRental: stayRental, fmt: fmt,
+    deliveryFee: deliveryFee,
   };
 })();

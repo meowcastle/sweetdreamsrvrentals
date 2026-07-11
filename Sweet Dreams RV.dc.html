@@ -291,7 +291,7 @@
             <span style="font-weight:600;font-size:14px;color:oklch(0.78 0.015 270);">Estimated total</span>
             <span style="font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-0.01em;background:linear-gradient(105deg, oklch(0.8 0.13 300), oklch(0.74 0.16 280));-webkit-background-clip:text;background-clip:text;color:transparent;">{{ totalLabel }}</span>
           </div>
-          <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:oklch(0.64 0.015 275);">Plus a <strong style="color:oklch(0.82 0.015 270);">{{ depositLabel }} fully refundable</strong> security deposit. Insurance and delivery beyond {{ deliveryRadiusLabel }} mi are quoted separately.</p>
+          <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:oklch(0.64 0.015 275);">Plus a <strong style="color:oklch(0.82 0.015 270);">{{ depositLabel }} fully refundable</strong> security deposit. Delivery is priced by distance ($120–$325); insurance is quoted separately.</p>
           <button onClick="{{ openReserve }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Check availability &amp; reserve</button>
           <button onClick="{{ openEmail }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;">Email me this quote</button>
           <div style="display:flex;align-items:center;gap:7px;justify-content:center;margin-top:13px;font-size:12px;color:oklch(0.64 0.015 275);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Self-serve estimate — no waiting on email</div>
@@ -331,8 +331,8 @@
           <image-slot id="sdrv-why-photo" src="why-fleet.png" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="Drop a fleet photo"></image-slot>
         </div>
         <div style="position:absolute;left:-14px;bottom:-14px;background:oklch(0.14 0.02 264 / 0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.14);border-radius:16px;padding:14px 17px;box-shadow:0 16px 32px -10px oklch(0 0 0 / 0.55);animation:floaty 5s ease-in-out infinite;">
-          <div style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#fff;line-height:1;">{{ deliveryRadiusLabel }} mi</div>
-          <div style="font-size:12.5px;color:oklch(0.74 0.02 280);margin-top:4px;">Free delivery radius</div>
+          <div style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#fff;line-height:1;">$120–$325</div>
+          <div style="font-size:12.5px;color:oklch(0.74 0.02 280);margin-top:4px;">Delivery, priced by distance</div>
         </div>
       </div>
     </div>
@@ -545,16 +545,10 @@
               <input type="text" value="{{ fSiteOther }}" onChange="{{ onSiteOther }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
 
-            <sc-if value="{{ siteWithin }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(0.5 0.13 152 / 0.12);border:1px solid oklch(0.6 0.14 152 / 0.32);">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M5 13l4 4L19 7" stroke="oklch(0.82 0.15 152)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.86 0.03 152);"><strong style="color:#fff;">≈ {{ siteMilesLabel }} mi</strong> from our Merlin base. Within the free delivery radius, so delivery is <strong style="color:#fff;">included</strong>.</span>
-              </div>
-            </sc-if>
-            <sc-if value="{{ siteBeyond }}" hint-placeholder-val="{{ false }}">
+            <sc-if value="{{ siteKnownDist }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(0.72 0.15 60 / 0.12);border:1px solid oklch(0.72 0.15 60 / 0.34);">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M12 9v4m0 4h.01M10.3 3.9 2.4 18a1.5 1.5 0 0 0 1.3 2.3h16.6a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0Z" stroke="oklch(0.82 0.16 66)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.88 0.05 66);"><strong style="color:#fff;">≈ {{ siteMilesLabel }} mi</strong> from our Merlin base, beyond the free {{ deliveryRadiusLabel }} mi radius. A <strong style="color:#fff;">{{ deliveryFeeLabel }}</strong> delivery fee has been added.</span>
+                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.88 0.05 66);"><strong style="color:#fff;">≈ {{ siteMilesLabel }} mi</strong> from our Merlin base. A <strong style="color:#fff;">{{ deliveryFeeLabel }}</strong> delivery fee has been added.</span>
               </div>
             </sc-if>
             <sc-if value="{{ siteUnknownDist }}" hint-placeholder-val="{{ false }}">
@@ -951,7 +945,7 @@
 }">
 class Component extends DCLogic {
   pricing = (window.SDPricing ? window.SDPricing.load() : null);
-  state = { nights: 4, trailerId: 'charlie', delivery: 'included', addons: {}, openFaq: 0,
+  state = { nights: 4, trailerId: 'charlie', addons: {}, openFaq: 0,
     reserveOpen: false, step: 'details', avail: 'idle', calOpen: false, calMonth: null, calStart: null, calMode: 'arrival', calHover: null,
     emailOpen: false, emailStep: 'form',
     fName: '', fEmail: '', fPhone: '', fArrival: '', fSite: '', fSiteSel: '', fSiteOther: '',
@@ -1314,9 +1308,9 @@ Sweet Dreams RV Rentals`,
   ];
 
   // Approx. driving distance (mi) from the Merlin / Grants Pass base for each
-  // campground. Used to auto-detect whether a delivery falls inside the free
-  // radius or triggers the beyond-radius fee — so the customer never has to
-  // guess. Anything not listed (e.g. "Other") is treated as unknown.
+  // campground. Used to auto-detect the delivery fee tier so the customer
+  // never has to guess. Anything not listed (e.g. "Other") is treated as
+  // unknown and confirmed with the quote instead.
   campgroundMiles = {
     'Valley of the Rogue State Park': 18, 'Joseph H. Stewart Rec Area': 48,
     'Emigrant Lake': 45, 'Southern Oregon RV Park': 28, 'Willow Lake': 58,
@@ -1330,9 +1324,9 @@ Sweet Dreams RV Rentals`,
 
   faqs = [
     { q: 'How does it actually work?', a: 'You book your own campsite at a campground or RV park, then we deliver the trailer there and set it up before you arrive. You show up to a ready-to-go home base. No towing, no leveling, no fuss.' },
-    { q: 'Where do you deliver?', a: 'Our base delivery fee covers roughly 100 miles around Merlin and Grants Pass. Anywhere farther out is still very doable. We just add a delivery charge based on distance, which we confirm with your quote.' },
+    { q: 'Where do you deliver?', a: 'Anywhere within about 100 miles of Merlin and Grants Pass, and often farther. Delivery is priced by distance: $120 for up to 24 miles, $175 for 25–49 miles, $325 for 50–100 miles. Pick your campground and the fee is calculated automatically. Unlisted addresses are confirmed with your quote.' },
     { q: 'How long can I book?', a: 'Stays run from a 3-night minimum up to 14 nights. Planning something longer or a special occasion? Just ask.' },
-    { q: 'What fees should I expect?', a: 'A $95 cleaning, prep & stocking fee and a $1,000 fully refundable security deposit. Delivery beyond 100 miles and insurance are quoted separately. Summer nightly rates run $149–$169 and are seasonal.' },
+    { q: 'What fees should I expect?', a: 'A $95 cleaning, prep & stocking fee, a delivery fee based on distance ($120–$325), and a $1,000 fully refundable security deposit. Insurance is quoted separately. Summer nightly rates run $149–$169 and are seasonal.' },
     { q: 'When is check-in and check-out?', a: 'Check-in is after 3 PM and check-out is between 11 AM and 12 PM, so we have time to deliver, set up, and turn the trailer over fresh for the next guests.' },
     { q: 'Can I bring my dog?', a: 'Yes, a house-mannered dog is welcome with a $45 pet fee. We just ask that pets are clean and well-behaved inside the trailer.' },
     { q: 'What if I need to cancel?', a: 'Cancel 14 or more days before arrival and you\u2019re refunded in full, less a small 3% fee (minimum $10). Within 14 days, 50% is non-refundable; within 7 days, the reservation is non-refundable. You can also reschedule within 14 days for a $50 fee and carry your funds to a future stay. Send us a request and we\u2019ll confirm the details.', action: 'cancel' },
@@ -1465,8 +1459,9 @@ Sweet Dreams RV Rentals`,
     const tripDatesLabel = arrivalDate ? this.fmtDate(arrivalDate) + ' – ' + this.fmtDate(departureDate) : 'your dates';
     const rental = P ? P.stayRental(t.rate, arrivalDate, nights, cfg) : t.rate * nights;
     const prep = cfg ? cfg.fees.prep : 95;
-    const deliveryFee = cfg ? cfg.delivery.beyondFee : 120;
-    const delivery = this.state.delivery === 'extended' ? deliveryFee : 0;
+    const siteMiles = this.campgroundMiles[this.state.fSiteSel];
+    const deliveryFee = (P && cfg) ? P.deliveryFee(siteMiles, cfg) : null;
+    const delivery = deliveryFee || 0;
     const addonsTotal = addonsList.reduce((s, a) => s + a.price * (this.state.addons[a.id] || 0), 0);
     const selectedAddonNames = addonsList
       .filter((a) => (this.state.addons[a.id] || 0) > 0)
@@ -1599,7 +1594,7 @@ Sweet Dreams RV Rentals`,
     const calHint = (calMode === 'departure' && anchorDate) ? 'Choose your checkout date' : 'Choose your arrival date';
     // Live pricing that follows the committed range or the hover-preview range.
     const calSelNights = (bandA && bandB) ? Math.round((bandB.getTime() - bandA.getTime()) / 86400000) : 0;
-    const calDeliveryFee = this.state.delivery === 'extended' ? deliveryFee : 0;
+    const calDeliveryFee = delivery;
     const hasCalPrice = calSelNights > 0;
     const calRental = P ? P.stayRental(t.rate, bandA, calSelNights, cfg) : t.rate * calSelNights;
     const calTripTotal = hasCalPrice ? calRental + prep + calDeliveryFee + addonsTotal : 0;
@@ -1813,13 +1808,9 @@ Sweet Dreams RV Rentals`,
       onArrival: (e) => this.setState({ fArrival: e.target.value, avail: 'idle' }),
       onSiteSelect: (e) => {
         const v = e.target.value;
-        const patch = { fSiteSel: v, fSite: this.siteValue(v, this.state.fSiteOther), avail: 'idle' };
-        // Auto-detect delivery zone from the campground's distance so the fee is
-        // set for the customer rather than left to them to guess.
-        const miles = this.campgroundMiles[v];
-        const radius = cfg ? cfg.delivery.freeRadius : 100;
-        if (typeof miles === 'number') patch.delivery = miles > radius ? 'extended' : 'included';
-        this.setState(patch);
+        // Delivery fee is derived fresh each render from the picked
+        // campground's distance (see renderVals) - no separate state needed.
+        this.setState({ fSiteSel: v, fSite: this.siteValue(v, this.state.fSiteOther), avail: 'idle' });
       },
       onSiteOther: (e) => { const d = e.target.value; this.setState({ fSiteOther: d, fSite: this.siteValue(this.state.fSiteSel, d), avail: 'idle' }); },
 
@@ -2046,11 +2037,9 @@ Sweet Dreams RV Rentals`,
       nights,
       nightsLineLabel: nights + ' nights × $' + t.rate,
       fleetFromLabel: 'From $' + fleetMinRate + ' / night',
-      deliveryFeeLabel: '+' + this.fmt(deliveryFee),
-      deliveryRadiusLabel: String(cfg ? cfg.delivery.freeRadius : 100),
-      siteMilesLabel: String(this.campgroundMiles[this.state.fSiteSel] || ''),
-      siteWithin: typeof this.campgroundMiles[this.state.fSiteSel] === 'number' && this.campgroundMiles[this.state.fSiteSel] <= (cfg ? cfg.delivery.freeRadius : 100),
-      siteBeyond: typeof this.campgroundMiles[this.state.fSiteSel] === 'number' && this.campgroundMiles[this.state.fSiteSel] > (cfg ? cfg.delivery.freeRadius : 100),
+      deliveryFeeLabel: deliveryFee != null ? '+' + this.fmt(deliveryFee) : '',
+      siteMilesLabel: String(siteMiles || ''),
+      siteKnownDist: typeof siteMiles === 'number',
       siteUnknownDist: this.state.fSiteSel === '__other',
       depositLabel: this.fmt(deposit),
       decNights: () => this.setState((s) => ({ nights: Math.max(MIN_N, s.nights - 1), avail: 'idle' })),
@@ -2071,15 +2060,10 @@ Sweet Dreams RV Rentals`,
       activeSleeps: t.sleeps,
       rentalLabel: this.fmt(rental),
       prepLabel: this.fmt(prep),
-      deliveryLabel: delivery ? '+' + this.fmt(delivery) : 'Included',
+      deliveryLabel: !this.state.fSiteSel ? '—' : (deliveryFee != null ? '+' + this.fmt(deliveryFee) : 'Confirmed with quote'),
       addonsTotalLabel: addonsTotal ? '+' + this.fmt(addonsTotal) : '$0',
       addonLines,
       totalLabel: this.fmt(total),
-
-      delIncStyle: this.state.delivery === 'included' ? 'border:2px solid oklch(1 0 0 / 0.9);' : 'border:1px solid oklch(1 0 0 / 0.14);',
-      delExtStyle: this.state.delivery === 'extended' ? 'border:2px solid oklch(1 0 0 / 0.9);' : 'border:1px solid oklch(1 0 0 / 0.14);',
-      setIncluded: () => this.setState({ delivery: 'included' }),
-      setExtended: () => this.setState({ delivery: 'extended' }),
 
       addons: addonsList.map((a) => {
         const q = this.state.addons[a.id] || 0;
