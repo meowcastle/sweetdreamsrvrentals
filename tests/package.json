@@ -10,6 +10,7 @@
     "test:flow": "playwright test specs/booking-flow.spec.js",
     "test:logic": "playwright test specs/date-logic.spec.js specs/required-fields.spec.js",
     "test:chaos": "playwright test specs/chaos.spec.js",
+    "test:stripe-sim": "node stripe-sim.js",
     "report": "playwright show-report",
     "install:browsers": "playwright install chromium"
   },
