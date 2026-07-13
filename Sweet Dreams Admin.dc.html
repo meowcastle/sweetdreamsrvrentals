@@ -917,7 +917,7 @@
 
                 <!-- actions -->
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:20px;">
-                  <button onClick="{{ emailQuote }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Email quote</button>
+                  <button onClick="{{ emailQuote }}" disabled="{{ cqSending }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ cqEmailQuoteLabel }}</button>
                   <sc-if value="{{ cqNoConflict }}" hint-placeholder-val="{{ true }}">
                     <button onClick="{{ confirmPhoneBooking }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Book over the phone</button>
                   </sc-if>
@@ -925,6 +925,9 @@
                     <button disabled style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.12);cursor:not-allowed;background:oklch(1 0 0 / 0.04);color:oklch(0.6 0.02 280);font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Trailer unavailable</button>
                   </sc-if>
                 </div>
+                <sc-if value="{{ cqSendError }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:12px;font-size:12.5px;color:oklch(0.78 0.14 30);text-align:center;">{{ cqSendError }}</div>
+                </sc-if>
               </div>
             </sc-if>
 
@@ -1065,7 +1068,7 @@ class Component extends DCLogic {
     refundLead: (function () { try { const a = JSON.parse(localStorage.getItem('sd_admin_automations') || '{}'); return a.refundLead || 1; } catch (e) { return 1; } })(),
     view: 'calendar', calViewMonth: null, blockOpen: false, payFilter: 'all',
     bfTrailer: 'marylou', bfDate: '2026-07-07', bfNights: 2, bfReason: 'Maintenance', bfNote: '',
-    cqOpen: false, cqStep: 'build',
+    cqOpen: false, cqStep: 'build', cqSending: false, cqSendError: '',
     cqName: '', cqEmail: '', cqPhone: '', cqSite: '',
     cqTrailer: 'charlie', cqDate: '2026-07-10', cqNights: 4, cqAddons: {},
     cqRate: 149, cqDelivery: 0, cqAdjust: 0,
@@ -2279,6 +2282,9 @@ class Component extends DCLogic {
       cqBuild: this.state.cqStep === 'build',
       cqSent: this.state.cqStep === 'sent',
       cqBooked: this.state.cqStep === 'booked',
+      cqSending: this.state.cqSending,
+      cqSendError: this.state.cqSendError,
+      cqEmailQuoteLabel: this.state.cqSending ? 'Sending…' : 'Email quote',
       cqTrailers: this.trailers.map((t) => ({ id: t.id, name: t.name })),
       cqName: this.state.cqName,
       cqEmail: this.state.cqEmail,
@@ -2361,7 +2367,37 @@ class Component extends DCLogic {
       onCqDelivery: (e) => this.setState({ cqDelivery: e.target.value }),
       onCqAdjust: (e) => this.setState({ cqAdjust: e.target.value }),
       onCqPayMethod: (e) => this.setState({ cqPayMethod: e.target.value }),
-      emailQuote: () => this.setState({ cqStep: 'sent' }),
+      emailQuote: async () => {
+        const email = (this.state.cqEmail || '').trim();
+        if (!/^\S+@\S+\.\S+$/.test(email)) { this.setState({ cqSendError: 'Enter a valid email first.' }); return; }
+        if (!this.state.cqDate) { this.setState({ cqSendError: 'Pick a date first.' }); return; }
+        this.setState({ cqSending: true, cqSendError: '' });
+        const addonsTotal = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((sum, x) => sum + x.price, 0);
+        try {
+          const res = await fetch('/api/quotes/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              // The admin panel is served from admin.<domain>, the guest-facing
+              // booking site from the bare domain (scripts/dev-server.js's
+              // host-based routing) - strip the prefix to get the link the
+              // guest should actually land on, rather than hardcoding either
+              // the staging or eventual production hostname.
+              siteOrigin: window.location.origin.replace(/^(https?:\/\/)admin\./, '$1'),
+              trailerId: this.state.cqTrailer,
+              arrival: this.state.cqDate,
+              nights: this.state.cqNights,
+              name: this.state.cqName, email, phone: this.state.cqPhone, site: this.state.cqSite,
+              rate: this.state.cqRate, delivery: this.state.cqDelivery, adjustment: this.state.cqAdjust, addonsTotal,
+            }),
+          });
+          if (!res.ok) throw new Error('quote email failed');
+          this.setState({ cqSending: false, cqStep: 'sent' });
+        } catch (e) {
+          this.setState({ cqSending: false, cqSendError: "Couldn't send that - try again." });
+        }
+      },
       confirmPhoneBooking: async () => {
         const s = this.state.cqDate ? new Date(this.state.cqDate + 'T00:00:00') : null;
         if (!s || isNaN(s)) return;

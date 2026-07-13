@@ -1225,8 +1225,35 @@ Sweet Dreams RV Rentals`,
     try {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('trailer');
-      if (id && this.trailers.some((t) => t.id === id)) {
+      const validId = id && this.trailers.some((t) => t.id === id);
+      if (validId) {
         this.setState({ trailerId: id });
+      }
+      // A quoted-reservation link (admin's "Email quote" action) - prefills
+      // what the admin already collected and drops the guest straight into
+      // the reserve modal instead of making them re-enter it all. Never
+      // reads a price from the URL: the live pricing engine (and
+      // create-checkout-session's own server-side check) always computes
+      // the real total, so a manually-quoted rate can't be replayed as a
+      // forged discount just by editing the link.
+      const arrival = params.get('arrival');
+      const validArrival = arrival && /^\d{4}-\d{2}-\d{2}$/.test(arrival);
+      if (validId && validArrival) {
+        const nightsParam = parseInt(params.get('nights'), 10);
+        const site = params.get('site') || '';
+        this.setState({
+          trailerId: id,
+          fArrival: arrival,
+          nights: (nightsParam >= 3 && nightsParam <= 14) ? nightsParam : this.state.nights,
+          fName: params.get('name') || '',
+          fEmail: params.get('email') || '',
+          fPhone: params.get('phone') || '',
+          fSiteSel: site ? '__other' : '',
+          fSiteOther: site,
+          fSite: site,
+          reserveOpen: true, step: 'details', avail: 'idle',
+        });
+        history.replaceState(null, '', window.location.pathname);
       }
       // Returning from a successful Stripe Checkout → show the confirmation.
       // The session id is only absent if successUrl's {CHECKOUT_SESSION_ID}
