@@ -2503,6 +2503,16 @@ class Component extends DCLogic {
       confirmPhoneBooking: async () => {
         const s = this.state.cqDate ? new Date(this.state.cqDate + 'T00:00:00') : null;
         if (!s || isNaN(s)) return;
+        // start is only used below for the day-index clash check (comparing
+        // against combinedBookings()'s own baseDate-relative offsets, an
+        // internally-consistent domain) - it must NOT be round-tripped back
+        // through dateAt()/toISO() to build the arrival string sent to the
+        // server. That reconstruction adds start*86400000ms to baseDate and
+        // rereads the local calendar date, which can land a day off from
+        // cqDate whenever "today" and the chosen date fall on opposite
+        // sides of a DST change (their UTC offsets differ by an hour, which
+        // is enough to cross a local-midnight boundary). cqDate is already
+        // the exact date string the picker gave us - use it directly.
         const start = Math.round((s.getTime() - this.baseDate.getTime()) / 86400000);
         // Guard: never write a booking that overlaps an existing hold on the same trailer.
         // (The server re-checks this too, under a lock, in case of a real race.)
@@ -2522,7 +2532,7 @@ class Component extends DCLogic {
             credentials: 'include',
             body: JSON.stringify({
               trailer: this.state.cqTrailer,
-              arrival: this.toISO(this.dateAt(start)),
+              arrival: this.state.cqDate,
               nights: this.state.cqNights,
               guest: this.state.cqName || 'Phone booking',
               phone: this.state.cqPhone || 'By phone',
