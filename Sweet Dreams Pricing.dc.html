@@ -374,6 +374,7 @@ class Component extends DCLogic {
       { label: 'Delivery (50-100 mi)', prefix: '$', suffix: '', value: cfg.delivery.tiers[2].fee, onChange: (e) => this.edit((c) => { c.delivery.tiers[2].fee = this.num(e.target.value); }) },
       { label: 'Cleaning / prep', prefix: '$', suffix: '', value: cfg.fees.prep, onChange: (e) => this.edit((c) => { c.fees.prep = this.num(e.target.value); }) },
       { label: 'Security deposit', prefix: '$', suffix: '', value: cfg.fees.deposit, onChange: (e) => this.edit((c) => { c.fees.deposit = this.num(e.target.value); }) },
+      { label: 'Pet fee', prefix: '$', suffix: '', value: cfg.fees.pet, onChange: (e) => this.edit((c) => { c.fees.pet = this.num(e.target.value); }) },
       { label: 'Min nights', prefix: '', suffix: 'nt', value: cfg.stay.min, onChange: (e) => this.edit((c) => { c.stay.min = Math.max(1, this.num(e.target.value)); }) },
       { label: 'Max nights', prefix: '', suffix: 'nt', value: cfg.stay.max, onChange: (e) => this.edit((c) => { c.stay.max = Math.max(1, this.num(e.target.value)); }) },
     ];

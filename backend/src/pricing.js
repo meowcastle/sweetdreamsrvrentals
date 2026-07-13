@@ -153,7 +153,7 @@ function addonsTotalFor(addonLabels, cfg) {
 // client-side for the reserve modal: rental, fees, delivery, addons, the
 // 14-day-out payment-plan rule, and the resulting dueToday/balanceLater
 // split. Throws on an unknown trailer.
-function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons, requestedPlan }) {
+function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons, hasPet, requestedPlan }) {
   const base = cfg.trailers[trailerId];
   if (base == null) throw new Error('unknown_trailer');
 
@@ -166,8 +166,9 @@ function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons
   const delivery = deliveryFee(miles, cfg) || 0;
 
   const addonsTotal = addonsTotalFor(addons, cfg);
+  const pet = hasPet ? (cfg.fees.pet || 0) : 0;
 
-  const tripTotal = rental + prep + delivery + addonsTotal;
+  const tripTotal = rental + prep + delivery + addonsTotal + pet;
   const grandTotal = tripTotal + deposit;
 
   const firstNight = stayRental(base, arrivalDate, 1, cfg);
@@ -182,7 +183,7 @@ function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons
   const balanceChargeDate = new Date(arrivalDate.getTime() - 14 * 86400000);
 
   return {
-    rental, prep, deposit, delivery, addonsTotal, tripTotal, grandTotal,
+    rental, prep, deposit, delivery, addonsTotal, pet, tripTotal, grandTotal,
     plan, dueToday, balanceLater, balanceChargeDate,
   };
 }

@@ -52,7 +52,7 @@ router.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   try {
     expected = computeExpected(cfg, {
       trailerId: b.trailerId, arrival: b.arrival, nights,
-      deliverySite: b.deliverySite, addons: b.addons, requestedPlan: b.paymentPlan,
+      deliverySite: b.deliverySite, addons: b.addons, hasPet: !!b.hasPet, requestedPlan: b.paymentPlan,
     });
   } catch (e) {
     return res.status(400).json({ error: 'invalid_trailer' });
@@ -91,6 +91,7 @@ router.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
     guest: b.guest, email: b.email, phone: b.phone || '',
     site: b.deliverySite || '',
     addons: JSON.stringify(Array.isArray(b.addons) ? b.addons : []),
+    hasPet: b.hasPet ? 'true' : 'false',
     plan: expected.plan,
     tripTotalCents: String(Math.round(expected.tripTotal * 100)),
     depositCents: String(Math.round(expected.deposit * 100)),

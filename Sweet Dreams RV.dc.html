@@ -227,11 +227,23 @@
             </div>
           </div>
 
-          <!-- 3 add-ons -->
+          <!-- 3 pets -->
+          <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+            <div>
+              <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">3 · Bringing a pet?</div>
+              <div style="margin-top:6px;font-size:13px;color:oklch(0.72 0.02 280);">House-mannered dogs welcome · {{ petFeeLabel }} fee</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button onClick="{{ setPetNo }}" style="{{ petNoStyle }}">No</button>
+              <button onClick="{{ setPetYes }}" style="{{ petYesStyle }}">Yes</button>
+            </div>
+          </div>
+
+          <!-- 4 add-ons -->
           <sc-if value="{{ showAddons }}" hint-placeholder-val="{{ true }}">
             <div style="background:oklch(0.2 0.022 264 / 0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid oklch(1 0 0 / 0.12);border-radius:20px;padding:20px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">3 · Add the fun</div>
+                <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">4 · Add the fun</div>
                 <div style="font-size:12px;color:oklch(0.64 0.015 275);">Toys &amp; extras · est. pricing</div>
               </div>
               <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:14px;">
@@ -282,6 +294,9 @@
             <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">{{ nightsLineLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
             <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Cleaning, prep &amp; stocking</span><span style="font-weight:600;color:#fff;">{{ prepLabel }}</span></div>
             <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Delivery</span><span style="font-weight:600;color:#fff;">{{ deliveryLabel }}</span></div>
+            <sc-if value="{{ showPet }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Pet fee</span><span style="font-weight:600;color:#fff;">{{ petFeeLabel }}</span></div>
+            </sc-if>
             <sc-if value="{{ showAddons }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div><sc-for list="{{ addonLines }}" as="al" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;padding-left:12px;"><span style="color:oklch(0.6 0.02 280);font-size:12.5px;">{{ al.label }}</span><span style="color:oklch(0.78 0.015 270);font-size:12.5px;">{{ al.amount }}</span></div></sc-for>
             </sc-if>
@@ -654,6 +669,9 @@
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">{{ selectedName }} · {{ tripDatesLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Cleaning, prep &amp; stocking</span><span style="font-weight:600;color:#fff;">{{ prepLabel }}</span></div>
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Delivery</span><span style="font-weight:600;color:#fff;">{{ deliveryLabel }}</span></div>
+                <sc-if value="{{ showPet }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Pet fee</span><span style="font-weight:600;color:#fff;">{{ petFeeLabel }}</span></div>
+                </sc-if>
                 <sc-if value="{{ hasAddons }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.78 0.015 270);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div><sc-for list="{{ addonLines }}" as="al" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;padding-left:12px;"><span style="color:oklch(0.6 0.02 280);font-size:12.5px;">{{ al.label }}</span><span style="color:oklch(0.78 0.015 270);font-size:12.5px;">{{ al.amount }}</span></div></sc-for>
                 </sc-if>
@@ -819,7 +837,7 @@
             <!-- mini summary -->
             <div style="margin-top:16px;border-radius:14px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:14px;display:flex;flex-direction:column;gap:8px;font-size:13px;">
               <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">{{ nightsLineLabel }}</span><span style="font-weight:600;color:#fff;">{{ rentalLabel }}</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Prep &amp; delivery</span><span style="font-weight:600;color:#fff;">{{ prepPlusDeliveryLabel }}</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">{{ prepDeliveryLineLabel }}</span><span style="font-weight:600;color:#fff;">{{ prepPlusDeliveryLabel }}</span></div>
               <sc-if value="{{ hasAddons }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Add-ons</span><span style="font-weight:600;color:#fff;">{{ addonsTotalLabel }}</span></div><sc-for list="{{ addonLines }}" as="al" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;padding-left:12px;"><span style="color:oklch(0.6 0.02 280);font-size:12.5px;">{{ al.label }}</span><span style="color:oklch(0.74 0.02 280);font-size:12.5px;">{{ al.amount }}</span></div></sc-for>
               </sc-if>
@@ -945,7 +963,7 @@
 }">
 class Component extends DCLogic {
   pricing = (window.SDPricing ? window.SDPricing.load() : null);
-  state = { nights: 4, trailerId: 'charlie', addons: {}, openFaq: 0,
+  state = { nights: 4, trailerId: 'charlie', addons: {}, hasPet: false, openFaq: 0,
     reserveOpen: false, step: 'details', avail: 'idle', calOpen: false, calMonth: null, calStart: null, calMode: 'arrival', calHover: null,
     emailOpen: false, emailStep: 'form',
     fName: '', fEmail: '', fPhone: '', fArrival: '', fSite: '', fSiteSel: '', fSiteOther: '',
@@ -1517,7 +1535,8 @@ Sweet Dreams RV Rentals`,
     const addonLines = addonsList
       .filter((a) => (this.state.addons[a.id] || 0) > 0)
       .map((a) => { const q = this.state.addons[a.id] || 0; return { label: a.name + (q > 1 ? ' ×' + q : ''), amount: this.fmt(a.price * q) }; });
-    const total = rental + prep + delivery + addonsTotal;
+    const petFee = this.state.hasPet ? (cfg ? cfg.fees.pet : 45) : 0;
+    const total = rental + prep + delivery + addonsTotal + petFee;
     const hv = this.props.heroVariant || 'statement';
 
     // reserve modal derived values
@@ -1830,6 +1849,19 @@ Sweet Dreams RV Rentals`,
       heroStatement: hv === 'statement',
       showAddons: this.props.showAddons !== false,
 
+      // ----- pet fee (step 3, between nights and add-ons) -----
+      hasPet: this.state.hasPet,
+      showPet: this.state.hasPet,
+      petFeeLabel: this.fmt(cfg ? cfg.fees.pet : 45),
+      petYesStyle: 'padding:12px 20px;border-radius:9999px;font-weight:600;font-size:13.5px;cursor:pointer;font-family:\'Nunito Sans\',sans-serif;border:none;' + (this.state.hasPet
+        ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;'
+        : 'background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.18);color:oklch(0.78 0.015 270);'),
+      petNoStyle: 'padding:12px 20px;border-radius:9999px;font-weight:600;font-size:13.5px;cursor:pointer;font-family:\'Nunito Sans\',sans-serif;border:none;' + (!this.state.hasPet
+        ? 'background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;'
+        : 'background:oklch(1 0 0 / 0.06);border:1px solid oklch(1 0 0 / 0.18);color:oklch(0.78 0.015 270);'),
+      setPetYes: () => this.setState({ hasPet: true }),
+      setPetNo: () => this.setState({ hasPet: false }),
+
       // ----- reserve modal -----
       reserveOpen: this.state.reserveOpen,
       reserveHeading: activeStep === 'details' ? 'Check availability & reserve'
@@ -1986,6 +2018,7 @@ Sweet Dreams RV Rentals`,
               phone: this.state.fPhone || '',
               deliverySite: this.state.fSite || '',
               addons: selectedAddonNames,
+              hasPet: this.state.hasPet,
               // ----- payment plan -----
               // 'firstnight' → charge dueToday now, save card, auto-charge the
               //   balance off-session on balanceChargeDate (14 days before arrival).
@@ -2022,7 +2055,8 @@ Sweet Dreams RV Rentals`,
       emailOpen: this.state.emailOpen,
       emailForm: this.state.emailStep === 'form',
       emailSent: this.state.emailStep === 'sent',
-      prepPlusDeliveryLabel: this.fmt(prep + delivery),
+      prepPlusDeliveryLabel: this.fmt(prep + delivery + petFee),
+      prepDeliveryLineLabel: this.state.hasPet ? 'Prep, delivery & pet fee' : 'Prep & delivery',
       openEmail: () => this.setState({ emailOpen: true, emailStep: 'form' }),
       closeEmail: () => this.setState({ emailOpen: false }),
       sendQuote: () => {

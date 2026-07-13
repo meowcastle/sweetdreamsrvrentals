@@ -41,6 +41,13 @@ async function handleCheckoutCompleted(session) {
 
   let addons = [];
   try { addons = JSON.parse(m.addons || '[]'); } catch (e) { addons = []; }
+  // Surfaced as a plain addons entry rather than a new column - it's an
+  // "extra" from a display/team-visibility standpoint same as a kayak or
+  // firewood bundle, and this reuses every existing surface that already
+  // lists addons (admin dashboard, team notification) with no new plumbing.
+  // The actual charge was already verified server-side against cfg.fees.pet
+  // in create-checkout-session, this is just what shows up afterward.
+  if (m.hasPet === 'true') addons = [...addons, 'Pet fee'];
 
   let result;
   try {
