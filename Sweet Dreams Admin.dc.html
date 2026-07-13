@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&amp;family=Archivo+Black&amp;display=swap" rel="stylesheet">
 <script src="./sd-pricing.js"></script>
+<script src="./sd-keynav.js"></script>
 <script src="./sd-bookings.js?v=100"></script>
 <style>
   * { box-sizing: border-box; }
@@ -41,7 +42,7 @@
   <!-- ===== LOGIN GATE ===== -->
   <sc-if value="{{ needsLogin }}" hint-placeholder-val="{{ false }}">
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">
-      <div style="width:100%;max-width:380px;background:oklch(0.16 0.02 264 / 0.7);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:32px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.7);">
+      <div data-sd-enter-group style="width:100%;max-width:380px;background:oklch(0.16 0.02 264 / 0.7);border:1px solid oklch(1 0 0 / 0.12);border-radius:24px;padding:32px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.7);">
         <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
           <span style="width:52px;height:52px;border-radius:9999px;background:linear-gradient(135deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));display:grid;place-items:center;"><img src="trailer-white.png" alt="" style="width:34px;height:34px;object-fit:contain;"></span>
           <h1 style="margin:16px 0 0;font-weight:700;font-size:20px;color:#fff;">Owner dashboard</h1>
@@ -49,16 +50,16 @@
         </div>
         <label style="display:flex;flex-direction:column;gap:6px;margin-top:24px;">
           <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email</span>
-          <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="owner@sweetdreamsrvrentals.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+          <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" onKeyDown="{{ onEnterKey }}" placeholder="owner@sweetdreamsrvrentals.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
         </label>
         <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
           <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Password</span>
-          <input type="password" value="{{ loginPassword }}" onChange="{{ onLoginPassword }}" placeholder="••••••••" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+          <input type="password" value="{{ loginPassword }}" onChange="{{ onLoginPassword }}" onKeyDown="{{ onEnterKey }}" placeholder="••••••••" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
         </label>
         <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:12px;padding:11px 13px;border-radius:12px;background:oklch(0.62 0.16 25 / 0.14);border:1px solid oklch(0.66 0.16 25 / 0.4);font-size:12.5px;color:oklch(0.86 0.09 30);">{{ loginErrorText }}</div>
         </sc-if>
-        <button onClick="{{ signIn }}" style="width:100%;margin-top:20px;padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">{{ signInLabel }}</button>
+        <button data-sd-enter-submit onClick="{{ signIn }}" style="width:100%;margin-top:20px;padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">{{ signInLabel }}</button>
       </div>
     </div>
   </sc-if>
@@ -485,7 +486,7 @@
       <sc-if value="{{ showRefundConfirm }}" hint-placeholder-val="{{ false }}">
         <div style="position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:20px;">
           <div onClick="{{ dismissRefund }}" style="position:absolute;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
-          <div style="position:relative;width:100%;max-width:410px;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:20px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:26px;">
+          <div data-sd-enter-group style="position:relative;width:100%;max-width:410px;background:oklch(0.15 0.02 264 / 0.98);border:1px solid oklch(1 0 0 / 0.14);border-radius:20px;box-shadow:0 30px 66px -16px oklch(0 0 0 / 0.78);padding:26px;">
             <span style="width:46px;height:46px;border-radius:9999px;background:oklch(0.5781 0.2303 264.8 / 0.16);border:1px solid oklch(0.6 0.16 288 / 0.45);display:grid;place-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M7 15h4M6 4h12a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z" stroke="oklch(0.82 0.12 292)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
             <h2 style="margin:15px 0 0;font-weight:700;font-size:19px;color:#fff;">{{ refundModalTitle }}</h2>
             <sc-if value="{{ refundContextIsCancel }}" hint-placeholder-val="{{ false }}">
@@ -504,7 +505,7 @@
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);">
                 <span style="font-size:16px;font-weight:700;color:oklch(0.72 0.02 280);">$</span>
-                <input type="number" min="0" value="{{ refundAmtValue }}" onInput="{{ onRefundAmt }}" style="flex:1;padding:13px 0;border:none;background:transparent;color:#fff;font-weight:700;font-size:16px;font-family:'Nunito Sans',sans-serif;outline:none;" />
+                <input type="number" min="0" value="{{ refundAmtValue }}" onInput="{{ onRefundAmt }}" onKeyDown="{{ onEnterKey }}" style="flex:1;padding:13px 0;border:none;background:transparent;color:#fff;font-weight:700;font-size:16px;font-family:'Nunito Sans',sans-serif;outline:none;" />
                 <span style="font-size:11.5px;color:oklch(0.6 0.02 280);white-space:nowrap;">of {{ refundConfirmMaxLabel }}</span>
               </div>
               <sc-if value="{{ refundPolicyShow }}" hint-placeholder-val="{{ false }}">
@@ -516,13 +517,13 @@
             </div>
             <div style="margin-top:16px;">
               <div style="font-size:12px;font-weight:600;color:oklch(0.72 0.02 280);margin-bottom:7px;">Reason for refund</div>
-              <select value="{{ refundReasonValue }}" onChange="{{ onRefundReason }}" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-weight:600;font-size:13.5px;font-family:'Nunito Sans',sans-serif;outline:none;cursor:pointer;">
+              <select value="{{ refundReasonValue }}" onChange="{{ onRefundReason }}" onKeyDown="{{ onEnterKey }}" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-weight:600;font-size:13.5px;font-family:'Nunito Sans',sans-serif;outline:none;cursor:pointer;">
                 <sc-for list="{{ refundReasonOpts }}" as="o" hint-placeholder-count="6">
                   <option value="{{ o.value }}">{{ o.label }}</option>
                 </sc-for>
               </select>
               <sc-if value="{{ refundReasonIsOther }}" hint-placeholder-val="{{ false }}">
-                <input type="text" value="{{ refundReasonNoteValue }}" onInput="{{ onRefundReasonNote }}" placeholder="Describe the reason" style="width:100%;margin-top:9px;padding:12px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-weight:500;font-size:13.5px;font-family:'Nunito Sans',sans-serif;outline:none;" />
+                <input type="text" value="{{ refundReasonNoteValue }}" onInput="{{ onRefundReasonNote }}" onKeyDown="{{ onEnterKey }}" placeholder="Describe the reason" style="width:100%;margin-top:9px;padding:12px 14px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-weight:500;font-size:13.5px;font-family:'Nunito Sans',sans-serif;outline:none;" />
               </sc-if>
             </div>
             <sc-if value="{{ refundHasEmail }}" hint-placeholder-val="{{ true }}">
@@ -725,13 +726,13 @@
                   </div>
 
                   <sc-if value="{{ u.resetOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="margin-top:11px;padding-top:11px;border-top:1px solid oklch(1 0 0 / 0.08);">
-                      <input type="password" value="{{ teamResetPassword }}" onChange="{{ onTeamResetPassword }}" placeholder="New password (min. 8 characters)" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+                    <div data-sd-enter-group style="margin-top:11px;padding-top:11px;border-top:1px solid oklch(1 0 0 / 0.08);">
+                      <input type="password" value="{{ teamResetPassword }}" onChange="{{ onTeamResetPassword }}" onKeyDown="{{ onEnterKey }}" placeholder="New password (min. 8 characters)" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
                       <sc-if value="{{ teamResetError }}" hint-placeholder-val="{{ false }}">
                         <div style="margin-top:8px;font-size:11.5px;color:oklch(0.86 0.09 30);">{{ teamResetError }}</div>
                       </sc-if>
                       <div style="margin-top:9px;display:flex;gap:8px;">
-                        <button onClick="{{ u.onSaveReset }}" style="flex:1;padding:9px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:12.5px;">{{ teamResetSaveLabel }}</button>
+                        <button data-sd-enter-submit onClick="{{ u.onSaveReset }}" style="flex:1;padding:9px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:12.5px;">{{ teamResetSaveLabel }}</button>
                         <button onClick="{{ closeTeamReset }}" style="padding:9px 14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:transparent;color:oklch(0.8 0.02 280);font-weight:600;font-size:12.5px;cursor:pointer;">Cancel</button>
                       </div>
                     </div>
@@ -750,25 +751,25 @@
               </sc-for>
             </div>
 
-            <div style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:16px;">
+            <div data-sd-enter-group style="margin-top:20px;border-radius:16px;border:1px solid oklch(1 0 0 / 0.1);background:oklch(1 0 0 / 0.03);padding:16px;">
               <div style="font-weight:700;font-size:14px;color:#fff;">Add an admin</div>
               <p style="margin:4px 0 0;font-size:12px;line-height:1.5;color:oklch(0.66 0.02 280);">They'll get full access to bookings, refunds, and pricing - same as you.</p>
               <label style="display:flex;flex-direction:column;gap:5px;margin-top:13px;">
                 <span style="font-size:11.5px;font-weight:600;color:oklch(0.78 0.015 270);">Name (optional)</span>
-                <input type="text" value="{{ teamNewName }}" onChange="{{ onTeamNewName }}" placeholder="Jamie" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+                <input type="text" value="{{ teamNewName }}" onChange="{{ onTeamNewName }}" onKeyDown="{{ onEnterKey }}" placeholder="Jamie" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
               </label>
               <label style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">
                 <span style="font-size:11.5px;font-weight:600;color:oklch(0.78 0.015 270);">Email</span>
-                <input type="email" value="{{ teamNewEmail }}" onChange="{{ onTeamNewEmail }}" placeholder="jamie@sweetdreamsrvrentals.com" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+                <input type="email" value="{{ teamNewEmail }}" onChange="{{ onTeamNewEmail }}" onKeyDown="{{ onEnterKey }}" placeholder="jamie@sweetdreamsrvrentals.com" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
               </label>
               <label style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">
                 <span style="font-size:11.5px;font-weight:600;color:oklch(0.78 0.015 270);">Password</span>
-                <input type="password" value="{{ teamNewPassword }}" onChange="{{ onTeamNewPassword }}" placeholder="Min. 8 characters" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
+                <input type="password" value="{{ teamNewPassword }}" onChange="{{ onTeamNewPassword }}" onKeyDown="{{ onEnterKey }}" placeholder="Min. 8 characters" style="padding:10px 12px;border-radius:10px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:13px;font-family:'Nunito Sans',sans-serif;">
               </label>
               <sc-if value="{{ teamAddError }}" hint-placeholder-val="{{ false }}">
                 <div style="margin-top:10px;font-size:12px;color:oklch(0.86 0.09 30);">{{ teamAddError }}</div>
               </sc-if>
-              <button onClick="{{ addTeamUser }}" style="width:100%;margin-top:13px;padding:11px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:13.5px;">{{ teamAddLabel }}</button>
+              <button data-sd-enter-submit onClick="{{ addTeamUser }}" style="width:100%;margin-top:13px;padding:11px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:13.5px;">{{ teamAddLabel }}</button>
             </div>
           </div>
         </div>
@@ -803,21 +804,21 @@
 
             <!-- BUILD -->
             <sc-if value="{{ cqBuild }}" hint-placeholder-val="{{ true }}">
-              <div style="padding:20px 22px 24px;">
+              <div data-sd-enter-group style="padding:20px 22px 24px;">
 
                 <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">Customer</div>
                 <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
                   <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Name</span>
-                  <input type="text" value="{{ cqName }}" onChange="{{ onCqName }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  <input type="text" value="{{ cqName }}" onChange="{{ onCqName }}" onKeyDown="{{ onEnterKey }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                 </label>
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:12px;">
                   <label style="display:flex;flex-direction:column;gap:6px;">
                     <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email</span>
-                    <input type="email" value="{{ cqEmail }}" onChange="{{ onCqEmail }}" placeholder="you@email.com" style="width:100%;min-width:0;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                    <input type="email" value="{{ cqEmail }}" onChange="{{ onCqEmail }}" onKeyDown="{{ onEnterKey }}" placeholder="you@email.com" style="width:100%;min-width:0;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   </label>
                   <label style="display:flex;flex-direction:column;gap:6px;">
                     <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Phone</span>
-                    <input type="tel" value="{{ cqPhone }}" onChange="{{ onCqPhone }}" placeholder="(541) 000-0000" style="width:100%;min-width:0;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                    <input type="tel" value="{{ cqPhone }}" onChange="{{ onCqPhone }}" onKeyDown="{{ onEnterKey }}" placeholder="(541) 000-0000" style="width:100%;min-width:0;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   </label>
                 </div>
 
@@ -853,7 +854,7 @@
                     </sc-for>
                     <option value="__other">Other</option>
                   </select>
-                  <input type="text" value="{{ cqSiteOther }}" onChange="{{ onCqSiteOther }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                  <input type="text" value="{{ cqSiteOther }}" onChange="{{ onCqSiteOther }}" onKeyDown="{{ onEnterKey }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   <sc-if value="{{ cqSiteUnknownDist }}" hint-placeholder-val="{{ false }}">
                     <div style="font-size:12px;color:oklch(0.75 0.13 60);">Unlisted site - set the delivery fee manually below.</div>
                   </sc-if>
@@ -884,15 +885,15 @@
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:12px;">
                   <label style="display:flex;flex-direction:column;gap:6px;">
                     <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Rate / night</span>
-                    <input type="number" value="{{ cqRate }}" onChange="{{ onCqRate }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                    <input type="number" value="{{ cqRate }}" onChange="{{ onCqRate }}" onKeyDown="{{ onEnterKey }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   </label>
                   <label style="display:flex;flex-direction:column;gap:6px;">
                     <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Delivery fee</span>
-                    <input type="number" value="{{ cqDelivery }}" onChange="{{ onCqDelivery }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                    <input type="number" value="{{ cqDelivery }}" onChange="{{ onCqDelivery }}" onKeyDown="{{ onEnterKey }}" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   </label>
                   <label style="display:flex;flex-direction:column;gap:6px;">
                     <span style="font-size:12px;font-weight:600;color:oklch(0.82 0.015 270);">Adjustment</span>
-                    <input type="number" value="{{ cqAdjust }}" onChange="{{ onCqAdjust }}" placeholder="0" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                    <input type="number" value="{{ cqAdjust }}" onChange="{{ onCqAdjust }}" onKeyDown="{{ onEnterKey }}" placeholder="0" style="padding:11px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   </label>
                 </div>
 
@@ -1009,10 +1010,10 @@
               <button onClick="{{ closeBlock }}" style="width:34px;height:34px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.06);cursor:pointer;display:grid;place-items:center;flex:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg></button>
             </div>
 
-            <div style="padding:20px 22px 24px;">
+            <div data-sd-enter-group style="padding:20px 22px 24px;">
               <label style="display:flex;flex-direction:column;gap:6px;">
                 <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Trailer</span>
-                <select value="{{ bfTrailer }}" onChange="{{ onBfTrailer }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                <select value="{{ bfTrailer }}" onChange="{{ onBfTrailer }}" onKeyDown="{{ onEnterKey }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   <sc-for list="{{ blockTrailers }}" as="t" hint-placeholder-count="8">
                     <option value="{{ t.id }}">{{ t.name }}</option>
                   </sc-for>
@@ -1022,7 +1023,7 @@
               <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:12px;">
                 <label style="display:flex;flex-direction:column;gap:6px;">
                   <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Start date</span>
-                  <input type="date" value="{{ bfDate }}" onChange="{{ onBfDate }}" style="width:100%;min-width:0;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;color-scheme:dark;">
+                  <input type="date" value="{{ bfDate }}" onChange="{{ onBfDate }}" onKeyDown="{{ onEnterKey }}" style="width:100%;min-width:0;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;color-scheme:dark;">
                 </label>
                 <label style="display:flex;flex-direction:column;gap:6px;">
                   <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Nights</span>
@@ -1036,7 +1037,7 @@
 
               <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
                 <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Reason</span>
-                <select value="{{ bfReason }}" onChange="{{ onBfReason }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                <select value="{{ bfReason }}" onChange="{{ onBfReason }}" onKeyDown="{{ onEnterKey }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.2 0.02 264);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
                   <option value="Maintenance">Maintenance</option>
                   <option value="Deep clean">Deep clean</option>
                   <option value="Owner use">Owner use</option>
@@ -1047,7 +1048,7 @@
 
               <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
                 <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Note <span style="color:oklch(0.6 0.02 280);font-weight:400;">(optional)</span></span>
-                <input type="text" value="{{ bfNote }}" onChange="{{ onBfNote }}" placeholder="e.g. Axle service at Grants Pass" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
+                <input type="text" value="{{ bfNote }}" onChange="{{ onBfNote }}" onKeyDown="{{ onEnterKey }}" placeholder="e.g. Axle service at Grants Pass" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:14px;font-family:'Nunito Sans',sans-serif;">
               </label>
 
               <sc-if value="{{ bfNoConflict }}" hint-placeholder-val="{{ true }}">
@@ -1068,7 +1069,7 @@
               </sc-if>
 
               <sc-if value="{{ bfNoConflict }}" hint-placeholder-val="{{ true }}">
-                <button onClick="{{ addBlock }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Block these nights</button>
+                <button data-sd-enter-submit onClick="{{ addBlock }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Block these nights</button>
               </sc-if>
               <sc-if value="{{ bfConflict }}" hint-placeholder-val="{{ false }}">
                 <button disabled style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.12);cursor:not-allowed;background:oklch(1 0 0 / 0.04);color:oklch(0.6 0.02 280);font-weight:600;font-size:15px;">Trailer unavailable</button>
@@ -1998,6 +1999,7 @@ class Component extends DCLogic {
       loginError: !!this.state.loginError,
       loginErrorText: this.state.loginError || '',
       signInLabel: this.state.loginBusy ? 'Signing in…' : 'Sign in',
+      onEnterKey: (e) => window.SDKeyNav.advanceOnEnter(e),
       signIn: async () => {
         if (this.state.loginBusy) return;
         this.setState({ loginBusy: true, loginError: null });

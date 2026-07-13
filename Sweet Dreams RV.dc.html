@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&amp;family=Archivo+Black&amp;display=swap" rel="stylesheet">
 <script src="./image-slot.js"></script>
 <script src="./sd-pricing.js"></script>
+<script src="./sd-keynav.js"></script>
 <script src="./sd-bookings.js"></script>
 <script>
   (function(){
@@ -486,7 +487,7 @@
 
         <!-- STEP 1: DETAILS + AVAILABILITY -->
         <sc-if value="{{ stepDetails }}" hint-placeholder-val="{{ true }}">
-          <div style="padding:20px 22px 24px;">
+          <div data-sd-enter-group style="padding:20px 22px 24px;">
             <div style="font-family:'Archivo Black',sans-serif;font-size:10.5px;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.72 0.03 282);">Step 1 · Trip details</div>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px;">
@@ -550,14 +551,14 @@
 
             <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Delivery campground / RV park <span style="color:oklch(0.72 0.16 20);">*</span></span>
-              <select value="{{ fSiteSel }}" onChange="{{ onSiteSelect }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.18 0.02 264);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <select value="{{ fSiteSel }}" onChange="{{ onSiteSelect }}" onKeyDown="{{ onEnterKey }}" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(0.18 0.02 264);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
                 <option value="">Select a campground…</option>
                 <sc-for list="{{ campgroundOptions }}" as="cg" hint-placeholder-count="12">
                   <option value="{{ cg }}">{{ cg }}</option>
                 </sc-for>
                 <option value="__other">Other</option>
               </select>
-              <input type="text" value="{{ fSiteOther }}" onChange="{{ onSiteOther }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="text" value="{{ fSiteOther }}" onChange="{{ onSiteOther }}" onKeyDown="{{ onEnterKey }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
 
             <sc-if value="{{ siteKnownDist }}" hint-placeholder-val="{{ false }}">
@@ -582,17 +583,17 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px;">
               <label style="display:flex;flex-direction:column;gap:6px;">
                 <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Your name <span style="color:oklch(0.72 0.16 20);">*</span></span>
-                <input type="text" value="{{ fName }}" onChange="{{ onName }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+                <input type="text" value="{{ fName }}" onChange="{{ onName }}" onKeyDown="{{ onEnterKey }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
               </label>
               <label style="display:flex;flex-direction:column;gap:6px;">
                 <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Phone <span style="color:oklch(0.72 0.16 20);">*</span></span>
-                <input type="tel" value="{{ fPhone }}" onChange="{{ onPhone }}" placeholder="(541) 000-0000" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+                <input type="tel" value="{{ fPhone }}" onChange="{{ onPhone }}" onKeyDown="{{ onEnterKey }}" placeholder="(541) 000-0000" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
               </label>
             </div>
 
             <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email <span style="color:oklch(0.72 0.16 20);">*</span></span>
-              <input type="email" value="{{ fEmail }}" onChange="{{ onEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="email" value="{{ fEmail }}" onChange="{{ onEmail }}" onKeyDown="{{ onEnterKey }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
 
             <!-- availability result -->
@@ -652,10 +653,10 @@
             <!-- action -->
             <div style="position:sticky;bottom:0;z-index:4;margin:8px -22px -24px;padding:14px 22px 20px;background:linear-gradient(to top, oklch(0.13 0.02 264) 64%, transparent);">
               <sc-if value="{{ availOk }}" hint-placeholder-val="{{ false }}">
-                <button onClick="{{ goToPayment }}" style="width:100%;padding:15px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Continue to reserve →</button>
+                <button data-sd-enter-submit onClick="{{ goToPayment }}" style="width:100%;padding:15px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Continue to reserve →</button>
               </sc-if>
               <sc-if value="{{ availNotOk }}" hint-placeholder-val="{{ true }}">
-                <button onClick="{{ checkAvail }}" style="width:100%;padding:15px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">{{ checkAvailLabel }}</button>
+                <button data-sd-enter-submit onClick="{{ checkAvail }}" style="width:100%;padding:15px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">{{ checkAvailLabel }}</button>
               </sc-if>
             </div>
           </div>
@@ -829,15 +830,15 @@
 
         <!-- FORM -->
         <sc-if value="{{ emailForm }}" hint-placeholder-val="{{ true }}">
-          <div style="padding:20px 22px 24px;">
+          <div data-sd-enter-group style="padding:20px 22px 24px;">
             <p style="margin:0 0 16px;font-size:13.5px;line-height:1.55;color:oklch(0.8 0.015 270);">We'll send this exact configuration to your inbox, plus a copy to our team so we can hold it for you. No obligation.</p>
             <label style="display:flex;flex-direction:column;gap:6px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Your email</span>
-              <input type="email" value="{{ fEmail }}" onChange="{{ onEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="email" value="{{ fEmail }}" onChange="{{ onEmail }}" onKeyDown="{{ onEnterKey }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
             <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Name <span style="color:oklch(0.6 0.02 280);font-weight:400;">(optional)</span></span>
-              <input type="text" value="{{ fName }}" onChange="{{ onName }}" placeholder="First name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="text" value="{{ fName }}" onChange="{{ onName }}" onKeyDown="{{ onEnterKey }}" placeholder="First name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
 
             <!-- mini summary -->
@@ -851,7 +852,7 @@
               <div style="display:flex;justify-content:space-between;"><span style="color:oklch(0.74 0.02 280);">Estimated total</span><span style="font-family:'Archivo Black',sans-serif;font-size:15px;color:#fff;">{{ totalLabel }}</span></div>
             </div>
 
-            <button onClick="{{ sendQuote }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Send me the quote</button>
+            <button data-sd-enter-submit onClick="{{ sendQuote }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Send me the quote</button>
           </div>
         </sc-if>
 
@@ -889,7 +890,7 @@
 
         <!-- FORM -->
         <sc-if value="{{ cancelForm }}" hint-placeholder-val="{{ true }}">
-          <div style="padding:20px 22px 24px;">
+          <div data-sd-enter-group style="padding:20px 22px 24px;">
             <p style="margin:0 0 14px;font-size:13.5px;line-height:1.55;color:oklch(0.8 0.015 270);">Fill this out to request a cancellation. Refunds follow the policy below, based on how far out your arrival date is. We'll review and confirm the details with you.</p>
 
             <div style="border:1px solid oklch(1 0 0 / 0.12);border-radius:16px;overflow:hidden;margin-bottom:18px;">
@@ -917,22 +918,22 @@
 
             <label style="display:flex;flex-direction:column;gap:6px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Name on reservation</span>
-              <input type="text" value="{{ cName }}" onChange="{{ onCName }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="text" value="{{ cName }}" onChange="{{ onCName }}" onKeyDown="{{ onEnterKey }}" placeholder="Full name" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
             <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Email</span>
-              <input type="email" value="{{ cEmail }}" onChange="{{ onCEmail }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="email" value="{{ cEmail }}" onChange="{{ onCEmail }}" onKeyDown="{{ onEnterKey }}" placeholder="you@email.com" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
             <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Confirmation # or reservation details</span>
-              <input type="text" value="{{ cDetails }}" onChange="{{ onCDetails }}" placeholder="Trailer &amp; trip dates, or confirmation number" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
+              <input type="text" value="{{ cDetails }}" onChange="{{ onCDetails }}" onKeyDown="{{ onEnterKey }}" placeholder="Trailer &amp; trip dates, or confirmation number" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
             <label style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
               <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Reason <span style="color:oklch(0.6 0.02 280);font-weight:400;">(optional)</span></span>
               <textarea value="{{ cReason }}" onChange="{{ onCReason }}" rows="3" placeholder="Anything we should know?" style="padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;resize:vertical;"></textarea>
             </label>
 
-            <button onClick="{{ submitCancel }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Submit cancellation request</button>
+            <button data-sd-enter-submit onClick="{{ submitCancel }}" style="width:100%;margin-top:18px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Submit cancellation request</button>
             <p style="margin:12px 0 0;font-size:12px;line-height:1.5;color:oklch(0.62 0.015 275);text-align:center;">Prefer to talk it through? Call us at <a href="tel:15416304795" style="color:oklch(0.78 0.02 280);">(541) 630-4795</a>.</p>
           </div>
         </sc-if>
@@ -2043,6 +2044,7 @@ Sweet Dreams RV Rentals`,
 
       openReserve: () => this.setState({ reserveOpen: true, step: 'details', avail: 'idle', calOpen: false, calStart: null, calMode: 'arrival' }),
       closeReserve: () => this.setState({ reserveOpen: false }),
+      onEnterKey: (e) => window.SDKeyNav.advanceOnEnter(e),
       checkAvail: () => {
         // Require a complete, committed date range, then all reserve fields.
         if (!this.state.fArrival || this.state.calStart) { this.setState({ avail: 'nodates', calOpen: true }); return; }
