@@ -267,13 +267,20 @@ function depositRefundHtml({ first, trailerName, deposit, money }) {
 // `rows` is a pre-built [{label, value}] breakdown - the route computes
 // those from the individual line items rather than trusting a client total,
 // same reasoning as everywhere else money changes hands in this app.
-function quoteHtml({ first, trailerName, datesLabel, site, rows, total, reserveHref, money }) {
-  const rowsHtml = rows.map((r, i) => kvRow(r.label, r.value, { noBorder: i === rows.length - 1 })).join('');
+// tripTotal/depositAmount/grandTotal are broken out separately (rather than
+// folded into `rows`) so the deposit always gets its own clearly-labeled
+// line and refund sentence, never silently absorbed into one lump total.
+function quoteHtml({ first, trailerName, datesLabel, site, rows, tripTotal, depositAmount, grandTotal, reserveHref, money }) {
+  const rowsHtml = rows.map((r) => kvRow(r.label, r.value)).join('')
+    + kvRow('Trip total', money(tripTotal))
+    + kvRow('Refundable security deposit', money(depositAmount))
+    + kvRow('Total', money(grandTotal), { strong: true, noBorder: true });
   const body = `
     <h2 style="margin:0;font-family:${F_HEADING};font-weight:700;font-size:22px;color:${INK};">Here's your quote, ${esc(first)}.</h2>
     <p style="margin:12px 0 0;font-size:15px;line-height:1.6;">Here's the breakdown for your ${esc(trailerName)} trip. Your dates aren't held until you reserve.</p>
     ${tripCard(trailerName, esc(datesLabel), esc(site))}
-    ${card(rowsHtml + kvRow('Quote total', money(total), { strong: true, noBorder: true }), { marginTop: 16 })}
+    ${card(rowsHtml, { marginTop: 16 })}
+    <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">Your ${money(depositAmount)} security deposit is fully refunded after the trailer is returned in good shape.</p>
     ${button(reserveHref, 'Reserve online')}
     <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">This reflects pricing at the time the quote was built - your final total is confirmed live when you reserve. Questions? Just <a href="mailto:${REPLY_EMAIL}" style="color:${PURPLE};">reply to this email</a> or call <strong style="color:${INK};">(541) 630-4795</strong>.</p>
   `;

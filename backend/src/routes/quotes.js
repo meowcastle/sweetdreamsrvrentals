@@ -36,7 +36,7 @@ function plusDays(iso, days) {
 router.post('/email', requireAdminAuth, async (req, res) => {
   const {
     siteOrigin, trailerId, arrival, nights, name, email, phone, site,
-    rate, delivery, adjustment, addonsTotal,
+    rate, delivery, adjustment, addonsTotal, depositAmount,
   } = req.body || {};
 
   if (!email || typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email)) {
@@ -56,14 +56,16 @@ router.post('/email', requireAdminAuth, async (req, res) => {
   const del = Number(delivery) || 0;
   const adj = Number(adjustment) || 0;
   const add = Number(addonsTotal) || 0;
-  const total = r * n + PREP_FEE + del + add + adj;
+  const deposit = Number(depositAmount) || 1000;
+  const tripTotal = r * n + PREP_FEE + del + add + adj;
+  const grandTotal = tripTotal + deposit;
 
   const datesLabel = `${fmtDate(arrival)} – ${fmtDate(plusDays(arrival, n))}`;
 
   const rows = [
     { label: `${n} nights × ${money(r)}`, value: money(r * n) },
     { label: 'Cleaning, prep & stocking', value: money(PREP_FEE) },
-    { label: 'Delivery', value: del ? money(del) : 'Included' },
+    { label: 'Delivery', value: money(del) },
   ];
   if (add) rows.push({ label: 'Add-ons', value: money(add) });
   if (adj) rows.push({ label: 'Adjustment', value: (adj < 0 ? '−' : '+') + money(Math.abs(adj)) });
@@ -75,13 +77,16 @@ router.post('/email', requireAdminAuth, async (req, res) => {
 
   const html = quoteHtml({
     first, trailerName, datesLabel, site: site || 'your campsite',
-    rows, total, reserveHref: link, money,
+    rows, tripTotal, depositAmount: deposit, grandTotal, reserveHref: link, money,
   });
   const body = [
     `Hi ${first},`, '',
     `Here's your quote for ${trailerName}, ${datesLabel}:`, '',
     ...rows.map((r2) => `  ${r2.label}: ${r2.value}`),
-    `  Quote total: ${money(total)}`, '',
+    `  Trip total: ${money(tripTotal)}`,
+    `  Refundable security deposit: ${money(deposit)}`,
+    `  Total: ${money(grandTotal)}`, '',
+    `Your ${money(deposit)} security deposit is fully refunded after the trailer is returned in good shape.`, '',
     `Reserve online anytime: ${link}`, '',
     'Questions? Just reply to this email or call (541) 630-4795.', '',
     'Sweet Dreams RV Rentals',
@@ -90,7 +95,7 @@ router.post('/email', requireAdminAuth, async (req, res) => {
   await queueMessages({
     bookingId: null, guest: name || null, email,
     trailer: trailerName, dates: datesLabel,
-    messages: [{ to: email, sendAt: todayIso(), kind: 'quote', subject: `Your ${trailerName} quote: ${money(total)}`, body, html }],
+    messages: [{ to: email, sendAt: todayIso(), kind: 'quote', subject: `Your ${trailerName} quote: ${money(grandTotal)}`, body, html }],
   });
 
   res.status(201).json({ ok: true });
