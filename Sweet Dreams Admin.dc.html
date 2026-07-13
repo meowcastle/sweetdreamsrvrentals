@@ -862,7 +862,20 @@
                   <span style="font-size:12.5px;font-weight:600;color:oklch(0.82 0.015 270);">Add-ons</span>
                   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
                     <sc-for list="{{ cqAddonChips }}" as="a" hint-placeholder-count="8">
-                      <button onClick="{{ a.toggle }}" style="{{ a.chipStyle }}"><span>{{ a.name }}</span><span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span></button>
+                      <sc-if value="{{ a.isSingle }}" hint-placeholder-val="{{ true }}">
+                        <button onClick="{{ a.toggle }}" style="{{ a.chipStyle }}"><span>{{ a.name }}</span><span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span></button>
+                      </sc-if>
+                      <sc-if value="{{ a.isQty }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ a.chipStyle }}">
+                          <span>{{ a.name }}</span>
+                          <span style="color:oklch(0.7 0.02 280);font-weight:600;">{{ a.priceLabel }}</span>
+                          <span style="display:inline-flex;align-items:center;gap:7px;margin-left:2px;padding-left:8px;border-left:1px solid oklch(1 0 0 / 0.16);">
+                            <button onClick="{{ a.dec }}" aria-label="Fewer" style="{{ a.stepStyle }}">−</button>
+                            <span style="min-width:14px;text-align:center;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;">{{ a.qtyLabel }}</span>
+                            <button onClick="{{ a.inc }}" aria-label="More" style="{{ a.stepStyle }}">+</button>
+                          </span>
+                        </div>
+                      </sc-if>
                     </sc-for>
                   </div>
                 </div>
@@ -1241,16 +1254,16 @@ class Component extends DCLogic {
     });
   }
 
-  cqAddonsList = [
-    { id: 'kayak',  name: 'Kayak',           price: 45 },
-    { id: 'sup',    name: 'Paddleboard',     price: 45 },
-    { id: 'pedal',  name: 'Pedal boat',      price: 65 },
-    { id: 'cabana', name: 'Floating cabana', price: 120 },
-    { id: 'bikes',  name: 'Bikes',           price: 60 },
-    { id: 'grill',  name: 'Propane grill',   price: 25 },
-    { id: 'wood',   name: 'Firewood',        price: 20 },
-    { id: 'chairs', name: 'Camp chairs',     price: 15 },
-  ];
+  // Live from the same pricing config the Pricing admin page edits and the
+  // public site reads (this.pricing, loaded via window.SDPricing) - this
+  // used to be a hardcoded list with its own names/prices that silently
+  // drifted from whatever the owner actually configured, so a phone quote
+  // could offer add-ons that didn't exist (or the wrong price) on the real
+  // site. active !== false matches how the public site filters its own
+  // addonsList.
+  get cqAddonsList() {
+    return (this.pricing && Array.isArray(this.pricing.addons)) ? this.pricing.addons.filter((a) => a.active !== false) : [];
+  }
 
   // day 0 = today in Pacific time (auto-advances at 12:00am PST/PDT)
   pstToday() {
@@ -2373,14 +2386,14 @@ class Component extends DCLogic {
         if (del) return this.fmt(del);
         return this.state.cqSiteSel === '__other' ? 'Set manually' : '$0';
       })(),
-      cqAddonsLabel: (() => { const a = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((s, x) => s + x.price, 0); return a ? this.fmt(a) : '$0'; })(),
+      cqAddonsLabel: (() => { const a = this.cqAddonsList.reduce((s, x) => s + x.price * (this.state.cqAddons[x.id] || 0), 0); return a ? this.fmt(a) : '$0'; })(),
       cqHasAdjust: (Number(this.state.cqAdjust) || 0) !== 0,
       cqAdjustLabel: (() => { const v = Number(this.state.cqAdjust) || 0; return (v < 0 ? '−' : '+') + this.fmt(Math.abs(v)); })(),
       cqDepositAmount: this.pricing ? this.pricing.fees.deposit : 1000,
       cqDepositLabel: this.fmt(this.pricing ? this.pricing.fees.deposit : 1000),
       cqTripTotalLabel: (() => {
         const rate = Number(this.state.cqRate) || 0, del = Number(this.state.cqDelivery) || 0, adj = Number(this.state.cqAdjust) || 0;
-        const add = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((s, x) => s + x.price, 0);
+        const add = this.cqAddonsList.reduce((s, x) => s + x.price * (this.state.cqAddons[x.id] || 0), 0);
         return this.fmt(rate * this.state.cqNights + 95 + del + add + adj);
       })(),
       // Includes the refundable security deposit - this is the real total a
@@ -2388,7 +2401,7 @@ class Component extends DCLogic {
       // not just the trip cost on its own.
       cqTotalLabel: (() => {
         const rate = Number(this.state.cqRate) || 0, del = Number(this.state.cqDelivery) || 0, adj = Number(this.state.cqAdjust) || 0;
-        const add = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((s, x) => s + x.price, 0);
+        const add = this.cqAddonsList.reduce((s, x) => s + x.price * (this.state.cqAddons[x.id] || 0), 0);
         const deposit = this.pricing ? this.pricing.fees.deposit : 1000;
         return this.fmt(rate * this.state.cqNights + 95 + del + add + adj + deposit);
       })(),
@@ -2416,12 +2429,22 @@ class Component extends DCLogic {
         const m = { cash: 'Cash', check: 'Check', card: 'Card by phone', etransfer: 'E-transfer', other: 'Other' }[this.state.cqPayMethod];
         return st + ' · ' + m;
       })(),
+      // Same isSingle/isQty split and inc/dec behavior as the public site's
+      // own add-ons chips (Sweet Dreams RV.dc.html), so a quote built here
+      // can represent "2 kayaks" exactly like a guest booking online would,
+      // instead of only a flat on/off per add-on.
       cqAddonChips: this.cqAddonsList.map((a) => {
-        const on = !!this.state.cqAddons[a.id];
+        const q = this.state.cqAddons[a.id] || 0;
+        const on = q > 0;
+        const max = a.qty ? Math.max(1, a.maxQty || 1) : 1;
         return {
           name: a.name, priceLabel: '$' + a.price,
-          chipStyle: 'display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9999px;font-weight:500;font-size:12.5px;cursor:pointer;color:#fff;font-family:\'Nunito Sans\',sans-serif;transition:all .12s ease;' + (on ? 'background:oklch(0.34 0.03 264 / 0.7);border:1.5px solid oklch(1 0 0 / 0.85);' : 'background:oklch(0.22 0.02 264 / 0.5);border:1.5px solid oklch(1 0 0 / 0.14);'),
-          toggle: () => this.setState((s) => ({ cqAddons: { ...s.cqAddons, [a.id]: !s.cqAddons[a.id] } })),
+          isSingle: !a.qty, isQty: !!a.qty, qtyLabel: String(q),
+          chipStyle: 'display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9999px;font-weight:500;font-size:12.5px;' + (a.qty ? '' : 'cursor:pointer;') + 'color:#fff;font-family:\'Nunito Sans\',sans-serif;transition:all .12s ease;' + (on ? 'background:oklch(0.34 0.03 264 / 0.7);border:1.5px solid oklch(1 0 0 / 0.85);' : 'background:oklch(0.22 0.02 264 / 0.5);border:1.5px solid oklch(1 0 0 / 0.14);'),
+          stepStyle: "width:24px;height:24px;flex:none;display:grid;place-items:center;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.22);background:oklch(1 0 0 / 0.06);color:#fff;font-size:14px;line-height:1;cursor:pointer;font-family:'Nunito Sans',sans-serif;",
+          toggle: () => this.setState((s) => ({ cqAddons: { ...s.cqAddons, [a.id]: s.cqAddons[a.id] ? 0 : 1 } })),
+          inc: () => this.setState((s) => ({ cqAddons: { ...s.cqAddons, [a.id]: Math.min(max, (s.cqAddons[a.id] || 0) + 1) } })),
+          dec: () => this.setState((s) => ({ cqAddons: { ...s.cqAddons, [a.id]: Math.max(0, (s.cqAddons[a.id] || 0) - 1) } })),
         };
       }),
       cqPayStatusOpts: [
@@ -2473,7 +2496,7 @@ class Component extends DCLogic {
         if (!/^\S+@\S+\.\S+$/.test(email)) { this.setState({ cqSendError: 'Enter a valid email first.' }); return; }
         if (!this.state.cqDate) { this.setState({ cqSendError: 'Pick a date first.' }); return; }
         this.setState({ cqSending: true, cqSendError: '' });
-        const addonsTotal = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((sum, x) => sum + x.price, 0);
+        const addonsTotal = this.cqAddonsList.reduce((sum, x) => sum + x.price * (this.state.cqAddons[x.id] || 0), 0);
         try {
           const res = await fetch('/api/quotes/email', {
             method: 'POST',
@@ -2521,7 +2544,7 @@ class Component extends DCLogic {
           .some((b) => b.trailer === this.state.cqTrailer && start < (b.start + b.nights) && b.start < (start + this.state.cqNights));
         if (clash) return;
         const rate = Number(this.state.cqRate) || 0, del = Number(this.state.cqDelivery) || 0, adj = Number(this.state.cqAdjust) || 0;
-        const add = this.cqAddonsList.filter((x) => this.state.cqAddons[x.id]).reduce((sum, x) => sum + x.price, 0);
+        const add = this.cqAddonsList.reduce((sum, x) => sum + x.price * (this.state.cqAddons[x.id] || 0), 0);
         const total = rate * this.state.cqNights + 95 + del + add + adj;
         const stLabel = { full: 'Paid in full', deposit: 'Deposit taken', invoice: 'Invoice sent' }[this.state.cqPayStatus];
         const mLabel = { cash: 'Cash', check: 'Check', card: 'Card by phone', etransfer: 'E-transfer', other: 'Other' }[this.state.cqPayMethod];
