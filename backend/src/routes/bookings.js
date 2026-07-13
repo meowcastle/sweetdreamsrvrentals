@@ -2,6 +2,8 @@ const express = require('express');
 const requireAdminAuth = require('../middleware/adminAuth');
 const pool = require('../db');
 const stripe = require('../stripe');
+const { queueMessages } = require('./emailQueue');
+const { buildPhoneBookingEmails } = require('../guestEmails');
 
 const router = express.Router();
 
@@ -162,10 +164,31 @@ router.post('/admin', requireAdminAuth, async (req, res) => {
       id: b.id || ((b.source === 'admin' ? 'ub' : 'pb') + Date.now()),
       trailer: b.trailer, arrival: b.arrival, nights, guest: b.guest || 'Booking',
       phone: b.phone, email: b.email, site: b.site, total: b.total,
-      type: b.type, source: b.source,
+      type: b.type, source: b.source, deposit: b.deposit,
       payStatus: b.pay && b.pay.status, payMethod: b.pay && b.pay.method,
     });
     if (result.conflict) return res.status(409).json({ error: 'trailer_unavailable' });
+
+    // Guest confirmation, best-effort: a phone booking recorded by the admin
+    // is just as real as an online one, so it should get the same email a
+    // web guest would - see buildPhoneBookingEmails() for why this is a
+    // separate builder (no saved card here, so no auto-charge language).
+    if (b.type === 'confirmed' && b.email) {
+      try {
+        const built = buildPhoneBookingEmails({
+          trailerId: b.trailer, arrival: b.arrival, nights, guest: b.guest, email: b.email,
+          site: b.site, tripTotal: b.total, deposit: b.deposit,
+          payStatusLabel: (b.pay && b.pay.status) || '',
+        });
+        await queueMessages({
+          bookingId: result.row.id, guest: b.guest, email: b.email,
+          trailer: built.trailerName, dates: built.datesLabel, messages: built.messages,
+        });
+      } catch (e) {
+        console.error(`[bookings/admin] Failed to queue guest emails for booking ${result.row.id}:`, e);
+      }
+    }
+
     res.status(201).json(rowToBooking(result.row));
   } catch (e) {
     if (e.code === '23505') return res.status(409).json({ error: 'duplicate_id' });

@@ -934,7 +934,7 @@
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:20px;">
                   <button onClick="{{ emailQuote }}" disabled="{{ cqSending }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4zM4 7l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ cqEmailQuoteLabel }}</button>
                   <sc-if value="{{ cqNoConflict }}" hint-placeholder-val="{{ true }}">
-                    <button onClick="{{ confirmPhoneBooking }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Book over the phone</button>
+                    <button onClick="{{ confirmPhoneBooking }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Paid over the phone</button>
                   </sc-if>
                   <sc-if value="{{ cqConflict }}" hint-placeholder-val="{{ false }}">
                     <button disabled style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.12);cursor:not-allowed;background:oklch(1 0 0 / 0.04);color:oklch(0.6 0.02 280);font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Trailer unavailable</button>
@@ -963,9 +963,14 @@
             <sc-if value="{{ cqBooked }}" hint-placeholder-val="{{ false }}">
               <div style="padding:32px 22px 28px;text-align:center;">
                 <span style="width:60px;height:60px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-                <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Booked over the phone</h3>
+                <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Paid over the phone</h3>
                 <p style="margin:10px auto 0;font-size:14px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:40ch;">{{ cqSelName }} is reserved for <strong style="color:#fff;">{{ cqBookName }}</strong>, {{ cqTripDates }}. Recorded as <strong style="color:oklch(0.84 0.06 152);">{{ cqPayResultLabel }}</strong> · {{ cqTotalLabel }}.</p>
-                <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:38ch;">It's on the calendar now, marked confirmed. No online payment needed.</p>
+                <sc-if value="{{ cqBookedHasEmail }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:38ch;">It's on the calendar now, marked confirmed. A confirmation email is on its way to {{ cqEmail }}.</p>
+                </sc-if>
+                <sc-if value="{{ cqBookedNoEmail }}" hint-placeholder-val="{{ true }}">
+                  <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:38ch;">It's on the calendar now, marked confirmed. No email on file, so no confirmation was sent.</p>
+                </sc-if>
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:22px;">
                   <button onClick="{{ createAnotherQuote }}" style="padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.06);color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Create another</button>
                   <button onClick="{{ closeQuote }}" style="padding:13px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:14px;font-family:'Nunito Sans',sans-serif;">Done</button>
@@ -2333,6 +2338,8 @@ class Component extends DCLogic {
       cqBuild: this.state.cqStep === 'build',
       cqSent: this.state.cqStep === 'sent',
       cqBooked: this.state.cqStep === 'booked',
+      cqBookedHasEmail: !!(this.state.cqEmail || '').trim(),
+      cqBookedNoEmail: !(this.state.cqEmail || '').trim(),
       cqSending: this.state.cqSending,
       cqSendError: this.state.cqSendError,
       cqEmailQuoteLabel: this.state.cqSending ? 'Sending…' : 'Email quote',
@@ -2519,8 +2526,10 @@ class Component extends DCLogic {
               nights: this.state.cqNights,
               guest: this.state.cqName || 'Phone booking',
               phone: this.state.cqPhone || 'By phone',
+              email: this.state.cqEmail || undefined,
               site: this.state.cqSite || 'To be confirmed',
-              total, type: 'confirmed', source: 'phone',
+              total, deposit: this.pricing ? this.pricing.fees.deposit : 1000,
+              type: 'confirmed', source: 'phone',
               pay: { status: stLabel, method: mLabel },
             }),
           });

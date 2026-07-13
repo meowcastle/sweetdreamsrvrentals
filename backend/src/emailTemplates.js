@@ -214,6 +214,29 @@ function confirmationFirstNightHtml({ first, trailerName, datesLabel, site, dueT
   return customerShell({ heroLabel: 'Reservation confirmed', bodyHtml: body });
 }
 
+// Phone/in-person bookings (admin's "Paid over the phone" action). No saved
+// card exists for these like the online flow has, so there's nothing to
+// describe as auto-charging - just what was actually collected, stated
+// plainly via payStatusLabel ("Paid in full", "Deposit taken", "Invoice
+// sent").
+function phoneBookingConfirmationHtml({ first, trailerName, datesLabel, site, tripTotal, depositAmount, grandTotal, payStatusLabel, money }) {
+  const body = `
+    <h2 style="margin:0;font-family:${F_HEADING};font-weight:700;font-size:22px;color:${INK};">You're booked, ${esc(first)}.</h2>
+    <p style="margin:12px 0 0;font-size:15px;line-height:1.6;">Your reservation is confirmed. Here's your trip at a glance.</p>
+    ${tripCard(trailerName, esc(datesLabel), esc(site))}
+    ${card(
+      kvRow('Trip total', money(tripTotal)) +
+      kvRow('Refundable security deposit', money(depositAmount)) +
+      kvRow('Total', money(grandTotal), { strong: true }) +
+      kvRow('Payment', esc(payStatusLabel), { noBorder: true }),
+      { marginTop: 16 },
+    )}
+    <p style="margin:22px 0 0;font-size:14px;line-height:1.6;">Your ${money(depositAmount)} deposit is refunded after the trailer is returned in good shape.</p>
+    <p style="margin:16px 0 0;font-size:14px;line-height:1.6;">Questions or changes? Just <a href="mailto:${REPLY_EMAIL}" style="color:${PURPLE};">reply to this email</a> or call <strong style="color:${INK};">(541) 630-4795</strong>.</p>
+  `;
+  return customerShell({ heroLabel: 'Reservation confirmed', bodyHtml: body });
+}
+
 function balanceReminderHtml({ first, trailerName, datesLabel, balanceLater, balanceChargeDateLabel, money }) {
   const body = `
     <h2 style="margin:0;font-family:${F_HEADING};font-weight:700;font-size:22px;color:${INK};">Your balance charges soon.</h2>
@@ -309,5 +332,6 @@ module.exports = {
   deliveryReminderHtml,
   depositRefundHtml,
   quoteHtml,
+  phoneBookingConfirmationHtml,
   teamAlertHtml,
 };

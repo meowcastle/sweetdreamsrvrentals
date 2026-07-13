@@ -9,6 +9,7 @@
 const {
   confirmationFullHtml, confirmationFirstNightHtml, balanceReminderHtml,
   balanceChargedHtml, deliveryReminderHtml, depositRefundHtml,
+  phoneBookingConfirmationHtml,
 } = require('./emailTemplates');
 
 const TRAILER_NAMES = {
@@ -181,4 +182,91 @@ Sweet Dreams RV Rentals`,
   return { trailerName, datesLabel, messages: msgs.filter((m) => m.to && m.sendAt) };
 }
 
-module.exports = { buildGuestEmails, TRAILER_NAMES, money, dateLong };
+// Phone/in-person bookings (admin's "Paid over the phone" action, Sweet
+// Dreams Admin.dc.html's confirmPhoneBooking). No saved payment method
+// exists for these like the online flow has, so there's no auto-charge
+// schedule to build - just a confirmation, plus the same delivery-reminder
+// and deposit-refund emails the online flow gets, since neither of those
+// depends on how the trip was paid for.
+// booking: { trailerId, arrival, nights, guest, email, site, tripTotal,
+//   deposit, payStatusLabel }
+function buildPhoneBookingEmails(booking) {
+  const trailerName = TRAILER_NAMES[booking.trailerId] || booking.trailerId;
+  const arrIso = booking.arrival;
+  const depIso = arrIso ? isoLocal(new Date(new Date(arrIso + 'T00:00:00').getTime() + booking.nights * MS)) : null;
+  const datesLabel = arrIso ? (fmtDate(arrIso) + ' – ' + fmtDate(depIso)) : 'your dates';
+  const name = booking.guest || 'there';
+  const first = (name.split(' ')[0]) || 'there';
+  const site = booking.site || 'your campsite';
+  const todayIso = isoLocal(new Date());
+  const tripTotal = booking.tripTotal || 0;
+  const deposit = booking.deposit || 0;
+  const grandTotal = tripTotal + deposit;
+  const msgs = [];
+
+  msgs.push({
+    kind: 'confirmation', to: booking.email, sendAt: todayIso,
+    subject: 'You’re booked! ' + trailerName + ' for ' + datesLabel,
+    body:
+`Hi ${first},
+
+Your Sweet Dreams RV reservation is confirmed.
+
+  Trailer:   ${trailerName}
+  Dates:     ${datesLabel}
+  Delivery:  ${site}
+
+  Trip total:                   ${money(tripTotal)}
+  Refundable security deposit:  ${money(deposit)}
+  Total:                        ${money(grandTotal)}
+  Payment:                      ${booking.payStatusLabel || ''}
+
+Your ${money(deposit)} deposit is refunded after the trailer is returned in good shape.
+
+Questions? Just reply to this email or call (541) 630-4795.
+
+See you out there,
+Sweet Dreams RV Rentals`,
+    html: phoneBookingConfirmationHtml({
+      first, trailerName, datesLabel, site, tripTotal, depositAmount: deposit,
+      grandTotal, payStatusLabel: booking.payStatusLabel || '', money,
+    }),
+  });
+
+  msgs.push({
+    kind: 'delivery-reminder', to: booking.email, sendAt: minus(arrIso, 2),
+    subject: 'We’re on our way soon. ' + trailerName + ' delivery ' + dateLong(arrIso),
+    body:
+`Hi ${first},
+
+Your trip is almost here! We'll deliver and set up your ${trailerName} on ${dateLong(arrIso)} at ${site}.
+
+  Check-in:  after 3 PM on arrival day
+  Check-out: 11 AM–12 PM on ${dateLong(depIso)}
+
+We'll walk you through everything on site. If your plans or site details changed, reply or call (541) 630-4795.
+
+Sweet Dreams RV Rentals`,
+    html: deliveryReminderHtml({
+      first, trailerName, arrivalLabel: dateLong(arrIso), departureLabel: dateLong(depIso), site, money,
+    }),
+  });
+
+  msgs.push({
+    kind: 'deposit-refund', to: booking.email, sendAt: plus(depIso, 1),
+    subject: 'Your ' + money(deposit) + ' deposit is on its way back',
+    body:
+`Hi ${first},
+
+Thanks for camping with us! Now that your ${trailerName} is back and checked over, we've released your ${money(deposit)} refundable security deposit. It should appear on your statement within a few business days.
+
+We'd love to host you again.
+
+Sweet Dreams RV Rentals`,
+    html: depositRefundHtml({ first, trailerName, deposit, money }),
+  });
+
+  return { trailerName, datesLabel, messages: msgs.filter((m) => m.to && m.sendAt) };
+}
+
+module.exports = { buildGuestEmails, buildPhoneBookingEmails, TRAILER_NAMES, money, dateLong };
