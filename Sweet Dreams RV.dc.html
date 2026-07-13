@@ -1229,18 +1229,39 @@ Sweet Dreams RV Rentals`,
       if (validId) {
         this.setState({ trailerId: id });
       }
-      // A quoted-reservation link (admin's "Email quote" action) - prefills
-      // what the admin already collected and drops the guest straight into
-      // the reserve modal instead of making them re-enter it all. Never
-      // reads a price from the URL: the live pricing engine (and
-      // create-checkout-session's own server-side check) always computes
-      // the real total, so a manually-quoted rate can't be replayed as a
-      // forged discount just by editing the link.
+      // A quoted-reservation link (admin's "Email quote" action) - the trip
+      // was already worked out over the phone, so this drops the guest
+      // straight into the payment step instead of re-asking for details
+      // they already gave the admin (a client-side skip only - it never
+      // reads a price from the URL, and create-checkout-session always
+      // recomputes and re-verifies the real total server-side, so a
+      // manually-quoted rate can't be replayed as a forged discount just by
+      // editing the link). "avail: 'ok'" mirrors what a real availability
+      // check would have set, since this step no longer runs one.
       const arrival = params.get('arrival');
       const validArrival = arrival && /^\d{4}-\d{2}-\d{2}$/.test(arrival);
       if (validId && validArrival) {
         const nightsParam = parseInt(params.get('nights'), 10);
         const site = params.get('site') || '';
+        // The admin's siteValue() joins a known campground and its site
+        // detail as "<campground> · <detail>" - recover that split here so
+        // fSiteSel lands on the real campground key (not '__other') when
+        // possible. Getting this wrong would make the client display and
+        // submit a delivery fee of $0 while create-checkout-session's
+        // server-side recompute (which parses the same string) charges the
+        // real distance-based fee - a mismatch that fails checkout outright.
+        let siteSel = '', siteOther = '';
+        if (site) {
+          const dot = site.indexOf(' · ');
+          const prefix = dot === -1 ? site : site.slice(0, dot);
+          if (Object.prototype.hasOwnProperty.call(this.campgroundMiles, prefix)) {
+            siteSel = prefix;
+            siteOther = dot === -1 ? '' : site.slice(dot + 3);
+          } else {
+            siteSel = '__other';
+            siteOther = site;
+          }
+        }
         this.setState({
           trailerId: id,
           fArrival: arrival,
@@ -1248,10 +1269,10 @@ Sweet Dreams RV Rentals`,
           fName: params.get('name') || '',
           fEmail: params.get('email') || '',
           fPhone: params.get('phone') || '',
-          fSiteSel: site ? '__other' : '',
-          fSiteOther: site,
-          fSite: site,
-          reserveOpen: true, step: 'details', avail: 'idle',
+          fSiteSel: siteSel,
+          fSiteOther: siteOther,
+          fSite: this.siteValue(siteSel, siteOther),
+          reserveOpen: true, step: 'payment', avail: 'ok',
         });
         history.replaceState(null, '', window.location.pathname);
       }
