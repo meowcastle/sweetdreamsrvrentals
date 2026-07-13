@@ -34,6 +34,13 @@ async function runBalanceChargeSweep() {
 // rows sitting in email_queue for events that will never happen - those are
 // suppressed here rather than sent.
 //
+// Anything due today (confirmation, team-notification) is also attempted
+// immediately at queue time (see queueMessages() in emailQueue.js), so in
+// the common case this sweep finds nothing to do for those - it exists as
+// the retry safety net for whatever that immediate attempt missed (a
+// transient Resend error, the app restarting mid-request) plus the actual
+// delivery mechanism for anything future-dated once its day arrives.
+//
 // Sends for real via Resend (see mail.js). A failed send is never marked
 // sent - it's left for the next sweep to retry, up to 5 attempts, with the
 // error recorded so it's visible via GET /api/email-queue rather than only
@@ -66,8 +73,10 @@ async function runEmailQueueSweep() {
 // pricing.js) and lands during business hours so a decline shows up on the
 // admin dashboard the same day someone's likely to see it.
 //
-// Email sweep runs every 5 minutes - a guest expects a confirmation email
-// soon after booking, not up to a day later.
+// Email sweep still runs every 5 minutes even though same-day mail is
+// usually already sent immediately at queue time - this is what actually
+// delivers future-dated mail once its day arrives, and retries anything the
+// immediate attempt failed at.
 function start() {
   cron.schedule('0 9 * * *', runBalanceChargeSweep, { timezone: 'America/Los_Angeles' });
   cron.schedule('*/5 * * * *', runEmailQueueSweep);
