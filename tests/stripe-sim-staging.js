@@ -48,7 +48,7 @@ async function createCheckoutSession({ trailerId, arrival, nights, plan, guest, 
   // pricing_config). Verified earlier tonight that staging's pricing_config
   // row is unset (null), so DEFAULTS is exactly what the live site is using.
   const cfg = DEFAULTS;
-  const expected = computeExpected(cfg, { trailerId, arrival, nights, deliverySite: '', addons: [], requestedPlan: plan });
+  const expected = await computeExpected(cfg, { trailerId, arrival, nights, deliverySite: '', addons: [], requestedPlan: plan });
   const grandTotalCents = Math.round(expected.grandTotal * 100);
   const res = await fetch(`${API_ORIGIN}/api/create-checkout-session`, {
     method: 'POST',

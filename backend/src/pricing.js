@@ -6,6 +6,7 @@
 // pricing config the customer's browser used, so a tampered price gets
 // rejected instead of charged.
 const pool = require('./db');
+const { drivingMilesFromMerlin } = require('./googleDistance');
 
 const DEFAULTS = {
   trailers: {
@@ -153,7 +154,7 @@ function addonsTotalFor(addonLabels, cfg) {
 // client-side for the reserve modal: rental, fees, delivery, addons, the
 // 14-day-out payment-plan rule, and the resulting dueToday/balanceLater
 // split. Throws on an unknown trailer.
-function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons, hasPet, requestedPlan }) {
+async function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons, hasPet, requestedPlan }) {
   const base = cfg.trailers[trailerId];
   if (base == null) throw new Error('unknown_trailer');
 
@@ -162,7 +163,19 @@ function computeExpected(cfg, { trailerId, arrival, nights, deliverySite, addons
   const prep = cfg.fees.prep || 0;
   const deposit = cfg.fees.deposit || 0;
 
-  const miles = CAMPGROUND_MILES[campgroundNameFrom(deliverySite)];
+  // Known campgrounds use the curated static table (free, instant). An
+  // unlisted ("Other") address falls through to a real Google Distance
+  // Matrix lookup - this is the authoritative, server-side check, so a
+  // guest can't submit a fake low mileage for an unlisted address and get
+  // undercharged: whatever the client showed during live preview, this is
+  // what actually gets charged.
+  let miles = CAMPGROUND_MILES[campgroundNameFrom(deliverySite)];
+  if (miles == null && deliverySite) {
+    miles = await drivingMilesFromMerlin(deliverySite).catch((e) => {
+      console.error('[pricing] drivingMilesFromMerlin failed:', e.message || e);
+      return null;
+    });
+  }
   const delivery = deliveryFee(miles, cfg) || 0;
 
   const addonsTotal = addonsTotalFor(addons, cfg);

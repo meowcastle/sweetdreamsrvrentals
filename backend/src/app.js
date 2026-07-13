@@ -13,6 +13,7 @@ const pricingRoutes = require('./routes/pricing');
 const overridesRoutes = require('./routes/overrides');
 const emailQueueRoutes = require('./routes/emailQueue');
 const quotesRoutes = require('./routes/quotes');
+const distanceRoutes = require('./routes/distance');
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/pricing', pricingRoutes);
 app.use('/api/overrides', overridesRoutes);
 app.use('/api/email-queue', emailQueueRoutes);
 app.use('/api/quotes', quotesRoutes);
+app.use('/api', distanceRoutes);
 
 // express-async-errors forwards thrown/rejected errors from async handlers
 // here instead of hanging the request or crashing the process.

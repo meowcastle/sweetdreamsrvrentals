@@ -67,7 +67,7 @@ function randomArrival(minDaysOut, maxDaysOut) {
 
 async function createCheckoutSession({ trailerId, arrival, nights, plan, guest, email }) {
   const cfg = await getEffectiveConfig();
-  const expected = computeExpected(cfg, { trailerId, arrival, nights, deliverySite: '', addons: [], requestedPlan: plan });
+  const expected = await computeExpected(cfg, { trailerId, arrival, nights, deliverySite: '', addons: [], requestedPlan: plan });
   const grandTotalCents = Math.round(expected.grandTotal * 100);
   const res = await fetch(`${api.BASE_URL}/api/create-checkout-session`, {
     method: 'POST',

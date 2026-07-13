@@ -50,7 +50,7 @@ router.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   const cfg = await getEffectiveConfig();
   let expected;
   try {
-    expected = computeExpected(cfg, {
+    expected = await computeExpected(cfg, {
       trailerId: b.trailerId, arrival: b.arrival, nights,
       deliverySite: b.deliverySite, addons: b.addons, hasPet: !!b.hasPet, requestedPlan: b.paymentPlan,
     });

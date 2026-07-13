@@ -566,6 +566,12 @@
                 <span style="font-size:12.5px;line-height:1.45;color:oklch(0.88 0.05 66);"><strong style="color:#fff;">≈ {{ siteMilesLabel }} mi</strong> from our Merlin base. A <strong style="color:#fff;">{{ deliveryFeeLabel }}</strong> delivery fee has been added.</span>
               </div>
             </sc-if>
+            <sc-if value="{{ siteChecking }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.14);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none;animation:spin 0.8s linear infinite;"><circle cx="12" cy="12" r="9" stroke="oklch(0.7 0.02 280)" stroke-width="2.5" stroke-dasharray="40" stroke-dashoffset="10" stroke-linecap="round"></circle></svg>
+                <span style="font-size:12.5px;line-height:1.45;color:oklch(0.74 0.02 280);">Checking delivery distance from Merlin, OR…</span>
+              </div>
+            </sc-if>
             <sc-if value="{{ siteUnknownDist }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.14);">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><circle cx="12" cy="12" r="9" stroke="oklch(0.7 0.02 280)" stroke-width="1.8"></circle><path d="M12 11v5m0-8h.01" stroke="oklch(0.7 0.02 280)" stroke-width="1.9" stroke-linecap="round"></path></svg>
@@ -967,6 +973,11 @@ class Component extends DCLogic {
     reserveOpen: false, step: 'details', avail: 'idle', calOpen: false, calMonth: null, calStart: null, calMode: 'arrival', calHover: null,
     emailOpen: false, emailStep: 'form',
     fName: '', fEmail: '', fPhone: '', fArrival: '', fSite: '', fSiteSel: '', fSiteOther: '',
+    // Real driving-distance lookup for an unlisted ("Other") address - see
+    // checkOtherDistance(). otherMilesFor tracks which address string the
+    // resolved miles/fee actually correspond to, so a stale result never
+    // gets shown/used after the guest keeps typing.
+    otherMilesChecking: false, otherMilesFor: '', otherMiles: null, otherMilesFee: null, otherMilesFailed: false,
     cancelOpen: false, cancelStep: 'form',
     cName: '', cEmail: '', cDetails: '', cReason: '',
     checkoutBusy: false, checkoutError: false, payPlan: 'firstnight',
@@ -1292,6 +1303,10 @@ Sweet Dreams RV Rentals`,
           fSite: this.siteValue(siteSel, siteOther),
           reserveOpen: true, step: 'payment', avail: 'ok',
         });
+        // An unrecognized ("Other") address from the quote still deserves a
+        // real delivery fee rather than always landing on "confirm with
+        // quote" - resolve it the same way typing it into the picker would.
+        if (siteSel === '__other' && siteOther) this.checkOtherDistance(siteOther);
         history.replaceState(null, '', window.location.pathname);
       }
       // Returning from a successful Stripe Checkout → show the confirmation.
@@ -1334,6 +1349,7 @@ Sweet Dreams RV Rentals`,
     if (this._carTimer) clearInterval(this._carTimer);
     if (this._onPricing) window.removeEventListener('sd-pricing-changed', this._onPricing);
     if (this._onBookings) window.removeEventListener('sd-bookings-changed', this._onBookings);
+    if (this._otherDistanceTimer) clearTimeout(this._otherDistanceTimer);
   }
 
   fmtDate(d) {
@@ -1408,6 +1424,44 @@ Sweet Dreams RV Rentals`,
     if (sel === '__other') return d || 'Other';
     if (!sel) return '';
     return d ? (sel + ' · ' + d) : sel;
+  }
+
+  // Debounced real driving-distance lookup for an unlisted ("Other")
+  // address (see /api/delivery-distance, backed by Google Distance Matrix).
+  // Waits for a pause in typing rather than firing per keystroke - a paid
+  // third-party API call on every character would be wasteful and mostly
+  // wrong mid-word anyway. create-checkout-session re-runs this same
+  // lookup authoritatively at charge time, so this is purely a live
+  // preview - a guest can't get a cheaper delivery fee by messing with it.
+  checkOtherDistance(address) {
+    if (this._otherDistanceTimer) clearTimeout(this._otherDistanceTimer);
+    const addr = (address || '').trim();
+    if (addr.length < 4) {
+      this.setState({ otherMilesChecking: false, otherMilesFor: '', otherMiles: null, otherMilesFee: null, otherMilesFailed: false });
+      return;
+    }
+    this.setState({ otherMilesChecking: true, otherMilesFailed: false });
+    this._otherDistanceTimer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/delivery-distance', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: addr }),
+        });
+        const data = await res.json().catch(() => ({}));
+        // Only apply the result if the guest hasn't kept typing since this
+        // request went out - otherwise an earlier, slower response could
+        // overwrite a newer one's in-flight "checking" state.
+        if (this.state.fSiteOther.trim() !== addr) return;
+        if (!res.ok) { this.setState({ otherMilesChecking: false, otherMilesFailed: true }); return; }
+        this.setState({
+          otherMilesChecking: false, otherMilesFor: addr,
+          otherMiles: data.miles, otherMilesFee: data.fee, otherMilesFailed: false,
+        });
+      } catch (e) {
+        if (this.state.fSiteOther.trim() !== addr) return;
+        this.setState({ otherMilesChecking: false, otherMilesFailed: true });
+      }
+    }, 800);
   }
 
   // Parse an inline-style string into a React style object (so <img> elements built
@@ -1525,7 +1579,14 @@ Sweet Dreams RV Rentals`,
     const tripDatesLabel = arrivalDate ? this.fmtDate(arrivalDate) + ' – ' + this.fmtDate(departureDate) : 'your dates';
     const rental = P ? P.stayRental(t.rate, arrivalDate, nights, cfg) : t.rate * nights;
     const prep = cfg ? cfg.fees.prep : 95;
-    const siteMiles = this.campgroundMiles[this.state.fSiteSel];
+    // A known campground uses the static table; "Other" uses whatever the
+    // live Google-backed lookup resolved for the CURRENT address text
+    // (otherMilesFor guards against showing a result for an address the
+    // guest has since edited/replaced) - null while checking, failed, or
+    // stale, which deliveryFee() below already treats as "unknown."
+    const siteMiles = this.state.fSiteSel === '__other'
+      ? (this.state.otherMilesFor === this.state.fSiteOther.trim() ? this.state.otherMiles : null)
+      : this.campgroundMiles[this.state.fSiteSel];
     const deliveryFee = (P && cfg) ? P.deliveryFee(siteMiles, cfg) : null;
     const delivery = deliveryFee || 0;
     const addonsTotal = addonsList.reduce((s, a) => s + a.price * (this.state.addons[a.id] || 0), 0);
@@ -1891,8 +1952,13 @@ Sweet Dreams RV Rentals`,
         // Delivery fee is derived fresh each render from the picked
         // campground's distance (see renderVals) - no separate state needed.
         this.setState({ fSiteSel: v, fSite: this.siteValue(v, this.state.fSiteOther), avail: 'idle' });
+        if (v === '__other' && this.state.fSiteOther.trim()) this.checkOtherDistance(this.state.fSiteOther);
       },
-      onSiteOther: (e) => { const d = e.target.value; this.setState({ fSiteOther: d, fSite: this.siteValue(this.state.fSiteSel, d), avail: 'idle' }); },
+      onSiteOther: (e) => {
+        const d = e.target.value;
+        this.setState({ fSiteOther: d, fSite: this.siteValue(this.state.fSiteSel, d), avail: 'idle' });
+        if (this.state.fSiteSel === '__other') this.checkOtherDistance(d);
+      },
 
       // ----- custom availability calendar -----
       calOpen: this.state.calOpen,
@@ -2122,7 +2188,8 @@ Sweet Dreams RV Rentals`,
       deliveryFeeLabel: deliveryFee != null ? '+' + this.fmt(deliveryFee) : '',
       siteMilesLabel: String(siteMiles || ''),
       siteKnownDist: typeof siteMiles === 'number',
-      siteUnknownDist: this.state.fSiteSel === '__other',
+      siteChecking: this.state.fSiteSel === '__other' && this.state.otherMilesChecking,
+      siteUnknownDist: this.state.fSiteSel === '__other' && typeof siteMiles !== 'number' && !this.state.otherMilesChecking,
       depositLabel: this.fmt(deposit),
       decNights: () => this.setState((s) => ({ nights: Math.max(MIN_N, s.nights - 1), avail: 'idle' })),
       incNights: () => this.setState((s) => ({ nights: Math.min(MAX_N, s.nights + 1), avail: 'idle' })),
