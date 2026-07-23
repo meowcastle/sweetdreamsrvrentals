@@ -115,3 +115,50 @@ CREATE TABLE IF NOT EXISTS admin_users (
   password_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Database-level guarantee against double-booking a trailer for overlapping
+-- dates. The app already prevents this via a per-trailer advisory lock plus
+-- an overlap check inside insertBooking()'s transaction (see bookings.js),
+-- but that only protects writes that go through that one function - this
+-- constraint is enforced by Postgres itself no matter what writes the row.
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+-- Denormalized mirror of booking_status_overrides.cancelled, kept in sync by
+-- the trigger below. An EXCLUDE constraint can't reference a second table
+-- (no subqueries), so cancellation state has to live on the bookings row
+-- itself for the WHERE clause below to see it: a cancelled booking's old
+-- dates must NOT block a new booking on the same trailer/dates.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS cancelled BOOLEAN NOT NULL DEFAULT false;
+
+-- One-time backfill from the existing overrides table, so bookings already
+-- cancelled before this column existed aren't treated as live occupancy when
+-- the exclusion constraint below is added.
+UPDATE bookings b SET cancelled = true
+FROM booking_status_overrides o
+WHERE o.booking_id = b.id AND o.cancelled = true AND NOT b.cancelled;
+
+CREATE OR REPLACE FUNCTION sync_booking_cancelled() RETURNS trigger AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    UPDATE bookings SET cancelled = false WHERE id = OLD.booking_id;
+    RETURN OLD;
+  ELSE
+    UPDATE bookings SET cancelled = NEW.cancelled WHERE id = NEW.booking_id;
+    RETURN NEW;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS booking_status_overrides_sync_cancelled ON booking_status_overrides;
+CREATE TRIGGER booking_status_overrides_sync_cancelled
+  AFTER INSERT OR UPDATE OR DELETE ON booking_status_overrides
+  FOR EACH ROW EXECUTE FUNCTION sync_booking_cancelled();
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'bookings_no_overlap') THEN
+    ALTER TABLE bookings ADD CONSTRAINT bookings_no_overlap
+      EXCLUDE USING gist (trailer WITH =, daterange(arrival, arrival + nights, '[)') WITH &&)
+      WHERE (NOT cancelled);
+  END IF;
+END $$;
