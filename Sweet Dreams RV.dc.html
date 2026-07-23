@@ -1267,21 +1267,22 @@ Sweet Dreams RV Rentals`,
       if (validId) {
         this.setState({ trailerId: id });
       }
-      // A quoted-reservation link (admin's "Email quote" action) - the trip
-      // was already worked out over the phone, so this drops the guest
-      // straight into the payment step instead of re-asking for details
-      // they already gave the admin (a client-side skip only - it never
-      // reads a price from the URL, and create-checkout-session always
-      // recomputes and re-verifies the real total server-side, so a
-      // manually-quoted rate can't be replayed as a forged discount just by
-      // editing the link). "avail: 'ok'" mirrors what a real availability
-      // check would have set, since this step no longer runs one.
       const arrival = params.get('arrival');
       const validArrival = arrival && /^\d{4}-\d{2}-\d{2}$/.test(arrival);
-      if (validId && validArrival) {
+      const name = params.get('name') || '';
+      const email = params.get('email') || '';
+      // A quoted-reservation link ("Email me this quote", or the admin's own
+      // "Email quote" action) - the trip was already worked out, so this
+      // drops the guest straight back into the reserve modal with
+      // everything restored instead of re-asking for details they already
+      // gave. Gated on contact info being present so a bare ?trailer=x deep
+      // link (no email/name) doesn't force the modal open - only trailerId
+      // gets set for that case, same as before.
+      const isQuoteLink = validId && (name || email);
+      if (isQuoteLink) {
         const nightsParam = parseInt(params.get('nights'), 10);
         const site = params.get('site') || '';
-        // The admin's siteValue() joins a known campground and its site
+        // The server's siteValue() joins a known campground and its site
         // detail as "<campground> · <detail>" - recover that split here so
         // fSiteSel lands on the real campground key (not '__other') when
         // possible. Getting this wrong would make the client display and
@@ -1300,18 +1301,62 @@ Sweet Dreams RV Rentals`,
             siteOther = site;
           }
         }
-        this.setState({
+        // Addon quantities (id -> qty), sanitized against the real addon
+        // list - an edited/garbled link shouldn't be able to set a bogus id
+        // or an unbounded quantity.
+        const addons = {};
+        try {
+          const parsed = JSON.parse(params.get('addons') || '{}');
+          if (parsed && typeof parsed === 'object') {
+            // Capped at a generous flat bound, not a per-addon maxQty - this
+            // static fallback list only carries id/name/price (the real
+            // maxQty lives in the live pricing config, not loaded yet at
+            // this point in mount). Not a security boundary either way:
+            // the server-side quote route re-validates against the real
+            // config, and the live quantity steppers enforce their own
+            // real max once rendered.
+            this.addonsList.forEach((a) => {
+              const qty = Math.floor(Number(parsed[a.id]));
+              if (Number.isFinite(qty) && qty > 0) addons[a.id] = Math.min(qty, 20);
+            });
+          }
+        } catch (e) {}
+
+        const common = {
           trailerId: id,
-          fArrival: arrival,
           nights: (nightsParam >= 3 && nightsParam <= 14) ? nightsParam : this.state.nights,
-          fName: params.get('name') || '',
-          fEmail: params.get('email') || '',
+          fName: name,
+          fEmail: email,
           fPhone: params.get('phone') || '',
           fSiteSel: siteSel,
           fSiteOther: siteOther,
           fSite: this.siteValue(siteSel, siteOther),
-          reserveOpen: true, step: 'payment', avail: 'ok',
-        });
+          addons,
+          hasPet: params.get('pet') === '1',
+          payPlan: params.get('plan') || this.state.payPlan,
+        };
+
+        if (validArrival) {
+          // Dates were already picked when the quote was sent - skip
+          // straight to payment (a client-side skip only - it never reads a
+          // price from the URL, and create-checkout-session always
+          // recomputes and re-verifies the real total server-side, so a
+          // manually-quoted rate can't be replayed as a forged discount just
+          // by editing the link). "avail: 'ok'" mirrors what a real
+          // availability check would have set, since this step no longer
+          // runs one.
+          this.setState(Object.assign({}, common, {
+            fArrival: arrival, reserveOpen: true, step: 'payment', avail: 'ok',
+          }));
+        } else {
+          // No dates yet (the common case for "Email me this quote", sent
+          // before the guest picked an arrival) - land on the reserve
+          // modal's date-picking step with everything else already filled
+          // in, one step from paying, instead of a blank form.
+          this.setState(Object.assign({}, common, {
+            reserveOpen: true, step: 'details', avail: 'idle',
+          }));
+        }
         // An unrecognized ("Other") address from the quote still deserves a
         // real delivery fee rather than always landing on "confirm with
         // quote" - resolve it the same way typing it into the picker would.
@@ -2167,6 +2212,7 @@ Sweet Dreams RV Rentals`,
                 phone: this.state.fPhone || '',
                 deliverySite: this.state.fSite || '',
                 addons: selectedAddonNames,
+                addonsMap: this.state.addons,
                 hasPet: this.state.hasPet,
                 paymentPlan: payPlan,
               }),

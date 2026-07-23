@@ -51,14 +51,23 @@ function plusDays(iso, days) {
 // it to send. `rows` is caller-built since the admin route's line items
 // (typed rates, manual adjustment) and the public route's (computed by the
 // pricing engine) don't share a shape beyond { label, value }.
-function queueQuoteEmail({ siteOrigin, trailerId, arrival, nights, name, email, phone, site, datesLabel, rows, tripTotal, depositAmount, grandTotal }) {
+function queueQuoteEmail({ siteOrigin, trailerId, arrival, nights, name, email, phone, site, addonsMap, hasPet, paymentPlan, datesLabel, rows, tripTotal, depositAmount, grandTotal }) {
   const trailerName = TRAILER_NAMES[trailerId];
   const first = (name || '').trim().split(' ')[0] || 'there';
 
-  const link = `${siteOrigin.replace(/\/$/, '')}/Sweet%20Dreams%20RV.dc.html?${new URLSearchParams({
+  // addons/pet/plan are only ever set by the public quote route below (the
+  // admin route has no equivalent raw selections to pass through, just
+  // pre-totaled numbers) - omitted from the link entirely when absent so an
+  // admin-built quote's reserve link looks exactly like it did before this.
+  const linkParams = {
     trailer: trailerId, arrival: arrival || '', nights: String(nights),
     name: name || '', email, phone: phone || '', site: site || '',
-  })}`;
+  };
+  if (addonsMap && Object.keys(addonsMap).length) linkParams.addons = JSON.stringify(addonsMap);
+  if (hasPet) linkParams.pet = '1';
+  if (paymentPlan) linkParams.plan = paymentPlan;
+
+  const link = `${siteOrigin.replace(/\/$/, '')}/Sweet%20Dreams%20RV.dc.html?${new URLSearchParams(linkParams)}`;
 
   const html = quoteHtml({
     first, trailerName, datesLabel, site: site || 'your campsite',
@@ -181,9 +190,22 @@ router.post('/send', publicQuoteLimiter, async (req, res) => {
   if (expected.pet) rows.push({ label: 'Pet fee', value: money(expected.pet) });
   if (expected.addonsTotal) rows.push({ label: 'Add-ons', value: money(expected.addonsTotal) });
 
+  // Sanitize the guest's raw addon selections (id -> qty) against the real
+  // config before they go anywhere near a URL - only known addon ids,
+  // clamped to a sane integer quantity, same bounds the admin dashboard's
+  // own qty steppers enforce.
+  const addonsMap = {};
+  if (b.addonsMap && typeof b.addonsMap === 'object') {
+    for (const a of (cfg.addons || [])) {
+      const qty = Math.floor(Number(b.addonsMap[a.id]));
+      if (Number.isFinite(qty) && qty > 0) addonsMap[a.id] = Math.min(qty, a.maxQty || 1);
+    }
+  }
+
   await queueQuoteEmail({
     siteOrigin: b.siteOrigin, trailerId: b.trailerId, arrival: b.arrival || null, nights,
     name: b.name, email: b.email, phone: b.phone, site: b.deliverySite,
+    addonsMap, hasPet: !!b.hasPet, paymentPlan: expected.plan,
     datesLabel, rows, tripTotal: expected.tripTotal, depositAmount: expected.deposit, grandTotal: expected.grandTotal,
   });
 
