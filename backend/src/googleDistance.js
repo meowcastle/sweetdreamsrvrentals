@@ -29,4 +29,30 @@ async function drivingMilesFromMerlin(address) {
   return el.distance.value / METERS_PER_MILE;
 }
 
-module.exports = { drivingMilesFromMerlin };
+// Resolves a guest-typed address to Google's own full, unambiguous formatted
+// address (e.g. "123 Main St, Grants Pass, OR 97526, USA") via the Geocoding
+// API. Distance Matrix alone will silently geocode vague input (a place
+// name, a partial address) and hand back a distance with no way to tell the
+// guest what it actually matched - this is the piece that lets the guest
+// confirm the real address before it's used for anything, which matters
+// most for a private residence (no listed name to fall back on, so a vague
+// entry has to become a real street address before delivery is booked
+// against it). Same null-vs-throw contract as drivingMilesFromMerlin: null
+// for "address doesn't exist," throw for a real failure.
+async function geocodeAddress(address) {
+  const key = process.env.GOOGLE_MAPS_API_KEY;
+  if (!key) throw new Error('GOOGLE_MAPS_API_KEY not configured');
+
+  const url = 'https://maps.googleapis.com/maps/api/geocode/json?' + new URLSearchParams({ address, key });
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Geocoding HTTP ${res.status}`);
+  const data = await res.json();
+  if (data.status === 'ZERO_RESULTS') return null;
+  if (data.status !== 'OK') throw new Error(`Geocoding API status: ${data.status}`);
+
+  const result = data.results && data.results[0];
+  if (!result) return null;
+  return { formattedAddress: result.formatted_address, placeId: result.place_id };
+}
+
+module.exports = { drivingMilesFromMerlin, geocodeAddress };

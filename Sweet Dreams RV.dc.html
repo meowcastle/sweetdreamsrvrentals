@@ -562,6 +562,15 @@
               <input type="text" value="{{ fSiteOther }}" onChange="{{ onSiteOther }}" onKeyDown="{{ onEnterKey }}" placeholder="Site number or address" style="margin-top:2px;padding:12px;border-radius:12px;border:1px solid oklch(1 0 0 / 0.16);background:oklch(1 0 0 / 0.05);color:#fff;font-size:16px;font-family:'Nunito Sans',sans-serif;">
             </label>
 
+            <sc-if value="{{ siteNeedsConfirm }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;padding:12px 13px;border-radius:12px;background:oklch(0.62 0.19 290 / 0.1);border:1px solid oklch(0.62 0.19 290 / 0.3);">
+                <div style="display:flex;align-items:flex-start;gap:9px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="9" stroke="oklch(0.8 0.12 290)" stroke-width="1.8"></circle><path d="M12 8v5m0 3h.01" stroke="oklch(0.8 0.12 290)" stroke-width="1.9" stroke-linecap="round"></path></svg>
+                  <span style="font-size:12.5px;line-height:1.5;color:oklch(0.88 0.05 290);">Did you mean <strong style="color:#fff;">{{ resolvedAddressLabel }}</strong>?</span>
+                </div>
+                <button onClick="{{ confirmOtherAddress }}" style="width:100%;margin-top:10px;padding:10px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:13.5px;font-family:'Nunito Sans',sans-serif;">Yes, use this address</button>
+              </div>
+            </sc-if>
             <sc-if value="{{ siteKnownDist }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;border-radius:12px;background:oklch(0.72 0.15 60 / 0.12);border:1px solid oklch(0.72 0.15 60 / 0.34);">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M12 9v4m0 4h.01M10.3 3.9 2.4 18a1.5 1.5 0 0 0 1.3 2.3h16.6a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0Z" stroke="oklch(0.82 0.16 66)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -863,7 +872,7 @@
             <span style="width:60px;height:60px;border-radius:9999px;background:oklch(0.5 0.13 152 / 0.18);border:1px solid oklch(0.6 0.14 152 / 0.4);display:inline-grid;place-items:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="oklch(0.8 0.16 152)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
             <h3 style="margin:16px 0 0;font-weight:700;font-size:21px;color:#fff;">Quote on its way!</h3>
             <p style="margin:10px auto 0;font-size:14px;line-height:1.55;color:oklch(0.82 0.015 270);max-width:34ch;">We've emailed your {{ selectedName }} quote to <strong style="color:#fff;">{{ emailLabel }}</strong>. Check your inbox in a minute or two.</p>
-            <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:36ch;">No obligation. We'll follow up with a call or email if you have any questions.</p>
+            <p style="margin:14px auto 0;font-size:12.5px;line-height:1.5;color:oklch(0.64 0.015 275);max-width:36ch;">No obligation. We'll reach out with a call soon to help with your booking.</p>
             <button onClick="{{ emailToReserve }}" style="width:100%;margin-top:20px;padding:14px;border-radius:9999px;border:none;cursor:pointer;background:linear-gradient(105deg, oklch(0.5781 0.2303 264.8), oklch(0.7262 0.1806 326.19));color:#fff;font-weight:600;font-size:15px;box-shadow:0 12px 30px -8px oklch(0.5781 0.2303 264.8 / 0.7);">Check availability &amp; reserve</button>
             <button onClick="{{ closeEmail }}" style="width:100%;margin-top:10px;padding:13px;border-radius:9999px;border:1px solid oklch(1 0 0 / 0.2);cursor:pointer;background:oklch(1 0 0 / 0.08);color:#fff;font-weight:600;font-size:14.5px;font-family:'Nunito Sans',sans-serif;">Done</button>
           </div>
@@ -980,6 +989,11 @@ class Component extends DCLogic {
     // resolved miles/fee actually correspond to, so a stale result never
     // gets shown/used after the guest keeps typing.
     otherMilesChecking: false, otherMilesFor: '', otherMiles: null, otherMilesFee: null, otherMilesFailed: false,
+    // The full address Google resolved the guest's typed text to, and
+    // whether they've explicitly confirmed it - a private residence has no
+    // listed name to fall back on, so vague typed text has to become a
+    // real, guest-confirmed street address before it's used for delivery.
+    otherResolvedAddress: null, otherConfirmed: false,
     cancelOpen: false, cancelStep: 'form',
     cName: '', cEmail: '', cDetails: '', cReason: '',
     checkoutBusy: false, checkoutError: false, payPlan: 'firstnight',
@@ -1482,20 +1496,28 @@ Sweet Dreams RV Rentals`,
   }
 
   // Debounced real driving-distance lookup for an unlisted ("Other")
-  // address (see /api/delivery-distance, backed by Google Distance Matrix).
-  // Waits for a pause in typing rather than firing per keystroke - a paid
-  // third-party API call on every character would be wasteful and mostly
-  // wrong mid-word anyway. create-checkout-session re-runs this same
-  // lookup authoritatively at charge time, so this is purely a live
-  // preview - a guest can't get a cheaper delivery fee by messing with it.
+  // address (see /api/delivery-distance, backed by Google's Geocoding +
+  // Distance Matrix APIs). Waits for a pause in typing rather than firing
+  // per keystroke - a paid third-party API call on every character would be
+  // wasteful and mostly wrong mid-word anyway. create-checkout-session
+  // re-runs this same lookup authoritatively at charge time, so this is
+  // purely a live preview - a guest can't get a cheaper delivery fee by
+  // messing with it.
+  //
+  // Any edit to the address (a fresh call here) resets otherConfirmed -
+  // the guest has to explicitly re-confirm the newly-resolved address
+  // rather than a stale confirmation silently carrying over.
   checkOtherDistance(address) {
     if (this._otherDistanceTimer) clearTimeout(this._otherDistanceTimer);
     const addr = (address || '').trim();
     if (addr.length < 4) {
-      this.setState({ otherMilesChecking: false, otherMilesFor: '', otherMiles: null, otherMilesFee: null, otherMilesFailed: false });
+      this.setState({
+        otherMilesChecking: false, otherMilesFor: '', otherMiles: null, otherMilesFee: null,
+        otherMilesFailed: false, otherResolvedAddress: null, otherConfirmed: false,
+      });
       return;
     }
-    this.setState({ otherMilesChecking: true, otherMilesFailed: false });
+    this.setState({ otherMilesChecking: true, otherMilesFailed: false, otherResolvedAddress: null, otherConfirmed: false });
     this._otherDistanceTimer = setTimeout(async () => {
       try {
         const res = await fetch('/api/delivery-distance', {
@@ -1511,12 +1533,26 @@ Sweet Dreams RV Rentals`,
         this.setState({
           otherMilesChecking: false, otherMilesFor: addr,
           otherMiles: data.miles, otherMilesFee: data.fee, otherMilesFailed: false,
+          otherResolvedAddress: data.formattedAddress || null,
         });
       } catch (e) {
         if (this.state.fSiteOther.trim() !== addr) return;
         this.setState({ otherMilesChecking: false, otherMilesFailed: true });
       }
     }, 800);
+  }
+
+  // Locks in the resolved address as the actual delivery site - replaces
+  // whatever rough text the guest typed with Google's full, unambiguous
+  // formatted address, so what's ultimately booked and charged against is
+  // the same specific address the guest saw and approved.
+  confirmOtherAddress() {
+    const addr = this.state.otherResolvedAddress;
+    if (!addr) return;
+    this.setState({
+      fSiteOther: addr, fSite: this.siteValue(this.state.fSiteSel, addr),
+      otherMilesFor: addr, otherConfirmed: true,
+    });
   }
 
   // Parse an inline-style string into a React style object (so <img> elements built
@@ -1638,10 +1674,16 @@ Sweet Dreams RV Rentals`,
     // live Google-backed lookup resolved for the CURRENT address text
     // (otherMilesFor guards against showing a result for an address the
     // guest has since edited/replaced) - null while checking, failed, or
-    // stale, which deliveryFee() below already treats as "unknown."
+    // stale, which deliveryFee() below already treats as "unknown." Also
+    // gated on otherConfirmed: a resolved address doesn't count as known
+    // until the guest has explicitly confirmed it's the right one.
     const siteMiles = this.state.fSiteSel === '__other'
-      ? (this.state.otherMilesFor === this.state.fSiteOther.trim() ? this.state.otherMiles : null)
+      ? (this.state.otherConfirmed && this.state.otherMilesFor === this.state.fSiteOther.trim() ? this.state.otherMiles : null)
       : this.campgroundMiles[this.state.fSiteSel];
+    // Resolved (Google matched it to a real address) but not yet confirmed -
+    // the "did you mean" prompt shows in this window, before any fee applies.
+    const siteNeedsConfirm = this.state.fSiteSel === '__other' && !this.state.otherConfirmed
+      && !!this.state.otherResolvedAddress && this.state.otherMilesFor === this.state.fSiteOther.trim();
     const deliveryFee = (P && cfg) ? P.deliveryFee(siteMiles, cfg) : null;
     const delivery = deliveryFee || 0;
     const addonsTotal = addonsList.reduce((s, a) => s + a.price * (this.state.addons[a.id] || 0), 0);
@@ -1686,6 +1728,14 @@ Sweet Dreams RV Rentals`,
     if (!(this.state.fPhone || '').trim()) reserveMissing.push('phone');
     if (!(this.state.fSiteSel || '').trim()) reserveMissing.push('campground');
     if (this.state.fSiteSel === '__other' && !(this.state.fSiteOther || '').trim()) reserveMissing.push('a site number or address');
+    // Only blocks progress when a specific resolved address is actually
+    // sitting there awaiting confirmation. If the lookup is still running,
+    // failed, or came back with nothing (no GOOGLE_MAPS_API_KEY configured,
+    // a Google outage, or a genuinely unresolvable address), the guest can
+    // still proceed with what they typed - same as before this feature -
+    // and the fee gets confirmed manually afterward, same as any other
+    // lookup failure already did.
+    if (siteNeedsConfirm) reserveMissing.push('confirmation of your delivery address');
     const reserveReady = reserveMissing.length === 0;
     const activeStep = this.state.step;
 
@@ -2273,7 +2323,11 @@ Sweet Dreams RV Rentals`,
       siteMilesLabel: String(siteMiles || ''),
       siteKnownDist: typeof siteMiles === 'number',
       siteChecking: this.state.fSiteSel === '__other' && this.state.otherMilesChecking,
-      siteUnknownDist: this.state.fSiteSel === '__other' && typeof siteMiles !== 'number' && !this.state.otherMilesChecking,
+      siteNeedsConfirm,
+      resolvedAddressLabel: this.state.otherResolvedAddress || '',
+      confirmOtherAddress: () => this.confirmOtherAddress(),
+      siteUnknownDist: this.state.fSiteSel === '__other' && typeof siteMiles !== 'number'
+        && !this.state.otherMilesChecking && !siteNeedsConfirm,
       depositLabel: this.fmt(deposit),
       decNights: () => this.setState((s) => ({ nights: Math.max(MIN_N, s.nights - 1), avail: 'idle' })),
       incNights: () => this.setState((s) => ({ nights: Math.min(MAX_N, s.nights + 1), avail: 'idle' })),
