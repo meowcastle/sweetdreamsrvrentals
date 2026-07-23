@@ -467,7 +467,7 @@
     <div style="position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vh,48px) clamp(8px,3vw,16px);overflow-y:auto;">
       <div onClick="{{ closeReserve }}" style="position:fixed;inset:0;background:oklch(0.05 0.02 264 / 0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
 
-      <div style="position:relative;width:100%;max-width:640px;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:oklch(0.13 0.02 264 / 0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid oklch(1 0 0 / 0.14);border-radius:26px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);">
+      <div id="reserveModalBox" style="position:relative;width:100%;max-width:640px;max-height:94vh;overflow-y:auto;overflow-anchor:none;-webkit-overflow-scrolling:touch;background:oklch(0.13 0.02 264 / 0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid oklch(1 0 0 / 0.14);border-radius:26px;box-shadow:0 32px 70px -18px oklch(0 0 0 / 0.75);">
 
         <!-- header -->
         <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid oklch(1 0 0 / 0.1);background:oklch(0.13 0.02 264 / 0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
@@ -1555,6 +1555,26 @@ Sweet Dreams RV Rentals`,
     });
   }
 
+  // The reserve modal's own box scrolls independently (max-height:94vh),
+  // not the page - switching steps (e.g. details -> payment) swaps its
+  // content but a browser never resets an element's own scrollTop just
+  // because its content changed, so scrolling partway down the details
+  // form left the next step opening mid-scroll instead of at its own top.
+  // Double rAF: a single frame isn't reliably after the new step's content
+  // has actually committed and laid out, and setting scrollTop too early
+  // gets clobbered once the real (shorter) content lands. Paired with
+  // overflow-anchor:none on the box itself (this is exactly the kind of
+  // post-layout scroll adjustment that CSS feature makes, and fighting it
+  // from here would be unreliable).
+  scrollReserveModalTop() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById('reserveModalBox');
+        if (el) el.scrollTop = 0;
+      });
+    });
+  }
+
   // Parse an inline-style string into a React style object (so <img> elements built
   // in renderVals never carry a literal "{{ hole }}" src during streaming).
   styleObj(str) {
@@ -2146,7 +2166,7 @@ Sweet Dreams RV Rentals`,
       datesReady: !!this.state.fArrival && !this.state.calStart,
       checkAvailLabel: (!this.state.fArrival || this.state.calStart) ? 'Pick your dates first' : (!reserveReady ? 'Fill in your details' : 'Check availability'),
 
-      openReserve: () => this.setState({ reserveOpen: true, step: 'details', avail: 'idle', calOpen: false, calStart: null, calMode: 'arrival' }),
+      openReserve: () => { this.setState({ reserveOpen: true, step: 'details', avail: 'idle', calOpen: false, calStart: null, calMode: 'arrival' }); this.scrollReserveModalTop(); },
       closeReserve: () => this.setState({ reserveOpen: false }),
       onEnterKey: (e) => window.SDKeyNav.advanceOnEnter(e),
       checkAvail: () => {
@@ -2160,8 +2180,8 @@ Sweet Dreams RV Rentals`,
           this.setState({ avail: conflict ? 'taken' : 'ok' });
         }, 950);
       },
-      goToPayment: () => this.setState({ step: 'payment', checkoutError: false }),
-      backToDetails: () => this.setState({ step: 'details' }),
+      goToPayment: () => { this.setState({ step: 'payment', checkoutError: false }); this.scrollReserveModalTop(); },
+      backToDetails: () => { this.setState({ step: 'details' }); this.scrollReserveModalTop(); },
       checkoutError: this.state.checkoutError,
       checkoutButtonLabel: this.state.checkoutBusy ? 'Redirecting to secure checkout…' : ('Pay ' + this.fmt(dueToday) + (payPlan === 'firstnight' ? ' to reserve' : ' now')),
       startCheckout: async () => {
@@ -2273,7 +2293,7 @@ Sweet Dreams RV Rentals`,
         // Remember this guest so their details prefill next time (quote or booking).
         try { localStorage.setItem('sd_guest', JSON.stringify({ name: this.state.fName || '', email: this.state.fEmail || '', phone: this.state.fPhone || '' })); } catch (e) {}
       },
-      emailToReserve: () => this.setState({ emailOpen: false, reserveOpen: true, step: 'details', avail: 'idle' }),
+      emailToReserve: () => { this.setState({ emailOpen: false, reserveOpen: true, step: 'details', avail: 'idle' }); this.scrollReserveModalTop(); },
 
       // ----- cancellation request modal -----
       cancelOpen: this.state.cancelOpen,
