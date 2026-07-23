@@ -999,6 +999,13 @@ class Component extends DCLogic {
   // ─────────────────────────────────────────────────────────────
   NOTIFY_ENDPOINT = '/api/notify';
 
+  // Sends the actual "Email me this quote" email to the guest (separate
+  // from NOTIFY_ENDPOINT above, which only alerts the team). Point
+  // QUOTE_EMAIL_ENDPOINT at your route, e.g. '/api/quotes/send'. While
+  // unset, the button still shows the "sent" confirmation but nothing
+  // actually goes out, same demo-mode fallback as the other endpoints here.
+  QUOTE_EMAIL_ENDPOINT = '/api/quotes/send';
+
   // ─────────────────────────────────────────────────────────────
   // STRIPE CHECKOUT  (deposit payment — Apple Pay / Google Pay / Klarna / cards)
   //
@@ -2139,6 +2146,33 @@ Sweet Dreams RV Rentals`,
           add_ons: selectedAddonNames.join(', ') || 'None',
           estimated_total: this.fmt(total),
         });
+        // Actually emails the guest their quote (notifyTeam above only alerts
+        // the team). Fire-and-forget like notifyTeam: queueQuoteEmail() on the
+        // server both attempts an immediate send and leaves a queued row the
+        // cron sweep retries on failure, so this doesn't need to block the
+        // "sent" confirmation on the fetch resolving.
+        const quoteUrl = this.QUOTE_EMAIL_ENDPOINT;
+        if (quoteUrl && this.state.fEmail) {
+          try {
+            fetch(quoteUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                siteOrigin: window.location.origin,
+                trailerId: this.state.trailerId,
+                arrival: this.state.fArrival || null,
+                nights: nights,
+                name: this.state.fName || '',
+                email: this.state.fEmail,
+                phone: this.state.fPhone || '',
+                deliverySite: this.state.fSite || '',
+                addons: selectedAddonNames,
+                hasPet: this.state.hasPet,
+                paymentPlan: payPlan,
+              }),
+            }).catch(() => {});
+          } catch (e) {}
+        }
         this.setState({ emailStep: 'sent' });
         // Remember this guest so their details prefill next time (quote or booking).
         try { localStorage.setItem('sd_guest', JSON.stringify({ name: this.state.fName || '', email: this.state.fEmail || '', phone: this.state.fPhone || '' })); } catch (e) {}

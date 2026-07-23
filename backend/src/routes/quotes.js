@@ -1,14 +1,34 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const requireAdminAuth = require('../middleware/adminAuth');
 const { queueMessages } = require('./emailQueue');
 const { quoteHtml } = require('../emailTemplates');
 const { TRAILER_NAMES, money } = require('../guestEmails');
+const { getEffectiveConfig, computeExpected } = require('../pricing');
 
 const router = express.Router();
+
+const TRAILER_IDS = ['charlie', 'ella', 'virginia', 'marylou', 'jerry', 'patricia', 'nola', 'billybob'];
 
 // Matches the admin quote-builder's own hardcoded prep fee (Sweet Dreams
 // Admin.dc.html's cqTotalLabel: `rate * nights + 95 + ...`).
 const PREP_FEE = 95;
+
+// Generous relative to a customer actually poking at "Email me this quote"
+// a few times while comparing trailers/add-ons, tight enough to bound abuse
+// now that this is reachable from the open internet (unlike POST /email
+// above, which is behind admin auth).
+const publicQuoteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_requests' },
+});
+
+function isValidDateString(s) {
+  return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(new Date(s + 'T00:00:00'));
+}
 
 function todayIso() {
   const d = new Date();
@@ -24,6 +44,44 @@ function plusDays(iso, days) {
   const d = new Date(iso + 'T00:00:00');
   d.setDate(d.getDate() + days);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Shared by both routes below: builds the quote email (HTML + plain text,
+// with a reserve link prefilled from the guest's contact info) and queues
+// it to send. `rows` is caller-built since the admin route's line items
+// (typed rates, manual adjustment) and the public route's (computed by the
+// pricing engine) don't share a shape beyond { label, value }.
+function queueQuoteEmail({ siteOrigin, trailerId, arrival, nights, name, email, phone, site, datesLabel, rows, tripTotal, depositAmount, grandTotal }) {
+  const trailerName = TRAILER_NAMES[trailerId];
+  const first = (name || '').trim().split(' ')[0] || 'there';
+
+  const link = `${siteOrigin.replace(/\/$/, '')}/Sweet%20Dreams%20RV.dc.html?${new URLSearchParams({
+    trailer: trailerId, arrival: arrival || '', nights: String(nights),
+    name: name || '', email, phone: phone || '', site: site || '',
+  })}`;
+
+  const html = quoteHtml({
+    first, trailerName, datesLabel, site: site || 'your campsite',
+    rows, tripTotal, depositAmount, grandTotal, reserveHref: link, money,
+  });
+  const body = [
+    `Hi ${first},`, '',
+    `Here's your quote for ${trailerName}, ${datesLabel}:`, '',
+    ...rows.map((r) => `  ${r.label}: ${r.value}`),
+    `  Trip total: ${money(tripTotal)}`,
+    `  Refundable security deposit: ${money(depositAmount)}`,
+    `  Total: ${money(grandTotal)}`, '',
+    `Your ${money(depositAmount)} security deposit is fully refunded after the trailer is returned in good shape.`, '',
+    `Reserve online anytime: ${link}`, '',
+    'Questions? Just reply to this email or call (541) 630-4795.', '',
+    'Sweet Dreams RV Rentals',
+  ].join('\n');
+
+  return queueMessages({
+    bookingId: null, guest: name || null, email,
+    trailer: trailerName, dates: datesLabel,
+    messages: [{ to: email, sendAt: todayIso(), kind: 'quote', subject: `Your ${trailerName} quote: ${money(grandTotal)}`, body, html }],
+  });
 }
 
 // Admin's "Email quote" action. Never trusts the client's total - rebuilds
@@ -49,8 +107,6 @@ router.post('/email', requireAdminAuth, async (req, res) => {
     return res.status(400).json({ error: 'invalid_site_origin' });
   }
 
-  const trailerName = TRAILER_NAMES[trailerId];
-  const first = (name || '').trim().split(' ')[0] || 'there';
   const n = Number(nights) || 0;
   const r = Number(rate) || 0;
   const del = Number(delivery) || 0;
@@ -59,7 +115,6 @@ router.post('/email', requireAdminAuth, async (req, res) => {
   const deposit = Number(depositAmount) || 1000;
   const tripTotal = r * n + PREP_FEE + del + add + adj;
   const grandTotal = tripTotal + deposit;
-
   const datesLabel = `${fmtDate(arrival)} – ${fmtDate(plusDays(arrival, n))}`;
 
   const rows = [
@@ -70,32 +125,66 @@ router.post('/email', requireAdminAuth, async (req, res) => {
   if (add) rows.push({ label: 'Add-ons', value: money(add) });
   if (adj) rows.push({ label: 'Adjustment', value: (adj < 0 ? '−' : '+') + money(Math.abs(adj)) });
 
-  const link = `${siteOrigin.replace(/\/$/, '')}/Sweet%20Dreams%20RV.dc.html?${new URLSearchParams({
-    trailer: trailerId, arrival, nights: String(n),
-    name: name || '', email, phone: phone || '', site: site || '',
-  })}`;
-
-  const html = quoteHtml({
-    first, trailerName, datesLabel, site: site || 'your campsite',
-    rows, tripTotal, depositAmount: deposit, grandTotal, reserveHref: link, money,
+  await queueQuoteEmail({
+    siteOrigin, trailerId, arrival, nights: n, name, email, phone, site,
+    datesLabel, rows, tripTotal, depositAmount: deposit, grandTotal,
   });
-  const body = [
-    `Hi ${first},`, '',
-    `Here's your quote for ${trailerName}, ${datesLabel}:`, '',
-    ...rows.map((r2) => `  ${r2.label}: ${r2.value}`),
-    `  Trip total: ${money(tripTotal)}`,
-    `  Refundable security deposit: ${money(deposit)}`,
-    `  Total: ${money(grandTotal)}`, '',
-    `Your ${money(deposit)} security deposit is fully refunded after the trailer is returned in good shape.`, '',
-    `Reserve online anytime: ${link}`, '',
-    'Questions? Just reply to this email or call (541) 630-4795.', '',
-    'Sweet Dreams RV Rentals',
-  ].join('\n');
 
-  await queueMessages({
-    bookingId: null, guest: name || null, email,
-    trailer: trailerName, dates: datesLabel,
-    messages: [{ to: email, sendAt: todayIso(), kind: 'quote', subject: `Your ${trailerName} quote: ${money(grandTotal)}`, body, html }],
+  res.status(201).json({ ok: true });
+});
+
+// Public: the homepage's "Email me this quote" button (no admin auth,
+// unlike POST /email above, which is the admin dashboard's own quote-builder
+// tool). Never trusts a client-supplied total - recomputes it the same
+// authoritative way create-checkout-session does (getEffectiveConfig +
+// computeExpected), so this can't be used to email a guest a price they
+// made up. `arrival` is optional here (unlike checkout): a guest can ask for
+// a quote before picking specific dates, same as the live on-page estimate -
+// computeExpected() degrades gracefully without one (skips the summer
+// surcharge, matching stayRental()'s own null-date fallback in sd-pricing.js).
+router.post('/send', publicQuoteLimiter, async (req, res) => {
+  const b = req.body || {};
+
+  if (!b.email || typeof b.email !== 'string' || !/^\S+@\S+\.\S+$/.test(b.email)) {
+    return res.status(400).json({ error: 'invalid_email' });
+  }
+  if (!TRAILER_IDS.includes(b.trailerId)) return res.status(400).json({ error: 'invalid_trailer' });
+  const nights = Number(b.nights);
+  if (!Number.isInteger(nights) || nights <= 0) return res.status(400).json({ error: 'invalid_nights' });
+  if (b.arrival != null && b.arrival !== '' && !isValidDateString(b.arrival)) {
+    return res.status(400).json({ error: 'invalid_arrival' });
+  }
+  if (!b.siteOrigin || typeof b.siteOrigin !== 'string' || !/^https?:\/\//.test(b.siteOrigin)) {
+    return res.status(400).json({ error: 'invalid_site_origin' });
+  }
+
+  const cfg = await getEffectiveConfig();
+  let expected;
+  try {
+    expected = await computeExpected(cfg, {
+      trailerId: b.trailerId, arrival: b.arrival || null, nights,
+      deliverySite: b.deliverySite, addons: b.addons, hasPet: !!b.hasPet, requestedPlan: b.paymentPlan,
+    });
+  } catch (e) {
+    return res.status(400).json({ error: 'invalid_trailer' });
+  }
+
+  const datesLabel = b.arrival
+    ? `${fmtDate(b.arrival)} – ${fmtDate(plusDays(b.arrival, nights))}`
+    : `${nights} night${nights === 1 ? '' : 's'} (dates to be confirmed)`;
+
+  const rows = [
+    { label: `${nights} night${nights === 1 ? '' : 's'} rental`, value: money(expected.rental) },
+    { label: 'Cleaning, prep & stocking', value: money(expected.prep) },
+    { label: 'Delivery', value: money(expected.delivery) },
+  ];
+  if (expected.pet) rows.push({ label: 'Pet fee', value: money(expected.pet) });
+  if (expected.addonsTotal) rows.push({ label: 'Add-ons', value: money(expected.addonsTotal) });
+
+  await queueQuoteEmail({
+    siteOrigin: b.siteOrigin, trailerId: b.trailerId, arrival: b.arrival || null, nights,
+    name: b.name, email: b.email, phone: b.phone, site: b.deliverySite,
+    datesLabel, rows, tripTotal: expected.tripTotal, depositAmount: expected.deposit, grandTotal: expected.grandTotal,
   });
 
   res.status(201).json({ ok: true });
